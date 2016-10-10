@@ -1,0 +1,199 @@
+\section{Macro}
+
+Il costrutto macro in Common Lisp consente ad un utente di definire funzione in
+grado di convertire una form Lisp in una differente form prima che queste
+vengano valutate e compilate.\\
+
+A differenza di quanto avviene nella grande maggioranza degli altri linguaggi,
+questa conversione viene però operata a livello di espressione, e non a livello
+i caratteri o stringhe. Piuttosto che fornire semplicemente la possibilità di
+definire una sostituzione che consente l’utilizzo di una sintassi banalmente
+più breve, una macro Lisp consente di estendere in maniera nativa e reale il
+linguaggio di programmazione Lisp stesso.
+
+Nel contesto del linguaggio di programmazione Common Lisp, il costrutto macro
+risulta di fondamentale importanza per la scrittura di codice di qualità: la
+presenza di questo costrutto consenti infatti di poter scrivere codice chiaro
+ed elegante a livello di utilizzo (API), aspetto che consente avere una
+maggiore comprensione del sistema che si sta costruendo e di ragionare in modo
+più semplice rispetto alla correttezza e alle caratteristiche di questo,
+andando poi però ad eseguire una trasformazione ad versione interna di questo
+codice più efficiente ma tipicamente più complessa.
+
+La presenza del costrutto macro consente infatti di produrre codice
+particolarmente conciso, chiaro ed elegante a livello di utilizzo ed API,
+consentendo di lavorare ad un livello di astrazione maggiore rispetto a quello
+della reale implementazione, implementazione che potrà poi essere
+arbitrariamente complessa ma tipicamente anche molto più efficiente. Il
+costrutto macro consente quindi di incapsulare la complessità
+dell’implementazione di una certa funzionalità, rendendo il sistema complessivo
+potenzialmente molto più semplice e consentendo a chi implementa di avere una
+migliore comprensione rispetto alle caratteristiche di correttezza e
+funzionamento del sistema che sta costruendo.\\
+
+La caratteristica fondamentale che distingue una form macro dalle altre form
+Lisp é che, come accennato in apertura di questa sezione, una macro non produce
+in output un valore. Ogni macro produce come output una nuova form costruita a
+partire da quella in input, rappresentata dal parametro body specificato in
+fase di invocazione della macro.
+
+Proprio perché una macro consiste in un processo di generazione di una nuova
+form, ossia codice Lisp, a partire da altre form, ossia codice Lisp, molto
+spesso può risultare comodo pensare ad una macro come ad un programma in grado
+di generare un altro programma.
+
+Nel caso più semplice, una macro sostituisce una form a partire da un template,
+a partire da una chiara corrispondenza, anche a livello visivo, tra il codice
+generante e il codice generato, consentita dalla combinazione tra costrutto
+\texttt{BACKQUOTE} e costrutto \texttt{COMMA}. Macro più complesse possono
+invece essere utilizzate per accedere all’intera potenza espressiva del
+linguaggio Lisp e poter generare codice a partire dai parametri forniti in
+input a queste durante l’esecuzione di un programma.\\
+
+\subsection{Come vengono utilizzate}
+
+Il principale strumento per la definizione di macro in Common Lisp è
+rappresentato una macro stessa: \texttt{DEFMACRO}. Una form \texttt{DEFMACRO}
+ricalca molto da vicino la struttura di una form \texttt{DEFUN}, il più comune
+costrutto utilizzato per la definizione di funzioni. Infatti, sia
+\texttt{DEFUN} che \texttt{DEFMACRO} specificano:
+
+\begin{itemize}
+
+\item un nome con il quale verrà internata la macro in definizione all’interno
+  dell’environment Lisp,
+
+\item una lista di nomi dei parametri in input alla macro,
+
+\item il corpo della macro stessa, che nel caso di \texttt{DEFUN} opera una
+  computazione generica a partire dai parametri di input, nel caso di
+  \texttt{DEFMACRO} opera necessariamente una trasformazione tra form.
+
+\end{itemize}
+
+\begin{lstlisting}[caption=Signature della macro DEFMACRO]
+(defmacro name (argument ...) body)
+\end{lstlisting}
+
+A differenza di \texttt{DEFUN}, per la quale è ammesso che vengano ritornati
+uno o più valori, \texttt{DEFMACRO} è vincolata a ritornare un unico elemeneto:
+un form che rappresenta il risultato dell'espansione del parametro body fornito
+in input. Un’ulteriore differenza, più complessa dal punto di vista
+concettuale, è rappresentata dal fatto che i parametri che vengono forniti ad
+una macro non vengono valutati, a differenza di quanto avviene nel caso
+dell’invocazione di una funzione. Ad esempio, fornendo in input la form
+\texttt{(+ 1 2)} ad una macro, il parametro body della macro verrà definito
+come la lista \texttt{(+ 1 2)} e non come il valore 3.\\
+
+Il metodo più semplice per generare una form nel corpo di una macro è
+utilizzando la backquote reader macro \texttt{`}. Questa macro si comporta in
+maniera molto simile al più noto quote \texttt{‘}, ad eccezione dei casi in cui
+si ha un’occorrenza del simbolo comma \texttt{,}.
+
+Il simbolo \texttt{COMMA} è ammesso dalla sintassi Lisp tradizionale solamente
+all’interno di una backquoted form, ossia una form prefissa dal simbolo
+backquote. In caso di utilizzo del simbolo nel contesto di una quoted form,
+ossia una form prefissa dal simbolo quote, Lisp segnalerà un errore al momento
+della lettura della form.
+
+In maniera analoga a \texttt{QUOTE}, \texttt{BACKQUOTE} previene la valutazione
+di una form. L’utilizzo del simbolo \texttt{COMMA} consente invece di fare in
+modo che la valutazione di una subform avvenga nonostante l’utilizzo del
+simbolo \texttt{BACKQUOTE}.
+
+\begin{lstlisting}
+? `(1 plus 2 is ,(+ 1 2)) (1 PLUS 2 IS 3)
+\end{lstlisting}
+
+Se si confronta il precedente esempio, che utilizza una combinazione dei
+simboli \texttt{BACKQUOTE} e \texttt{COMMA}, e il seguente esempio, definito in
+maniera molto simile, che utilizza però il simbolo \texttt{QUOTE}, è piuttosto
+semplice comprendere il significato di quanto appena esposto.
+
+\begin{lstlisting}
+? '(1 plus 2 is ,(+ 1 2)) (1 PLUS 2 IS (+ 1 2))
+\end{lstlisting}
+
+Risulta abbastanza naturale immaginare come \texttt{BACKQUOTE} e \texttt{COMMA}
+possano quindi fornire uno strumento per la definizione di template che
+consentano la sostituzione di elementi.\\
+
+Quanto appena riportato raccoglie le informazioni fondamentali alla definizione
+di una macro. In seguito viene invece analizzato il momento successivo alla
+definizione, ossia il processo di espansione di una macro.
+
+\subsection{Espansione di una macro}
+
+Quando la funzione \texttt{EVAL} riceve in input una lista il cui CAR (primo
+elemento) è un simbolo, Lisp procede con la verifica della presenza del simbolo
+tra le definizioni locali all’esecuzione (\texttt{FLET}, \texttt{LABEL},
+\texttt{MACROLET}). Se questa ricerca non ottiene risultati, Lisp verifica
+invece la presenza di definizioni a livello globale per il simbolo. Se una
+delle due ricerche ha successo e il simbolo viene matchato con l’identificativo
+associato ad una macro, la form viene identificata come una chiamata a macro.
+
+A questo punto viene utilizzata una funzione definita a livello di linguaggio,
+detta funzione di espansione. Questa funzione viene invocata con l’intera macro
+come primo parametro e con un environment come secondo parametro. Come
+affermato in precedenza, questa funzione deve ritornare una nuova form Lisp,
+che viene detta espansione della chiamata a macro.
+
+Una volta che la funzione di espansione ha prodotto in output la nuova form,
+questa viene valutata al posto della form originale e il risultato di questa
+valutazione viene ritornato come risultato della chiamata a macro complessiva
+originale.
+
+% Come detto, il corpo della macro ritorna una form, form che verrà valutata
+% solo in un momento successivo all’esecuzione della macro, ossia al processo 
+% di espansione. Quindi, quando Lisp valuta una chiamata ad una macro viene 
+% prima di tutto espanso il corpo della macro definita, come illustrato nei 
+% paragrafi precedenti, e solamente in seguito, una volta definito il corpo 
+% espanso, verrà valutato il risultato complessivo dell’esecuzione.
+
+Il processo appena illustrato rappresenta una semplificazione del reale
+processo di espansione di una macro ma rimane comunque corretto dal punto di
+vista concettuale e consente comunque di comprendere il funzionamento generale
+del processo in maniera più semplice e soprattutto evidenzia delle potenzialità
+di una macro come strumento per la programmazione.\\
+
+L’aspetto probabilmente più importante trascurato dalla precedente spiegazione
+riguarda il momento in cui viene espansa una form Lisp. Lisp prevede infatti
+che sia possibile ritardare il processo di espansione delle macro anche ad un
+momento successivo alla compilazione. Nel prossimo paragrafo vengono indicati i
+momenti in cui è possibile che una macro venga espansa.
+
+Come detto, una macro potrebbe essere espansa una sola volta, quando il
+programma viene compilato. Altrimenti potrebbe essere espansa al primo utilizzo
+di questa durante dell’esecuzione del programma, e questa espansione potrebbe
+essere memorizzata per consentirne un riutilizzo più efficiente nel caso in cui
+si dovessero verificare chiamate successive. Infine, una macro potrebbe essere
+espansa ad ogni invocazione. Una macro definita in modo corretto dovrebbe
+essere in grado di agire in modo corretto in ciascuna queste diverse
+situazioni.
+
+\begin{itemize}
+
+\item Essendo che una macro potrebbe essere espansa in momenti diversi nel ciclo di vita di un programma, questa dovrebbe essere scritta in maniera tale da dipendere il meno possibile dall’ambiente in cui viene eseguita per ottenere una corretta espansione.
+
+\item Inoltre, per assicurarsi un comportamento consistente in diverse esecuzioni, sarebbe meglio assicurarsi del fatto che tutte le definizioni di macro siano disponibili, all’interprete o compilatore, prima che si verifichi una qualsiasi chiamata a queste nel codice del programma.
+
+\item Essendo che una macro potrebbe potenzialmente dover essere espansa già in fase di compilazione, è necessario che un compilatore Lisp, abbia già internato la definizione di una macro prima del primo utilizzo di questa all’interno del codice. Se così non dovesse essere si verificherebbe infatti un errore, in quanto il compilatore sarebbe in grado di espandere la macro al momento corretto.
+
+\item Si è scelto di sottolineare questa differenza in quanto questa è particolarmente caratteristica del costrutto macro e non in linea con le modalità di compilazione e valutazioni del resto del linguaggio.
+
+\end{itemize}
+
+Un aspetto particolarmente interessante rispetto al funzionamento delle macro
+Common Lisp è rappresentato dal fatto che macro e funzioni in Lisp non sono in
+alcun modo interscambiabili. Come presentato nei paragrafi precedente infatti,
+il processo di valutazione di una macro si compone di passaggi diversi rispetto
+a quelli che contraddistinguono la valutazione di una funzione, differenza che
+rende impossibile il riutilizzo delle une al posto delle altre.
+
+Una conseguenza rilevante di questa impossibilità di sostuire macro a funzioni
+e vicersa è il fatto che, nonostante possa sembrare sensato in prima battuta,
+una macro non può essere utilizzata come parametri di una higher order
+function, come ad esempio \texttt{APPLY}, \texttt{FUNCALL} o \texttt{MAP}. In
+queste situazioni, la lista che rappresenta la chiama a macro originale infatti
+non esisterà, e non può esistere, questo perché, in una certa misura, è come se
+i parametri di questa fossero già stati valutati.

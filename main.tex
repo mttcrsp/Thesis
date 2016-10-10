@@ -1,0 +1,175 @@
+\documentclass{book}
+
+%% Imports
+
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{csquotes}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{setspace}
+\usepackage{color}
+\usepackage{float}
+\usepackage{url}
+
+\usepackage[
+	backend=biber,
+    sorting=ynt,
+	style=ieee-alphabetic,
+    defernumbers=true
+]{biblatex}
+\addbibresource{bib/papers.bib}
+\addbibresource{bib/books.bib}
+\addbibresource{bib/websites.bib}
+
+%% Definitions
+
+\newcommand{\image}[4]{
+  \begin{figure}[H]
+  \makebox[\textwidth][c]{
+    \includegraphics[scale=#4]{#1}
+  }
+  \caption{#2}
+  \label{#3}
+  \end{figure}
+}
+
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+
+\lstset{
+  basicstyle=\footnotesize,
+  commentstyle=\color{gray},
+  captionpos=b,
+}
+
+\def\beforepreface{
+	\pagenumbering{roman}
+	\pagestyle{plain}
+}
+
+\def\prefacesection#1{%
+	\chapter*{#1}
+	\addcontentsline{toc}{chapter}{#1}
+}
+
+\def\afterpreface{
+	\newpage
+    
+    \tableofcontents
+    \listoftables
+	\listoffigures
+	
+    \cleardoublepage
+	
+    \pagenumbering{arabic}
+	\pagestyle{headings}
+}
+
+\title{CLAST}
+\author{Matteo Crespi 748274}
+\date{Agosto 2016}
+
+%% Options
+
+\setstretch{1.3}
+
+\setlength{\oddsidemargin}{36.1pt}
+\setlength{\evensidemargin}{0pt}
+\setlength{\marginparwidth}{40pt}
+
+\marginparsep 10pt
+
+\topmargin 0pt \headsep .5in
+\textheight 8.1in \textwidth 6in
+
+% \brokenpenalty=10000
+
+\pagestyle{headings}
+
+\linespread{1.3}
+
+%% Content
+
+\begin{document}
+
+\maketitle
+
+\beforepreface
+
+\prefacesection{Prefazione}
+\prefacesection{Dedica}
+
+\afterpreface
+
+\chapter{Introduzione}
+
+AGGIUNGI INTRODUZIONE CHE PARLA DEL CONTENUTO DELLA TESI E DEGLI OBIETTIVI DEL
+PROGETTO DI TESI
+
+%%% SECTION: MOTIVATIONS
+\include{src/motivations}
+
+\chapter{Teoria}
+
+UN SECONDO CAPITOLO PRESENTA L'AMBITO DI RICERCA NEL QUALE SI COLLOCA LA TESI,
+QUELLO DELLA SOURCE CODE ANALYSIS, E FORNISCE UN'INTRODUZIONE AI CONCETTI TEORICI
+FONDAMENTALI CHE VERRANNO UTILIZZATI NEL RESTO DELLA TESI, GLI ABSTRACT SYNTAX
+TREES
+
+%%% SECTION: SOURCE CODE ANALYSIS
+\include{src/source-code-analysis}
+%%% SECTION: ABSTRACT SYNTAX TREE
+\include{src/abstract-syntax-tree}
+%%% SECTION: MACROS
+\include{src/macro}
+
+% LE MACRO COMMON LISP RAPPRESENTANO ANCH'ESSE UNO DEGLI ELEMENTI TEORICI
+% FONDAMENTALI PER LA COMPRENSIONE DEL FUNZIONAMENTO DELLA LIBRERIA, QUINDI PUÒ
+% AVER SENSO INCLUDERE LA SEZIONE RELATIVA A QUESTE ALL'INTERNO DI QUESTO
+% CAPITOLO SULLA TEORIA.
+
+% A DIFFERENZA DELLE MACRO, L'ENVIRONMENTS API È UN ASPETTO PROPRIO PIÙ PRATICO
+% E IMPLEMENTATIVO, DAL QUALE LA LIBRERIA POTREBBE ANCHE PRESCINDERE. PER QUESTA
+% RAGIONE PUÒ AVER SENSO ANCHE SPOSTARLO ALL'INTERNO DEL CAPITOLO RELATIVO
+% ALL'IMPLEMENTAZIONE DELLA LIBRERIA STESSA
+
+
+\chapter{Libreria}
+
+%%% SECTION: STRUCTURE
+\include{src/structure}
+%%% SECTION: ENVIRONMENTS
+\include{src/environment}
+
+% \subsubsection{LOOP parsing}
+% APPROFONDIMENTO SUL PARSING DI LOOP. DOVREBBE ESSERE UN ESEMPIO PARTICOLARMENTE
+% INTERESSANTE PERCHÉ SI TRATTA DI UNA MACRO CHE PERÒ NON VIENE ANALIZZATA A 
+% LIVELLO DI MACROESPANSIONE MA PIUTTOSTO A LIVELLO DI CODICE SORGENTE. IN PIÙ È
+% ANCHE UN OTTIMO ESEMPIO DI COME IL PARSING VENGA OPERATO IN MODO RICORSIVO E DI
+% COME VENGA UTILIZZATA L'API RELATIVA AGLI ENVIRONMENT.
+
+\chapter{Applicazioni}
+\section{Free Variables Analysis}
+
+%%% SECTION: PATTERN MATCHING
+\include{src/pattern-mathing}
+
+\section{Type Checking}
+
+\chapter{Conclusione}
+\section{Sviluppi Futuri}
+
+\appendix
+
+\chapter{Codice}
+
+\begin{lstlisting}
+(some code)
+\end{lstlisting}
+
+\printbibliography[nottype=misc,title={Bibliografia}]
+\printbibliography[type=misc,title={Sitografia}]
+
+\end{document}
+

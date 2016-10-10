@@ -1,0 +1,472 @@
+\section{Abstract Syntax Trees}
+
+Un Abstract Syntax Tree, nome spesso abbreviato utilizzando la sigla AST, è uno
+strumento per la rappresentazione, sotto forma di albero, della struttura di un
+programma. Dal punto di vista formale, un Abstract Syntax Tree è un albero
+ordinato ed etichettato, i cui nodi interni rappresentano gli operatori
+utilizzati dal codice del programma che si desidera rappresentare, e le cui
+fogli rappresentano gli operandi soggetto delle operazioni precedentemente
+citate. Un arco congiunge un nodo che rappresenta un operatore a ciascuno dei
+suoi operandi o, eventualmente, agli operatori innestati a questo. Se si
+considera un linguaggio di programmazione tradizionale, esempi di operatori
+sono rappresentati da funzioni e operatori booleani, esempi di operandi sono
+rappresentati da variabili e constanti.\\
+
+Come affermato dalla precedente definizione, un AST rappresenta la struttura di
+un programma. In particolare, a differenza di altri esempi di meccanismi di
+rappresentazione, un AST fa riferimento alla struttura sintattica astratta di
+un programma.
+
+La struttura sintattica astratta di un programma rappresenta un’astrazione
+rispetto alla normale struttura, tipicamente definita concreta per
+contrapposizione, di un linguaggio di programmazione. La sintassi astratta di
+un linguaggio di programmazione si differenzia da quella concreta,  utilizzata
+per la scrittura di codice sorgente, in quanto ne solitamente rappresenta una
+semplificazione. In particolare, la sintassi astratta elimina tutte le regole
+sintattiche che non influenzano la semantica del programma.
+
+Il classico esempio di regola sintattica che viene trascurata dalla sintassi
+astratta di un programma è rappresentato dalle grouping parentheses, un
+costrutto comune a diversi linguaggi di programmazione che consente di
+raggruppare un certo insieme di elementi. La ragione per cui questa particolare
+regola viene eliminata all’interno della sintassi astratta è rappresentato dal
+fatto che questa regola, non aggiunge alcuna informazione rispetto alla
+semantica del programma: l’informazioni che l’utilizzo delle parentesi
+trasmette può essere trasmessa in maniera del tutto equivalente semplicemente
+facendo riferimento ad una rappresentazione ad albero del programma,
+rappresentazione in cui gli elementi possono essere raggruppati dalla presenza
+un nodo antenato comune. Un altro esempio di regola sintattica che viene
+trascurata per una ragione del tutto equivalente è la regola di utilizzo del
+simbolo ; come elemento di separazione di un’istruzione dalla successiva. Anche
+in questo caso infatti la struttura stessa dell’albero di rappresentazione può
+essere utilizza per rappresentare la relazione tra le istruzioni, senza la
+necessità ulteriori modalità di rappresentazione.\\
+
+Da un punto di vista pratico, un Abstract Syntax Tree viene in molti casi
+costruito a partire da un Parse Tree, in letteratura definito anche Concrete
+Syntax Tree, uno strumento di rappresentazione della struttura sintattica
+concreta di un programma, prodotto tipicamente attraverso dal semplice parsing
+del codice sorgente. Il processo di generazione di un AST a partire da un Parse
+Tree procede per eliminazione di nodi e archi ritenuti ridondanti o non
+necessari. Lo scopo di queste eliminazioni è quello di ottenere uno strumento
+più comodo per le elaborazioni successive, uno strumento che non riporta
+informazioni ridondanti o non interessanti alle elaborazioni successive. Gli
+AST sono infatti molto spesso degli strumenti per il supporto alla
+realizzazione di funzionalità complesse e non un prodotto ultimo
+dell’elaborazione.
+
+\image{img/concrete-syntax-tree.png}
+    {Esempio di Concrete Syntax Tree per l'espressione \texttt{3 + 4 * 5}}
+      {fig:concrete-syntax-tree}
+      {0.5}
+      
+\image{img/abstract-syntax-tree.png}
+    {Esempio di Abstract Syntax Tree per l'espressione \texttt{3 + 4 * 5}}
+      {fig:abstract-syntax-tree}
+      {0.5}
+
+Purtroppo, non esiste una tecnica per la generazione di AST indipendente dal
+linguaggio e dal contesto di utilizzo. La ragione fondamentale per la mancanza
+di questa strategia univoca è data proprio dalla natura di strumento di
+supporto a cui si è fatto riferimento nel paragrafo precedente. Essendo un AST
+uno strumento di supporto, è importante che sia definito a partire dalle
+necessità caratteristiche delle funzionalità che si desidera realizzare a
+partire da questo. Per questa ragione, molto spesso quindi un AST viene
+arricchito con informazioni aggiuntive e caratteristiche del contesto di
+applicazione. Queste informazioni forniscono maggiore conoscenza rispetto alla
+semantica del programma in modo specifico per la funzionalità per realizzare la
+quale si fa uso dell’AST in costruzione. Il fatto che funzionalità diverse
+richiedano informazioni diverse ed sono proprio queste differenze a rendere
+poco ragionevole la definizione di una strategia univoca di generazione.
+
+La grande varietà di formalismi e costrutti che caratterizzano i diversi
+linguaggi di programmazione e la velocità con la quale ne vengono introdotti di
+nuovi rappresentano altri due fattori renderebbe una strategia indipendente dal
+linguaggio poco efficace e rapidamente obsoleta.\\
+
+Come affermato nella sezione precedente non è possibile definire una strategia
+di generazione degli ASTs univoca. Un AST viene costruito in maniera specifica
+per un linguaggio di programmazione e per la realizzazione di una specifica
+funzionalità.
+
+Tuttavia, nel caso in cui si abbia una famiglia di linguaggi di programmazione
+molto simili tra loro, ossia che condividono gran parse della sintassi
+astratta, e si desideri realizzare una stessa funzionalità che si desidera
+realizzare per ciascuno di questi, è possibile definire una strategia di
+generazione di AST comune. Un AST di questo tipo, comune a diversi linguaggi di
+programmazione, viene detto AST unificato.
+
+Formalmente, un AST unificato è una rappresentazione ad albero della struttura
+sintattica astratta del codice sorgente scritto utilizzando una certa famiglia
+di linguaggi di programmazione.
+
+Un esempio di AST unificato è rappresentato dal clang AST, ossia l’Abstract
+Syntax Tree che viene prodotto dallo strumento clang<http://clang.llvm.org>,
+uno strumento che si pone come obiettivo quello di definire un modulo di
+frontend per compilatore LLVM\footnote{http://llvm.org/} comune alla famiglia
+di linguaggi di programmazione C, C++, Objective C and Objective C++.\\
+
+L’obiettivo più comune per il quale vengono impiegati gli AST è la
+semplificazione e disaccoppiamento tra diversi passi del processo di
+compilazione. Nel seguito di questa tesi verrà brevemente illustrato il
+processo con il quale un AST viene prodotto e utilizzato da un compilatore. Le
+applicazioni degli AST non si limitano al contesto dei compilatori, alla
+possibilità di costruire strumenti per il refactoring \cite{jscodeshift2016} e
+clone-detection \cite{DBLP:conf/saci/LazarB14}. Anche all’interno di un
+compilatore stesso però, l’applicazione degli AST non si limita alla solo
+supporto della generazione di codice macchina. Altre applicazioni all’interno
+di un compilatore vanno dal supporto tipizzazione statica a quello per il
+pattern matching. La prossima sezione di questo capitolo presenta quindi le
+principali applicazioni degli AST nei diversi contesti che fanno un utilizzo di
+questo meccanismo di rappresentazione. Questo allo scopo di introdurre al
+lettore i requisiti che una libreria per la generazione di ASTs per un
+linguaggio di programmazione, come quella descritta da questa tesi, deve
+supportare.\\
+
+La libreria CLAST, soggetto di questa tesi, utilizza questi come meccanismo per
+la rappresentazione di un programma al fine di consentire la creazione di
+strumenti di source code analysis. Data quindi l'importanza sia dal punto di
+vista teorico che dal punto di vista pratico che queste strutture dati hanno
+all'interno di CLAST, si è scelto di presentare, attraverso questa sezione, un
+approfondimento rispetto alla teoria alla base degli AST e alle applicazioni di
+questi nel contesto di strumenti per l'analisi ed elaborazione di sistemi
+software.
+
+\subsection{Applicazioni degli AST}
+
+Le applicazioni degli Abstract Syntax Trees sono diverse sia nel mondo della
+ricerca che nel mondo dell’industria. All’interno di questa sezione vengono
+presentati alcuni esempi da entrambi questi mondi per sottolineare l’importanza
+della disponibilità di uno strumento per la generazione di AST per un dato
+linguaggio di programmazione. Questo viene fatto al fine di mostrare al lettore
+l’utilità, i requisiti e la tradizionale collocazione di uno strumento per la
+generazione di ASTs come quello che viene trattato da questa tesi.
+
+Essendo il maggiore campo di applicazione degli ASTs quello dei compilatori, la
+prossima sezione ne presenta un approfondimento.
+
+\subsubsection{Nei compilatori}
+
+Un compilatore prende in input un programma scritto un linguaggio di
+programmazione e produce come output una programma equivalente scritto in
+linguaggio macchina. Tipicamente, il lavoro di un compilatore può essere
+scomposto in un certo insieme di fasi in consecutive. Ciascuna di queste fasi
+riceve in input una certa rappresentazione del programma e ne produce in output
+una differente, arricchita e modificata al fine di consentire o semplificare le
+fasi successive. In seguito vengono presentate le fasi tipicamente che portano
+alla generazione di un AST.\\
+
+Le prime operazioni svolte durante il processo di compilazione sono quelle
+relative all’analisi lessicale, detta anche scanning, del codice sorgente. Lo
+scopo di questa fase è quello di leggere i caratteri che compongono sorgente di
+un programma target e riunirli all’interno di un gruppi logici di caratteri
+correlati tra loro detti token. Esempi di token comuni alla maggior parte dei
+linguaggi di programmazione sono le keyword utilizzate dal linguaggio, ossia le
+sequenze di caratteri riservate dal linguaggio di programmazione, i numeri
+interi e l’operatore di assegnamento. Questi token vengono forniti come input
+alla fase, in forma di stream, alla fase successiva del processo di
+compilazione.\\
+
+La fase successiva alla fase di analisi lessicale è rappresentata dalla fase di
+analisi sintattica o parsing, la quale fornisce, a partire dallo stream di
+token prodotto dalla fase precedente, un insieme di entità sintattiche, come ad
+esempio espressioni e istruzioni.
+
+Le entità sintattiche sopraccitate vengono quindi poste, sempre durante questa
+fase, all’interno di un Parse Tree, struttura a partire dalla quale viene
+prodotto l’AST del programma, procedendo per eliminazione degli elementi
+ridondanti o poco interessanti alle fasi successive, come spiegato nella
+precedente sezione.
+
+Nel caso in cui il linguaggio di programmazione utilizzato per la scrittura del
+programma in compilazione abbia una struttura sintattica particolarmente
+semplice da trattare, alcuni strumenti scelgono di saltare la fase di
+definizione del Parse Tree e procedere direttamente con la costruzione di un
+AST a partire dall’output della fase di analisi sintattica.
+
+All’interno di un compilatore, un Abstract Syntax Tree rappresenta quindi molto
+spesso l’output di una della fase di elaborazione compiuta dalla componente
+parser, o più generalmente l’output della fase di parsing, e rappresenta
+l’input per le successive fasi di analisi semantica e generazione di codice
+macchina. \\
+
+\image{img/compiler-architecture}
+      {Architettura di un compilatore per un linguaggio di programmazione
+      tradizionale}
+      {fig:compiler-architecture}
+      {0.5}
+
+Anche se un compilatore utilizza diverse altre strutture dati per il suo
+funzionamento interno, l’AST esegue ricopre un ruolo unico. Gli AST vengono
+infatti utilizzati molto intensamente durante la fase di analisi semantica,
+durante la quale un compilare verifica il corretto utilizzo degli elementi del
+linguaggio e del programma. Un compilatore genera tabelle dei simboli
+utilizzati da un programma a partire dall’AST durante la fase di analisi
+semantica. Dopo essere stato utilizzato per la verifica della correttezza
+sintattica, l’AST viene utilizzato come base per la generazione di codice
+macchina o, come più spesso accade, viene utilizzato per la generazione di una
+”intermediate representation” o ”IR”, a cui spesso nella letteratura si fa
+riferimento come a un linguaggio intermedio, apposito per la generazione di
+codice. \\
+
+Dato l’elenco di applicazioni che un compilatore fa di un AST, riportato
+all’interno del paragrafo precedente, è possibile presentare alcuni dei
+requisiti che vengono tipicamente richiesti all’implementazione di uno
+strumento per la generazione di ASTs. É importante sottolineare che, data la
+natura di strumento di supporto degli AST, i requisiti di un AST sono
+fortemente dipendenti dalla specifica applicazione. Per questa ragione i
+requisiti presentati in seguito sono solamente rappresentativi
+dell’applicazione del contesto del compilatore di un linguaggio di
+programmazione tradizionale.
+
+\begin{itemize}
+
+\item La presenza di operatori n-ari in un linguaggio di programmazione rende
+necessario che l’AST per tale linguaggio supporti la presenza di nodi con un
+numero arbitrario di figli.
+
+\item L’ordine di esecuzione delle istruzioni del programma deve essere
+correttamente identificato, conservato ed rappresentato in modo esplicito
+dall’AST, come anche quello degli operandi di eventuali operazioni n-arie.
+
+\item Gli identificativi e valori utilizzati dalle istruzioni di assegnamento
+presenti all’interno del codice devono essere memorizzati.
+
+\item Durante la definizione dei nodi, i tipi delle variabili esplicitati dal
+programmatore devono essere preservati, così come la posizione di ciascuna
+dichiarazione all’interno del codice sorgente.
+
+\item A partire da un AST deve sempre essere possibile ricostruire il codice
+sorgente originale nella sua interezza. Il codice prodotto in questo modo
+dovrebbe essere sufficientemente simile al codice originale da conservarne il
+funzionamento in fase di esecuzione, una volta ricompilato.\\
+
+\end{itemize}
+
+Data la complessità dei requisiti appena proposti in riferimento alla
+progettazione di un AST per una dato linguaggio di programmazione,
+l’applicazione di noti design pattern può risultare di grande aiuto alla
+realizzazione di un sistema per la generazione di ASTs.
+
+Ad esempio, è fortemente probabile che un compilatore debba procedere diverse
+volte alla visita dei nodi che compongono l’AST. Inoltre, molto spesso è
+necessario che il compilatore deve svolgere operazioni differenti in base al
+tipo di nodo o in base al valore di particolari attributi di questo. Infine,
+essendo un AST utilizzato da diverse componenti di un compilatore, è importante
+che questo fornisca un’interfaccia per la visita particolarmente facile da
+comprendere anche per gli sviluppatori di queste diverse componenti.
+
+Il design pattern Visitor, presentato in \cite{gamma1995design}, risulta quindi
+un pattern particolarmente appropriato a questo contesto, consentendo di
+soddisfare le necessità appena elencate fornendo delle linee guida che
+consentono l’implementazione di operazioni di visita dei singoli nodi e
+attraversamento dell’albero che siano particolarmente efficienti e che
+forniscano accesso a tutte le informazioni relative a tipo e attributi a
+ciascuno di questi questo, fornendo allo stesso tempo un interfaccia nota e
+standard agli utenti dell’API.\\
+
+\image{img/visitor-pattern}
+      {Diagramma delle classi relativo al design pattern Visitor}
+      {fig:visitor-pattern}
+      {0.5}
+
+Dopo aver illustrato il principale campo di applicazione degli ASTs, e di
+riflesso di uno strumento per la generazione di ASTs, la prossima sezione di
+questo capitolo presenta alcuni dei principali lavori presenti nella
+letteratura del settore rispetto agli AST, indicando alcune delle principali
+linee di ricerca in questo ambito.
+
+\subsubsection{Nella ricerca}
+
+In questa sezione vengono presentati alcuni lavori correlati a quanto esposto
+all’interno di questa tesi. Lo scopo di questa sezione è quindi quello di
+fornire al lettore una panoramica del settore in cui questa tesi opera, quello
+della creazione di sistemi per la generazione di AST, dal punto di vista della
+ricerca. A questo scopo vengono elencati alcuni articoli relativi al mondo
+degli Abstract Syntax Trees che presentano il problema della progettazione di
+AST  e meccanismi di generazione per ASTs per la realizzazione di sistemi che
+realizzano svariate funzionalità a partire dall’elaborazione delle informazioni
+a cui questi danno accesso.\\
+
+In \cite{martinez2014accurate}, Martinez et al. propongono una tecnica che
+lavora a partire da AST e, in particolare, basata sull’utilizzo di un algoritmo
+di calcolo della distanza tra istanze di AST. Questa tecnica consente la
+correzione di errori presenti a livello di codice sorgente mediante
+l’identificazione di pattern di correzione precedentemente applicati durante lo
+sviluppo.
+
+La tecnica opera in prima battuta andando a ricercare all’interno di un sistema
+per il controllo delle versioni tutte quelle revisioni che contengono la
+correzione di un errore. Dopo questa prima fase, il progetto viene monitorato
+allo scopo di identificare nuove occorrenze dell’errore. Questa ricerca viene
+operata a livello di AST, utilizzando il sopraccitato algoritmo di calcolo
+della distanza tra AST. Una volta identificata l’occorrenza di un errore
+precedentemente risolto, sempre lavorando a livello di AST, viene applicata
+nuovamente la modifica identificata come correzione per quel particolare
+errore.\\
+
+ASTLOG è uno strumento sviluppato da Crew \cite{DBLP:conf/dsl/Crew97}, durante
+il suo lavoro come ricercatore presso Microsoft Inc. Si tratta di uno strumento
+che consente di operare ricerche, anche molto complesse, all’interno del codice
+di un programma scritto utilizzando i linguaggi C e C++, programmi anche di
+dimensioni molto significative.
+
+Questo strumento si pone come un’alternativa ai generali metodi di ricerca in
+sistemi UNIX come grep e awk, consentendo la ricerca di pattern complessi come
+ad esempio l’utilizzo di un certo nome di per una variabile di un certo tipo
+all’interno di un metodo che prende in input un dato numero di parametri,
+presente all’interno di una classe dichiarata all’interno di un file che
+importa una data libreria.
+
+Lo strumento è stato realmente utilizzato al di fuori del mondo della ricerca
+e, in particolare, \cite{DBLP:conf/dsl/Crew97} presenta come casi di studio
+ricerche all’interno di Microsoft SQL Server, descritto come uno programma di
+450mila righe di codice, e Microsoft Word, ai tempi indicato come un programma
+da più di due milioni di righe di codice.\\
+
+In \cite{DBLP:conf/kbse/Welty97}, Welty presenta un’ontologia per la
+rappresentazione di conoscenza a livello di codice sorgente basata
+sull’utilizzo di ASTs. L’obiettivo di questa ontologia è quello di minimizzare
+lo sforzo necessario ai singoli membri di un team di sviluppo per la
+documentazione e la ricerca di informazioni relative all’implementazione di una
+sistema software, rendendo più semplice l’aggiunta di nuovi membri al team di
+sviluppo.\\
+
+Bulychev e Minea descrivono, in \cite{peter2008duplicate}, un approccio
+indipendente dal linguaggio per l’identificazione di codice duplicato, definiti
+formalmente code clones dagli autori, all’interno di grandi sistemi software.
+L’approccio viene quindi illustrato attraverso la presentazione un algoritmo
+che consente di confrontare, a livello di AST, due o più frammenti di codice al
+fine di ricercare sequenze di istruzioni che possono essere riottenute,
+applicando le dovuto sostituzioni di sottoalberi agli ASTs, a partire dalle
+sequenze di istruzioni presenti all’interno di altri frammenti di codice.\\
+
+Utilizzando come fondamento il lavoro di Bulychev e Minea, Lazar e Banias
+presentano una metodologia \cite{DBLP:conf/saci/LazarB14} per l’identificazione
+di episodi di plagio nello specifico contesto di sistemi software sviluppati
+utilizzando il linguaggio di programmazione C. Uno degli elementi di maggiore
+interesse esposti da questo lavoro, rispetto ai contenuti di questa tesi, è
+rappresentato dallo studio che i due autori descrivono rispetto alle
+riflessioni operate per la definizione del meccanismo di generazione degli
+ASTs. Gli autori descrivono infatti il meccanismo come esterno al processo di
+compilazione e costruito in maniera tale da riportare solamente gli elementi
+strettamente necessari all’analisi che la metodologia si pone come obiettivo.\\
+
+In \cite{DBLP:conf/acsac/YamaguchiLR12}, Yagamaguchi et al. descrivono una
+tecnica per l’analisi di ASTs al fine di identificare pattern riconosciuti
+durante lo studio di vulnerabilità software note al fine di poter verificare la
+presenza di occorrenze di queste stesse vulnerabilità ed eventualmente
+segnalare le necessarie modifiche che lo sviluppatore del sistema dovrà
+applicare.\\
+
+Infine, Neamtiu et al. descrivono in \cite{DBLP:journals/sigsoft/NeamtiuFH05}
+uno strumento che lavora combinando un sistema di controllo delle versioni ad
+un’analisi degli AST e che consente di tracciare e studiare l’evoluzione di un
+sistema software, scritto utilizzando il linguaggio C, nel tempo, soprattutto
+per quanto concerne gli aspetti architetturali del sistema.
+
+\subsubsection{Nell’industria}
+
+Mentre la sezione precedente ha indicato alcuni degli utilizzi degli AST nel
+mondo della ricerca, all’interno di questa sezione vengono presentate alcune
+applicazione degli AST che possono essere trovate nel mondo dell’industria e
+dei sistemi di comune utilizzo. Questo al fine di completare la panoramica che
+queste ultime sezioni hanno offerto sui requisiti e sulle applicazioni degli
+Abstract Syntax Trees e dei sistemi per la loro generazione.\\
+
+Oltre alle alla più tradizionale applicazione degli ASTs, illustrata nella
+sezione relativa all’utilizzo degli ASTs nel contesto di un compilatore, la
+seconda applicazione più significativa degli ASTs è all’interno di strumenti
+per il supporto allo sviluppo, in particolare all’interno di sistemi per
+l'analisi e modifica di codice sorgente.\\
+
+Per molti programmatori, la possibilità di utilizzare all’interno del proprio
+IDE una funzionalità che consenta di selezionare un insieme di istruzioni e
+costruire un metodo a partire da queste, tipicamente chiamata ”Extract Method”,
+è una funzionalità la cui presenza viene data sostanzialmente per scontata.
+
+Perché sia possibile realizzare questa funzionalità e, più generalmente, perché
+sia possibile realizzare un sistema che consenta di svolgere una qualsiasi
+operazione di refactoring è di fondamentale importanza avere a disposizione un
+meccanismo di rappresentazione del codice del sistema in analisi. Un AST
+rappresenta probabilmente la struttura dati più appropriata, e di più impiegata
+\cite{eclipse2006} \cite{netbeans2007}, a questo scopo.
+
+Eclipse\footnote{https://www.eclipse.org}, l’IDE più utilizzato dagli utenti
+del linguaggio di programmazione Java, realizza la funzionalità appena
+descritta e, più generalmente la grande maggioranza delle operazioni di
+modifica di codice sorgente automatica, a partire da ASTParser, una libreria
+Java che consente la generazione e visita dell’Abstract Syntax Tree di un
+programma. Libreria che è possibile utilizzare anche per la generazione di
+plugin che estendono le funzionalità dell’ambiente Eclipse.\\
+
+JSCodeshift \cite{jscodeshift2016} è un altro esempio di strumento che utilizza
+come fondamento per il suo funzionamento gli Abstract Syntax Trees. JSCodeshift
+è uno strumento open-source, nato come progetto interno a Facebook\texttrademark,
+per la manutenzione di grandi quantità di codice JavaScript.
+
+In particolare, JSCodeShift viene utilizzato per operare codemod, termine con
+il quale gli sviluppatori dello strumento fanno riferimento ad un insieme di
+cambiamenti su larga scala che coinvolgono grandi porzioni di del codice di un
+sistema. Cambiamenti che possono consistere di semplici modifiche, come ad
+esempio il cambio del nome di una variabile o metodo, o anche di modiche molto
+complesse, come aggiornamento delle chiamate ad una libreria o interazione con
+un framework a seguito di cambiamenti critici, breaking changes, della
+struttura o del funzionamento di questi.\\
+
+Da un punto di vista pratico, il funzionamento di JSCodeshift può essere
+semplificato come segue: lo strumento prende in input un frammento di codice
+JavaScript ed il mapping associato alla modifica che si desidera venga operata
+dallo strumento, e produce in output un nuovo frammento di codice JavaScript in
+cui il mapping è stato applicato a tutte le occorrenze. Questo mapping
+descrive, a livello di AST, la modifica che si desidera venga applicata al
+codice matchato dall’espressione di origine del mapping. Lo strumento lavora
+quindi completamente a livello di AST andando dapprima a generare l’AST del
+codice in input, andando poi a identificare i nodi all’interno di questo che
+sono matchati dall’espressione di origine del mapping, generando codice di
+rimpiazzo adeguato a partire dal nodo matchato e dal mapping fornito in input,
+operando il rimpiazzo del nodo, e andando a rigenerare codice JavaScript a
+partire dall’AST all’interno del quale è stata operata la sostituzione.\\
+
+Nonostante la relativa semplicità dello strumento dal punto di vista
+concettuale, la sua utilità risulta molto significativa. Consente infatti di
+operare modifiche anche molto complesse a sistemi software di grandi dimensioni
+\cite{jsconf2016}. Modifiche che risulterebbero eccessivamente dispendiose in
+termini di tempo, operando in modo manuale, o addirittura impossibili
+utilizzando un approcci più tradizionali come quelli basati su espressioni
+regolari a causa della presenza di costrutti ambigui nella, sempre in
+evoluzione, grammatica del linguaggio JavaScript.\\
+
+% Sempre per quanto riguarda, librerie per l’interazione con ASTs nel contesto
+% di un linguaggio di programmazione, il linguaggio di programmazione Python
+% espone un modulo specifico per la generazione, visita e manipolazione di AST
+% all’interno delle librerie standard
+% <https://docs.python.org/2/library/ast.html>. Librerie equivalenti sono
+% tipicamente disponibili per la maggior parte dei linguaggi di programmazione
+% più diffusi. CITA COME ESEMPI C C++ OBJECTIVE-C <http://clang.llvm.org>
+% JAVASCRIPT<http://esprima.org> RUBY <https://rubygems.org/gems/ast/> \\
+
+% Il linguaggio di programmazione PHP ha di recente (Luglio 2014) introdotto
+% nel processo di compilazione ed esecuzione un passo prevede la trasformazione
+% del codice di un programma, in particolare della fase di parsing, in un
+% Abstract Syntax Tree. All’interno di una RFC, vengono discussi i vantaggi che
+% questa modifica porta al linguaggio complessivo. Tra i diversi vantaggi
+% citati dalla RFC, in particolare, emergono tre diversi aspetti:
+%  • da un punto di vista dell’ingegneria del software, l’introduzione di una
+%  fase di trasformazione in AST, rende l’implementazione della fase produzione
+%  di opcode disaccoppiata dalla fase di parsing precedente a questa. Questo
+%  consente grandi vantaggi dal punto di vista della manutenibilità del codice
+%  di implementazione e qualità di questo, eliminando diversi casi limite.
+%  • Dal punto di del linguaggio di programmazione, questa modifica ha
+%  eliminato diverse limitazioni rispetto alle potenzialità sintattiche del
+%  linguaggio di programmazione. Un esempio di miglioramento di questo tipo è
+%  rappresentato dal costrutto yield fornito dal linguaggio, il quale, a causa
+%  di limiti implementativi, necessitava dell’utilizzo di parentesi, ridondanti
+%  dal punto di vista espressivo, quando utilizzato come espressione. Oltre ad
+%  eliminare limitazioni come nell’esempio appena presentato, l’introduzione di
+%  una fase di trasformazione sotto forma di AST ha reso possibile
+%  l’introduzione di sintassi completamente nuovi al linguaggio di
+%  programmazione, come ad esempio un costrutto dedicato alla destrutturazione
+%  di array, comune a diversi linguaggi, e un costrutto dedicato per la
+%  generazione semplificata di liste. La modifica proposta dalla RFC è stata
+%  approvata in maniera unanime dal comitato degli sviluppatori del linguaggio.
