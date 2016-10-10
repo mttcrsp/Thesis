@@ -1,158 +1,689 @@
-\section{Struttura della libreria}
-
-\subsection{Divisione in moduli}
-Le componenti principali della libreria CLAST sono le seguenti tre. Un primo modulo è responsabile per la rappresentazione degli elementi che compongono un programma scritto utilizzando il linguaggio di programmazione Common LISP, che contiene quindi prevelentemente un insieme di classi in grado di generare oggetti immutabili utili che verranno poi utilizzati per la definizione dell'AST. Un secondo modulo è responsabile del parsing di un programma Common LISP, ed espone quindi una semplice interfaccia che consente di fornire in input un programma, rappresentato da una serie di form LISP, e produce in output un AST e un oggetto environment, due oggetti che raccolgono l'insieme delle informazioni estratte dalla libreria in fase di parsing. Infine, un terzo modulo consente l'interazione con l'output della fase di parsing e rappresenta quindi l'interfaccia principale tramite la quale un programma di analisi basato sulla libreria CLAST è in grado di interfacciarsi con questa.\\
-
-COME VIENE PRESENTATO IL FUNZIONAMENTO\\
-
-In seguito viene presentato il funzionamento generale della libreria, attraverso le funzioni principali che la distinguono. Essendo la libreria strutturata seguendo un approccio prettamente funzionale, piuttosto che orientato agli oggetti, risulta particolarmente poco adatta alla rappresentazione utilizzando un tipico diagramma delle classi UML. Per questa ragione, si è scelto di illustrare il funzionamento utilizzando un approccio più tipicamente vicino al mondo funzionale, andando a definire in modo quasi matematico input e output delle funzioni che caratterizzano il funzionamento della libreria e mostrando le relazioni tra di queste, in maniera tale da fornire al lettore un'idea del comportamento dinamico del sistema complessivo rappresentato da libreria e programma utente di questa. La spiegazione viene integrata utilizzando diagrammi delle attività UML, in maniera tale da fornire al lettore uno strumento grafico di supporto.\\
-
-\subsection{Funzioni generiche}
-
-Le funzioni che vengono presentate in seguito sono le funzioni fondamentali al funzionamento della libreria. La libreria fa un grande utilizzo del method dispatching offerto dal runtime delle diverse implementazioni del linguaggio Common LISP al fine di ottenere una forma di pattern matching. Questo consente di sfruttare le ottimizzazioni del runtime per l'implementazione della ricerca del metodo appropriato da utilizzare per il parsing o il traversal di una particolare form in tempo costante piuttosto che lineare. Per questa ragione, la grande maggioranza delle funzione presentate in seguito, le più importanti per il funzionamento della libreria, sono funzioni generiche, specializzate attraverso la definizione di un metodo per ogni sottoclasse di CLAST-ELEMENT, ossia per ogni possibile tipo di form LISP. (Spiega questa affermazione perchè per qualcuno che non conosce lisp non ha alcun senso, non sa cosa sia una funzione generica e non sa cosa voglia dire che una funzione generica viene specializzata da un metodo. Magari non spiegarlo nel testo, spiegalo all'interno di una nota a pié pagina.)
-
-\subsection{Modulo di rappresentazione}
-
-(In questa sezione presenta un diagramma delle classi che indichi la struttura gerarchica utilizzata per la rappresentazione. Qua ci vuole un diagramma veramente bello. Fai anche un discorso sull'ereditarietà multipla e come questa venga utilizzata come mixin/trait per la rappresentazione di IMPLICIT-PROGN forms e un altro tipo di forms.)\\
-
-(Aggiungi una parte in cui dici che a differenza di quanto avviene in altri contesti, come ad esempio quello dei compilatori, in cui si ha la generazione di un parse tree e, solo a partire da questo, si ha la generazione dell'AST vero e proprio, nel caso di CLAST si ha una generazione diretta dell'AST. Inventa una motivazione per cui questo viene fatto. Una buona motivazione iniziale potrebbe essere perché dal punto di vista dell'API risulterebbe scomodo avere a che fare con questi due step e la libreria cerca di sollevare lo sviluppo e la progettazione di uno strumento di source code analysis da tutto ciò che non riguarda la fase di analisi vera e proprio obiettivo dello strumento. Questa è una motivazione per cui questo non si vede dall'esterno. Spiegare perchè questo non viene fatto nemmeno internamente non è altrettanto semplice. Si può fare leva sul fatto che a differenza del contesto della compilazione in cui si vuole operare anche una validazione del codice soggetto, al fine di identificare errori logici o sintattici, questo non è uno degli obiettivi di CLAST. CLAST si limita a produrre l'AST di un programma Common LISP, senza effettuare una validazione di questo. Da questo punto di vista la libreria potrebbe produrre in output anche un AST per un programma che non ha senso dal punto di vista sintattico. Fai un esempio in cui mostri che un programma che contiene una chiamata ad una funzione che non è definita viene parsato senza alcun problema e viene prodotto in output un AST perfettamente valido. Questo perché la validazione e la compilazione non sono obiettivi dello strumento.)
-
-\subsection{Modulo di parsing}
-
-is-environment: e to void (env.lisp)\\
-
-(Dovresti indagare meglio il significato di env.lisp. Non solo per poter dire qualcosa di questa funzione, anche perché è una delle parti della libreria che è stata implementata solamente per Allegro e LispWorks, ossia quelle che causano crash ad ogni passo.)
-(Questa roba è sbagliata ma magari torna buona da qualche altra parte: 'A differenza delle altre funzioni presentate all'interno di questo paragrafo, la funzione IS-ENVIRONMENT non è una funzione di tipo generico. Lo scopo di questa funzione')\\
-
-parse-class-option: opt-name to clast-element (parse-defclass.lisp)
-parse-class-option: opt-name to clast-element (parse-defclass.lisp)
-parse-class-slot-option: option to clast-element (parse-defclass.lisp)\\
-
-struct-option-subform-bare-p: sos to clast-element (parse-defstruct.lisp)
-parse-struct-option: opt-name to clast-element (parse-defstruct.lisp)\\
-
-parse-loop-clause: clause-kwd to clast-element (parse-loop.lisp)
-named-clause-p: x to clast-element (parse-loop.lisp)
-named-clause-name: x to clast-element (parse-loop.lisp)
-with-clause-p: x to clast-element (parse-loop.lisp)\\
-
-Come più volte indicato, l'implementazione del parsing offerta dalla libreria lavora per discesa ricorsiva. Questo approccio è visibile non solo dalle funzioni principali esposte dalla libreria, ma anche da questo insieme di funzioni generiche interne. Queste funzioni si occupano infatti di operare il parsing di tutti i diversi tipo di possibili sottoform all'interno di form DEFCLASS, DEFSTRUCT e LOOP.\\
-
-parse: form to clast-element (parse.lisp)\\
-
-Come il nome permette di intuire PARSE è probabilmente la funzione fondamentale della libreria, la funzione che fornisce l'accesso alla funzionalità di parsing realizzata da questa. PARSE è una funzione che prende in input una form LISP e produce in output una coppia rappresentata da un oggetto di tipo CLAST-ELEMENT, radice dell'AST di oggetti di tipo CLAST-ELEMENT prodotto dal parsing a partire dalla form, e un oggetto environment, contenente le informazioni rispetto a definizioni e dichiarazioni specificate dalla form stessa e da eventuali sottoform presenti all'interno di questa. (Aggiungi il fatto che sono definiti metodi PARSE per operare il parsing delle strutture fondamentali del linguaggio LISP form atomiche e composte. Nel caso delle prime i metodi sono in grado di produrre direttamente la coppia di valori appropriata in output. Nel caso di form composte, ossia conses, la reale implementazione del parsing viene delegata alla funzione generica PARSE-FORM e ad i metodi relativi a questa.)\\
-
-parse-form: (op form) to clast-element (parse.lisp)\\
-
-PARSE-FORM è la funzione che opera al reale discesa ricorsiva all'interno di una form, in particolare effettuando un dispatching rispetto all'operatore utilizzato da questa, ossia il primo elemento di questa se si considerando la form LISP proprio come lista. Sono quindi presenti metodi PARSE-FORM per tutti i prinicpali operatori del linguaggio Common LISP. Ciascuno di questi metodi opera il parsing della in input e delega il parsing delle sottoform, agendo in modo ricorsivo, alla funzione PARSE. (Aggiungi il discorso relativo al fatto che sia a PARSE che PARSE-FORM prendono in input un parametro environment opzionale, nel caso in cui non sia fornito in input ne costruiscono uno nuovo, il quale viene aumentato a partire da definizioni e dichiarazioni presenti all'interno della form, per poi essere ritornato come secondo elemento della coppia prodotta in output.)\\
-
-parse-declaration: decl-identifier to clast-element (parse.lisp)\\
-
-Questa funzione risulta di particolare importanza in quanto opera il parsing delle dichiarazioni relative agli elementi del programma in analisi, specificate dall'autore del programma. Queste dichiarazioni rappresentano un elemento di fondamentale importanza per qualsiasi strumento di source code analysis in quanto rappresentano il meccanismo nativo che un programmatore Common LISP può utilizzare per fornire maggiori informazioni al sistema rispetto alla semantica del programma che sta sviluppando. Risulta quindi di grande importanza il parsing e l'analisi di questo tipo di elementi, in quanto andranno molto spesso a rappresentare il fondamento alla base del lavoro di uno strumento di analisi costruito a partire da CLAST. (Aggiungi un footnote, o un inciso nel testo, in cui si spiega che CLAST è pensata anche per consentire la realizzazione di strumenti di analisi che operano un'inferenza, come ad esempio type checkers, oltre che strumenti che fanno riferimento alle annotazioni, specificate per mezzo di dichiarazione, nel codice del programma.)\\
-
-parse-ll: lltype ll, ll-vars: ll, ll-default-forms: ll, count-ll-vars: kind lambda-list (utilities/lambda-list-parsing.lisp)\\
-
-Queste funzioni sono dedicate al parsing di form che rappresentano lambda lists, <cos'è una lambda list?>. Essendo che si tratta di un elemento di particolare importanza e complessità nel contesto dell'intero linguaggio di programmazione, queste funzioni ricoprono un ruolo particolarmente importante all'interno della libreria. Inoltre, essendo il parsing di lambda lists un'operazione spesso utile nella realizzazione di strumenti per l'analisi di codice LISP e allo stesso tempo particolarmente complessa da implementare in modo corretto si considera la possibilità di esportare queste funzioni come una libreria a parte, nonostante siano coinvolte solamente nel funzionamento interno nel contesto della libreria CLAST. (Il senso di questa storia è che non fanno parte dell'API ma sono una cosa che viene implementata molto spesso in programmi che fanno analisi di codice LISP è che sono particolarmente facili da implementare in modo scorretto.)
-
-\subsection{Modulo di traversal}
-
-clast-element-subforms: form to list-of-subforms (clast-elements.lisp)\\
-
-(correggi questa funzione non viene specializzata per ogni possibile form, viene specializzata per ogni sottoclasse di CLAST-ELEMENT in maniera tale da incapsulare la nozione rispetto alle foglie di ciascun nodo, rappresentato da un'istanza di CLAST-ELEMENT) Questa funzione data una form restituisce l'insieme di tutte le sottoform contenute da questa. Questa funzione risulta fondamentale alla porzione della libreria che si occupa della visita dell'AST prodotto al termine del parsing, in quanto consente la navigazione all'interno di questo. (aggiungi che parte del pattern Visitor implementa questa funzione)\\
-
-as-string: form to string (clast-printing.lisp)\\
-
-AS-STRING è una funzione che prende in input un'istanza di CLAST-ELEMENT e una rappresentazione testuale dei dati relativi a questa. Oltre a rappresentare una funzione particolarmente utile in fase di debugging e costruzione della libreria, questa funzione risulta particolarmente importante in quanto, essendo in grado di produrre un rappresentazione testuale, consente l'analisi di programmi Common LISP anche da parte di sistemi scritti utilizzando un linguaggio di programmazione differente, come ad esempio sistemi di source code translation, fornendo un elemento che ad esempio potrebbe consentire la produzione di codice in un qualsiasi linguaggio di programmazione a partire dalla ricca rappresentazione di una programma LISP prodotta in output proprio da questa funzione.\\
-
-map-subforms: form func \&key result-type to form (walk.lisp)\\
-
-MAP-SUBFORMS è una funzione generica che rappresenta lo strumento a partire dalla quale viene implementata la visita dell'AST, accessibile dagli utenti della libreria tramite la funzione WALK. Ciascun metodo si occupa di implementare la navigazione all'interno di una specifica sottoclasse di CLAST-ELEMENT, lavorando a partire da CLAST-ELEMENT-SUBFORMS. Mentre la funzione, precedemente illustrata, incapsula la conoscenza rispetto alla presenza di foglie di ciacsuno nodo dell'AST, rappresentato da un oggetto di tipo CLAST-ELEMENT, questa funzione incapsula la conoscenza rispetto alle modalità di traversal di ciascun sottoalbero presente a partire dal nodo in analisi. (indica quale parte del pattern Visitor viene realizzata da questa funzione)\\
-
-walk clast-element to void (walk.lisp)\\
-
-Funzione particolarmente importante perché fornisce accesso alla funzionalità di traversal dell'AST prodotto in output dalla libreria. Questa è la funzione che opera la visita dei diversi nodi, istanze della classe CLAST-ELEMENT, che compongono l'AST; visita a partire dalla quale è possibile ispezionare la struttura del programma in analisi. (indica quale parte del pattern Visitor viene invece realizzata da questa funzione)
-
 \section{Modulo di rappresentazione}
 
-La struttura del modulo di rappresentazione sviluppato all’interno della libreria CLAST ricalca molto da vicino il processo di valutazione del codice sorgente di un programma Common Lisp. Questo allo scopo di ottenere delle strutture che consentano di ottenere una rappresentazione molto vicina a quella utilizzata internamente da un reale sistema Common Lisp, ossia la più ricca possibile. Tutto questo mentendo sempre il riferimento al codice sorgente vero e proprio, in maniera tale da ottenere sia informazioni rispetto alla semantica del programma a livello macchina, sia informazioni rispetto alla semantica desiderata dall’autore del programma.
+La struttura del modulo di rappresentazione sviluppato all’interno della
+libreria CLAST ricalca molto da vicino il processo di valutazione del codice
+sorgente di un programma Common Lisp. Questo allo scopo di ottenere delle
+strutture che consentano di ottenere una rappresentazione molto vicina a
+quella utilizzata internamente da un reale sistema Common Lisp, ossia la più
+ricca possibile. Tutto questo mentendo sempre il riferimento al codice
+sorgente vero e proprio, in maniera tale da ottenere sia informazioni rispetto
+alla semantica del programma a livello macchina, sia informazioni rispetto
+alla semantica desiderata dall’autore del programma.
 
-\subsection{Il processo di valutazione}
+\subsection{Processo di valutazione}
 
-Come affermato nel paragrafo precedente, le strutture facenti parte del modulo di rappresentazione sono particolarmente legate al processo di valutazione utilizzato dal linguaggio. Per questa ragione, allo scopo di fornire al lettore una migliore comprensione delle strutture pratiche che verranno presentate nel dettaglio in seguito, in questa sottosezione viene presentato un breve sunto del processo di valutazione e delle strutture fondamentali di un programma scritto utilizzando il linguaggio di programmazione Common Lisp.\\
+Come affermato nel paragrafo precedente, le strutture facenti parte del modulo
+di rappresentazione sono particolarmente legate al processo di valutazione
+utilizzato dal linguaggio. Per questa ragione, allo scopo di fornire al
+lettore una migliore comprensione delle strutture pratiche che verranno
+presentate nel dettaglio in seguito, in questa sottosezione viene presentato
+un breve sunto del processo di valutazione e delle strutture fondamentali di
+un programma scritto utilizzando il linguaggio di programmazione Common
+Lisp.\\
 
-La struttura fondamentale alla base del processo di valutazione di un programma Lisp è la form. Una form viene infatti definita formalmente dallo standard ANSI Common Lisp come \textit{“an object meant to be evaluated”}. Dal punto di vista pratico una form può essere rappresentata sia da un atomo che da una lista.\\
+La struttura fondamentale alla base del processo di valutazione di un
+programma Lisp è la form. Una form viene infatti definita formalmente dallo
+standard ANSI Common Lisp come “an object meant to be evaluated”. Dal punto di
+vista pratico una form può essere rappresentata sia da un atomo che da una
+lista.\\
 
-Il caso in cui una form è rappresentata da un atomo è il caso più semplice all’interno del processo di valutazione. Una volta identificato un atomo, il sistema di valutazione deve semplicemente verificare se questo rappresenta un oggetto auto-valutante, \textit{self-evaluating object}, o un simbolo. Nel caso di un self-evaluating object il sistema si limita a produrre come risultato l’oggetto stesso, come il nome stesso di questa struttura suggerisce. Esempi di self-evaluating objects sono rappresentati da numeri, sia interi che complessi, stringhe, pathnames e array.\\
+Il caso in cui una form è rappresentata da un atomo è il caso più semplice
+all’interno del processo di valutazione. Una volta identificato un atomo, il
+sistema di valutazione deve semplicemente verificare se questo rappresenta un
+oggetto auto-valutante, self-evaluating object, o un simbolo. Nel caso di un
+self-evaluating object il sistema si limita a produrre come risultato
+l’oggetto stesso, come il nome stesso di questa struttura suggerisce. Esempi
+di self-evaluating objects sono rappresentati da numeri, sia interi che
+complessi, stringhe, pathnames e array.
 
 \begin{lstlisting}
-
- 3 =>  3
- #c(2/3 5/8) =>  #C(2/3 5/8)
- #p"S:[BILL]OTHELLO.TXT" =>  #P"S:[BILL]OTHELLO.TXT"
- #(a b c) =>  #(A B C)
- "fred smith" =>  "fred smith”
- 
- \end{lstlisting}
-
-Nel caso in cui un atomo non sia un self-evaluating object, il sistema Lisp lo identifica come simbolo. A sua volta, un simbolo può essere o una symbol macro, una form utilizzata in sostituzione di un’altra form, o una variabile. La prima operazione che un sistema Lisp aderente allo standard compie in questo caso è una verifica rispetto alla presenza o meno di una definizione di macro all’interno dell’environment lessicale in uso al momento della valutazione. Se una definizione è effettivamente presente allora viene applicata al funzione associata a questa al fine di produrre una form che verrà valutata al posto del simbolo stesso. Se non dovesse essere presente una definizione di macro all’interno dell’ambiente, il sistema Lisp assume che il il simbolo rappresenti una variabile. Il valore della variabile associata al simbolo viene quindi ricercato e utilizzato per ritornato come output del processo di valutazione.\\
-
-Come affermato, nel caso il simbolo non sia stato identificato come symbol-macro, il sistema assume che questo rappresenti una variabile, nel caso in cui questo non lo sia, o più generalmente in cui non sia stato associato alcun valore alla variabile referenziata dal simbolo, il sistema si limita a segnalare un errore di tipo \texttt{UNBOUND-VARIABLE}. Sia il modulo di rappresentazione che il modulo di parsing, seguono questa convenzione. Questo porta ad ottenere una rappresentazione corretta del comportamento di un programma che, a runtime, manifesterà un comportamento scorretto e un fallimento. L’utilizzo di questa convenzione porta ad ottenere un rappresentazione statica che presenta informazioni sufficienti a consentire l’individuazione di comportamenti potenzialmente scorretti; esattamente ciò che risulta più interessante per gli strumenti di source code analysis per i quali CLAST si pone come infrastruttura abilitante.\\
-
-Infine, nel caso in cui una form sia costituita da una lista, questa prende il nome di compound form, e il processo di valutazione prosegue in modo più approfondito. Ciascuna compound form viene scomposta in due componenti: un operatore, ossia il simbolo di testa della lista, e una lista di parametri, rappresentata da una nuova lista contenente tutti gli elementi della lista originale ad eccezione dell’operatore. La valutazione passa quindi all’analisi del simbolo operatore, ricercando eventuali associazioni a questo all’interno dell’attuale environment lessicale. In base a questa ricerca la compound form viene classificata come all’interno delle seguenti 4 categorie: special form, macro form, function form e lambda form.
-
-\begin{lstlisting}
-
-(car '(+ 1 2)) => +     ; CAR is a symbol
-(cdr '(+ 1 2)) => (1 2) ; CDR is a list    
-
+3 =>  3
+#c(2/3 5/8) =>  #C(2/3 5/8)
+#p"S:[BILL]OTHELLO.TXT" =>  #P"S:[BILL]OTHELLO.TXT"
+#(a b c) =>  #(A B C)
+"fred smith" =>  "fred smith"
 \end{lstlisting}
 
-Nel caso in cui l’operatore venga identificato come il nome di una funzione, questa viene invocata utilizzando come input la lista di parametri identificata al passo precedente. Nel caso in cui l’operatore venga identificato come nome di una macro, la valutazione prosegue dando inizio al processo di valutazione delle macro illustrato nel corso del capitolo precedente, sezione <>. Nel caso in cui l’environment in cui viene eseguita la ricerca contenga alcuna definizione per il simbolo operatore, la compound form viene identificata come lambda form, l’operatore viene quindi utilizzato come una funzione e la valutazione avviene in maniera analoga a questo riportato nel caso di una function form. Il caso più interessante dal caso in cui, a partire dall’analisi dell’operatore, una compound form venga identificata come una special form.\\
+Nel caso in cui un atomo non sia un self-evaluating object, il sistema Lisp lo
+identifica come simbolo. A sua volta, un simbolo può essere o una symbol
+macro, una form utilizzata in sostituzione di un’altra form, o una variabile.
+La prima operazione che un sistema Lisp aderente allo standard compie in
+questo caso è una verifica rispetto alla presenza o meno di una definizione di
+macro all’interno dell’environment lessicale in uso al momento della
+valutazione. Se una definizione è effettivamente presente allora viene
+applicata al funzione associata a questa al fine di produrre una form che
+verrà valutata al posto del simbolo stesso. Se non dovesse essere presente una
+definizione di macro all’interno dell’ambiente, il sistema Lisp assume che il
+il simbolo rappresenti una variabile. Il valore della variabile associata al
+simbolo viene quindi ricercato e utilizzato per ritornato come output del
+processo di valutazione.\\
 
-Il maggior interesse per compound forms di tipo special form è legato al fatto che form di questo tipo possono utilizzare o una sintassi speciale, o regole di valutazione speciali, o entrambi, altre ad essere in grado potenzialmente di compiere modifiche dell’environment all’interno del quale vengono valutate e del flusso di controllo. La valutazione di form di questo tipo può produrre nuovi environment lessicali o dinamici all’interno dei quali verrà verranno valutate le eventuali form innestate. Ad esempio, una compound form che utilizza l’operatore LET, dichiara un nuovo environment lessicale, identico a quello di invocazione, all’interno del quale vengono aggiunti dei nuovi bindings rispetto a nomi di variabile. Questo significa che form di tipo special form avranno un impatto particolarmente significativo sul funzionamento del modulo di parsing, in quanto, ad esempio, avendo la possibilità di utilizzare una sintassi speciale, ciascuna di queste potenzialmente rappresenterà una nuova regola della grammatica target del parser.\\
+Come affermato, nel caso il simbolo non sia stato identificato come symbol-
+macro, il sistema assume che questo rappresenti una variabile, nel caso in cui
+questo non lo sia, o più generalmente in cui non sia stato associato alcun
+valore alla variabile referenziata dal simbolo, il sistema si limita a
+segnalare un errore di tipo UNBOUND-VARIABLE. Sia il modulo di
+rappresentazione che il modulo di parsing, seguono questa convenzione. Questo
+porta ad ottenere una rappresentazione corretta del comportamento di un
+programma che, a runtime, manifesterà un comportamento scorretto e un
+fallimento. L’utilizzo di questa convenzione porta ad ottenere un
+rappresentazione statica che presenta informazioni sufficienti a consentire
+l’individuazione di comportamenti potenzialmente scorretti; esattamente ciò
+che risulta più interessante per gli strumenti di source code analysis per i
+quali CLAST si pone come infrastruttura abilitante.\\
 
-Questo conclude il breve riassunto del processo di valutazione di un programma Common Lisp e delle strutture fondamentali che caratterizzano questo processo. Nel prossima sezione verrano quindi approfonditi meccanismi che la libreria CLAST utilizza per la rappresentazione di queste strutture al fine di facilitare i compiti di analisi del codice sorgente di un programma.
+Infine, nel caso in cui una form sia costituita da una lista, questa prende il
+nome di compound form, e il processo di valutazione prosegue in modo più
+approfondito. Ciascuna compound form viene scomposta in due componenti: un
+operatore, ossia il simbolo di testa della lista, e una lista di parametri,
+rappresentata da una nuova lista contenente tutti gli elementi della lista
+originale ad eccezione dell’operatore. La valutazione passa quindi all’analisi
+del simbolo operatore, ricercando eventuali associazioni a questo all’interno
+dell’attuale environment lessicale. In base a questa ricerca la compound form
+viene classificata come all’interno delle seguenti 4 categorie: special form,
+macro form, function form e lambda form.
+
+\begin{lstlisting}
+(car '(+ 1 2)) => +     ; CAR is a symbol
+(cdr '(+ 1 2)) => (1 2) ; CDR is a list
+\end{lstlisting}
+
+Nel caso in cui l’operatore venga identificato come il nome di una funzione,
+questa viene invocata utilizzando come input la lista di parametri
+identificata al passo precedente. Nel caso in cui l’operatore venga
+identificato come nome di una macro, la valutazione prosegue dando inizio al
+processo di valutazione delle macro illustrato nel corso del capitolo
+precedente, sezione <>. Nel caso in cui l’environment in cui viene eseguita la
+ricerca contenga alcuna definizione per il simbolo operatore, la compound form
+viene identificata come lambda form, l’operatore viene quindi utilizzato come
+una funzione e la valutazione avviene in maniera analoga a questo riportato
+nel caso di una function form. Il caso più interessante dal caso in cui, a
+partire dall’analisi dell’operatore, una compound form venga identificata come
+una special form.\\
+
+Il maggior interesse per compound forms di tipo special form è legato al fatto
+che form di questo tipo possono utilizzare o una sintassi speciale, o regole
+di valutazione speciali, o entrambi, altre ad essere in grado potenzialmente
+di compiere modifiche dell’environment all’interno del quale vengono valutate
+e del flusso di controllo. La valutazione di form di questo tipo può produrre
+nuovi environment lessicali o dinamici all’interno dei quali verrà verranno
+valutate le eventuali form innestate. Ad esempio, una compound form che
+utilizza l’operatore LET, dichiara un nuovo environment lessicale, identico a
+quello di invocazione, all’interno del quale vengono aggiunti dei nuovi
+bindings rispetto a nomi di variabile. Questo significa che form di tipo
+special form avranno un impatto particolarmente significativo sul
+funzionamento del modulo di parsing, in quanto, ad esempio, avendo la
+possibilità di utilizzare una sintassi speciale, ciascuna di queste
+potenzialmente rappresenterà una nuova regola della grammatica target del
+parser.\\
+
+Questo conclude il breve riassunto del processo di valutazione di un programma
+Common Lisp e delle strutture fondamentali che caratterizzano questo processo.
+Nel prossima sezione verrano quindi approfonditi meccanismi che la libreria
+CLAST utilizza per la rappresentazione di queste strutture al fine di
+facilitare i compiti di analisi del codice sorgente di un programma.
 
 \subsection{Strutture di rappresentazione}
 
-Dopo aver brevemente presentato il processo di valutazione utilizzato da un sistema Common Lisp e le strutture fondamentali utilizzate da questo processo, questa sezione presenta i meccanismi che vengono forniti dalla libreria CLAST allo scopo di rappresentare un programma.\\
+Dopo aver brevemente presentato il processo di valutazione utilizzato da un
+sistema Common Lisp e le strutture fondamentali utilizzate da questo processo,
+questa sezione presenta i meccanismi che vengono forniti dalla libreria CLAST
+allo scopo di rappresentare un programma.\\
 
-La rappresentazione fornita dalla libreria è organizzata all’interno di un grande insieme di classi, organizzate all’interno di una gerarchia sfruttando il supporto all’ereditarietà offerto dal linguaggio e in particolare all’ereditarietà multipla. In particolare, il supporto dell’ereditarietà multipla viene sfruttato allo scopo di definire un insieme di classi in grado di agire da mixins, la cui semantica verrà presentata in seguito.\\
+La rappresentazione fornita dalla libreria è organizzata all’interno di un
+grande insieme di classi, organizzate all’interno di una gerarchia sfruttando
+il supporto all’ereditarietà offerto dal linguaggio e in particolare
+all’ereditarietà multipla. In particolare, il supporto dell’ereditarietà
+multipla viene sfruttato allo scopo di definire un insieme di classi in grado
+di agire da mixins, la cui semantica verrà presentata in seguito.\\
 
-Un mixin o trait viene tipicamente definito come una classe che definisce un insieme i metodi o attributi allo scopo di facilitare il riuso di questi all’interno di altre classi, senza però dover forzare la definizione una relazione di ereditarietà diretta tra la classe mixin e la classe che opera il riuso. Lo scopo di soluzioni di questo tipo, implementate da linguaggio di programmazione diversi con modalità e nomi diversi, è quindi fondamentalmente quello di facilitare il riuso di codice evitando allo stesso tempo i problemi legati alle ambiguità che possono essere causate dall’impiego dell’ereditarietà multipla.
+Un mixin o trait viene tipicamente definito come una classe che definisce un
+insieme i metodi o attributi allo scopo di facilitare il riuso di questi
+all’interno di altre classi, senza però dover forzare la definizione una
+relazione di ereditarietà diretta tra la classe mixin e la classe che opera il
+riuso. Lo scopo di soluzioni di questo tipo, implementate da linguaggio di
+programmazione diversi con modalità e nomi diversi, è quindi fondamentalmente
+quello di facilitare il riuso di codice evitando allo stesso tempo i problemi
+legati alle ambiguità che possono essere causate dall’impiego
+dell’ereditarietà multipla.\\
 
-A differenza di quanto avviene nel contesto di altri linguaggio di programmazione, come ad esempio Scala e Swift, in Common Lisp un mixin viene definito attraverso una semplice definizione di classe in maniera del tutto analoga a quanto avverrebbe per la definizione di una classe tradizionale.\\
+A differenza di quanto avviene nel contesto di altri linguaggio di
+programmazione, come ad esempio Scala e Swift, in Common Lisp un mixin viene
+definito attraverso una semplice definizione di classe in maniera del tutto
+analoga a quanto avverrebbe per la definizione di una classe tradizionale.\\
 
-La classe fondamentale al vertice della gerarchia delle strutture esposte da CLAST è la classe \texttt{CLAST-ELEMENT}. Questa classe ha il semplice scopo di raccogliere le diverse strutture offerte dalla libreria all'interno di un unico tipo, in maniera tale da facilitare l’ispezione e l’analisi di oggetti prodotto dalla libreria. Per questa ragione non dichiara alcun attributo ed alcun metodo viene specializzato rispetto a questa.\\
+La classe fondamentale al vertice della gerarchia delle strutture esposte da
+CLAST è la classe CLAST-ELEMENT. Questa classe ha il semplice scopo di
+raccogliere le diverse strutture offerte dalla libreria all'interno di un
+unico tipo, in maniera tale da facilitare l’ispezione e l’analisi di oggetti
+prodotto dalla libreria. Per questa ragione non dichiara alcun attributo ed
+alcun metodo viene specializzato rispetto a questa.\\
 
-La prima classe concreta all’interno della gerarchia è la classe \texttt{FORM}. Lo scopo di questa classe è quello di rappresentare i dettagli fondamentali di ciascun elemento presente all’interno di un programma Common Lisp e in particolare, fungere da nodo, ossia unità fondamentale, della rappresentazione mediante AST fornita dalla libreria. Questa classe espone quindi tre attributi fondamentali.\\
+La prima classe concreta all’interno della gerarchia è la classe FORM. Lo
+scopo di questa classe è quello di rappresentare i dettagli fondamentali di
+ciascun elemento presente all’interno di un programma Common Lisp e in
+particolare, fungere da nodo, ossia unità fondamentale, della rappresentazione
+mediante AST fornita dalla libreria. Questa classe espone quindi tre attributi
+fondamentali.\\
 
 \begin{itemize}
 
-\item Un attributo \texttt{SOURCE}, il quale riporta il codice sorgente associato al nodo, form, in analisi, il quale facilita allo scopo di facilitare il compito di un analizzatore che lavora a partire dalla libreria.
+\item Un attributo SOURCE, il quale riporta il codice sorgente associato al
+nodo, form, in analisi, il quale facilita allo scopo di facilitare il compito
+di un analizzatore che lavora a partire dalla libreria.
 
-\item Un attributo \texttt{TOP}, il quale rappresenta form all’interno della quale, la form è innestata. Questo attributo risulta di fondamentale importanza per la libreria in quanto consente di rappresentare un programma all’interno di una struttura ad albero, un AST, come anticipato all’interno dei capitoli precendenti. Questo consente di ottenere una rappresentazione universalmente nota e per la quale le operazioni di traversal risultano particolarmente semplici.
-    
-\item Un attributo \texttt{TYPE}, il quale riporta il tipo, dichiarato o potenzialmente inferito del nodo, form, in analisi. Questo allo scopo di facilitare il lavoro di strumenti come type checkers, che cerchino di aggiungere una tipizzazione statica ad un linguaggio di programmazione dinamico come il Common Lisp.
+\item Un attributo TOP,  il quale rappresenta form all’interno della quale, la
+form è innestata. Questo attributo risulta di fondamentale importanza per la
+libreria in quanto consente di rappresentare un programma all’interno di una
+struttura ad albero, un AST, come anticipato all’interno dei capitoli
+precendenti. Questo consente di ottenere una rappresentazione universalmente
+nota e per la quale le operazioni di traversal risultano particolarmente
+semplici.
+
+\item Un attributo TYPE, il quale riporta il tipo, dichiarato o potenzialmente
+inferito del nodo, form, in analisi. Questo allo scopo di facilitare il lavoro
+di strumenti come type checkers, che cerchino di aggiungere una tipizzazione
+statica ad un linguaggio di programmazione dinamico come il Common Lisp.\\
 
 \end{itemize}
 
 
-Alla base della libreria vengono quindi definite altre due classi che, come anticipato in precedenza, hanno lo scopo di agire da mixin. La prima di queste classi è chiamata \texttt{IMPLICIT-PROGN}, la seconda è chiamata \texttt{EXPANSION-COMPONENT}.\\
 
-Lo scopo della classe \texttt{IMPLICIT-PROGN} è quello di raccogliere gli attributi ed i metodi necessari all’analisi di form che contengono una implicita form di tipo \texttt{PROGN}. Il costrutto \texttt{PROGN} è il costrutto fondamentale alla definizione di codice imperativo in Common Lisp, valuta l’insieme di form fornite in input in sequenza e ritorna il risultato dell’ultima di queste, scartando il risultato di tutte le precedenti. Essendo l’utilizzo di questo costrutto presente in modo implicito alla base del funzionamento di diversi altri costrutti, come ad esempio \texttt{DEFUN} e \texttt{DEFMACRO}, si è scelto di rendere questo fornire isolare le responsabilità e le strutture fondamentali al parsing e all’analisi di form di questo tipo all’interno di questo mixin, allo scopo di facilitare il riuso all’interno delle funzioni e delle strutture dedicate al parsing dei diversi costrutti che compiono un \texttt{IMPLICIT-PROGN}. I due slot fondamentali esposti da questa classe sono i seguenti.
+Alla base della libreria vengono quindi definite altre due classi che, come
+anticipato in precedenza, hanno lo scopo di agire da mixin. La prima di queste
+classi è chiamata IMPLICIT-PROGN, la seconda è chiamata EXPANSION-COMPONENT.\\
+
+Lo scopo della classe IMPLICIT-PROGN è quello di raccogliere gli attributi ed
+i metodi necessari all’analisi di form che contengono una implicita form di
+tipo PROGN. Il costrutto PROGN è il costrutto fondamentale alla definizione di
+codice imperativo in Common Lisp, valuta l’insieme di form fornite in input in
+sequenza e ritorna il risultato dell’ultima di queste, scartando il risultato
+di tutte le precedenti. Essendo l’utilizzo di questo costrutto presente in
+modo implicito alla base del funzionamento di diversi altri costrutti, come ad
+esempio DEFUN e DEFMACRO, si è scelto di rendere questo fornire isolare le
+responsabilità e le strutture fondamentali al parsing e all’analisi di form di
+questo tipo all’interno di questo mixin, allo scopo di facilitare il riuso
+all’interno delle funzioni e delle strutture dedicate al parsing dei diversi
+costrutti che compiono un IMPLICIT-PROGN. I due slot fondamentali esposti da
+questa classe sono i seguenti.\\
 
 \begin{itemize}
 
-\item \texttt{IPROGN-FORMS} è un attributo che tiene traccia delle form innestate all’interno di questa e che verranno implicitamente eseguite all’interno di una form di tipo \texttt{PROGN}.
+\item IPROGN-FORMS è un attributo che tiene traccia delle form innestate
+all’interno di questa e che verranno implicitamente eseguite all’interno di
+una form di tipo PROGN.
 
-\item \texttt{BODY-ENV} è invece un attributo che riporta un oggetto di tipo environment, il quale rappresenta l’environment all’interno del quale verrà eseguita la valutazione delle form memorizzate dall’attributo \texttt{IPROGN-FORMS} appena riportato. È importante notare che nel caso di molte special forms, questo attributo risulta di fondamentale importanza agli scopi di uno strumento di analisi, in quanto consente di osservare il reale ambiente di valutazione.
+\item BODY-ENV è invece un attributo che riporta un oggetto di tipo
+environment, il quale rappresenta l’environment all’interno del quale verrà
+eseguita la valutazione delle form memorizzate dall’attributo IPROGN-FORMS
+appena riportato. È importante notare che nel caso di molte special forms,
+questo attributo risulta di fondamentale importanza agli scopi di uno
+strumento di analisi, in quanto consente di osservare il reale ambiente di
+valutazione.
 
 \end{itemize}
 
-SE METTI QUESTA PARTE DOPO LA PARTE RELATIVA AL PARSING QUA PUOI SPIEGARE IL FATTO CHE BODY-ENV, NEL CASO DI ISTRUZIONI COME LET, È MOLTO DIVERSO DALL’ENVIRONMENT RITORNATO, IN QUANTO ISTRUZIONI COME LET SONO IN GRADO DI PRODURRE UN NUOVO ENVIRONMENT, LESSICALE O DINAMICO, AGGIUNGENDO NUOVE INFORMAZIONI A QUESTO, ALL’INTERNO DEL QUALE VERRANO VALUTATE LE IMPROGN-FORMS. SE INVECE VIENE MESSA PRIMA È NECESSARIO SPIEGARE NELLA SEZIONE RELATIVA AL PARSING CHE IN ALCUNI CASI SI HA QUESTA DIFFERENZA.\\
+SE METTI QUESTA PARTE DOPO LA PARTE RELATIVA AL PARSING QUA PUOI SPIEGARE IL
+FATTO CHE BODY-ENV, NEL CASO DI ISTRUZIONI COME LET, È MOLTO DIVERSO
+DALL’ENVIRONMENT RITORNATO, IN QUANTO ISTRUZIONI COME LET SONO IN GRADO DI
+PRODURRE UN NUOVO ENVIRONMENT, LESSICALE O DINAMICO, AGGIUNGENDO NUOVE
+INFORMAZIONI A QUESTO, ALL’INTERNO DEL QUALE VERRANO VALUTATE LE IMPROGN-
+FORMS. SE INVECE VIENE MESSA PRIMA È NECESSARIO SPIEGARE NELLA SEZIONE
+RELATIVA AL PARSING CHE IN ALCUNI CASI SI HA QUESTA DIFFERENZA.\\
 
-La classe EXPANSION-COMPONENT è invece responsabile per la definizione delle strutture e dei metodi che consentono il parsing di form soggette a processo di valutazione tipico di una macro. Questa classe in particolare espone un altro attributo fondamentale ad uno strumento per l’analisi di un programma Lisp, ossia la risultato dell’espansione della form rappresentata dal nodo.\\
+La classe EXPANSION-COMPONENT è invece responsabile per la definizione delle
+strutture e dei metodi che consentono il parsing di form soggette a processo
+di valutazione tipico di una macro. Questa classe in particolare espone un
+altro attributo fondamentale ad uno strumento per l’analisi di un programma
+Lisp, ossia la risultato dell’espansione della form rappresentata dal nodo.\\
 
-Le tre classi appena riportate rappresentano il substrato fondamentale della rappresentazione offerta dalla libreria CLAST. Il livello di dettaglio offerto dalla libreria è però molto maggiore rispetto a quello possibile utilizzando solamente queste tre classi. La libreria infatti dichiara più di cento classi che vengono utilizzate per rappresentare istruzioni ad un livello di dettaglio di singolo operatore. Il diagramma in seguito presenta i principali raggruppamenti delle classi facenti parte del modulo di rappresentazione. Una discussione di ciascuna di queste risulterebbe troppo estesa per essere riportata all’interno di questa tesi e viene rimandata alla documentazione fornita in accompagnamento alla libreria.
+Le tre classi appena riportate rappresentano il substrato fondamentale della
+rappresentazione offerta dalla libreria CLAST. Il livello di dettaglio offerto
+dalla libreria è però molto maggiore rispetto a quello possibile utilizzando
+solamente queste tre classi. La libreria infatti dichiara più di cento classi
+che vengono utilizzate per rappresentare istruzioni ad un livello di dettaglio
+di singolo operatore. Il diagramma in seguito presenta i principali
+raggruppamenti delle classi facenti parte del modulo di rappresentazione. Una
+discussione di ciascuna di queste risulterebbe troppo estesa per essere
+riportata all’interno di questa tesi e viene rimandata alla documentazione
+fornita in accompagnamento alla libreria.\\
 
+AGGIUNGI QUALI COMPOUND FORM VENGONO RAPPRESENTATE NEL DETTAGLIO E QUALI
+VENGONO RAPPRESENTATE SEMPLICEMENTE COME APPLICAZIONI DI MACRO O FUNZIONE.\\
+
+Gli operatori speciali indicati dallo standard ANSI Common Lisp, sezione
+3.1.2.1.2 listato 2, più tutti gli operatori interessanti dal punto di vista
+dell’analisi non presentati all’interno di quella lista. questi operatori
+aggiuntivi sono quelli legati al CLOS, al meccanismo delle dichiarazioni e al
+costrutto loop, in quanto particolarmente utilizzati e potenzialmente molto
+significativi dal punto di vista dell’analisi. In presenza di qualsiasi altro
+operatore, la rappresentazione si limita a riportare, l’applicazione di
+questo, distinguendo se si tratta dell’applicazione di una funzione o di una
+macro. Questa modalità di analisi consente di rappresentare qualsiasi
+possibile compound form con il maggiore grado di precisione possibile a
+seconda dello specifico caso in analisi.
+
+\section{Modulo di parsing}
+
+Dopo aver approfondito, nel corso della precedente sezione, le strutture che
+la libreria CLAST offre per la rappresentazione di codice sorgente, questa
+sezione ha l’obiettivo di presentare e discutere la progettazione e
+implementazione del secondo modulo facente parte libreria. Il modulo di
+parsing è responsabile dello svolgimento delle reali operazioni di analisi
+sintattica, e in parte semantica, del codice sorgente fornito in input alla
+libreria al fine di produrre una rappresentazione costruita a partire dalle
+strutture esposte dal modulo di rappresentazione.
+
+\section{Architettura del modulo}
+
+Dal punto di vista architetturale, il modulo consiste di un parser a discesa
+ricorsiva, una particolare tipologia di parser. Formalmente, un parser a
+discesa ricorsiva è definito come un parser che opera in modo top-down,
+costruito a partire da un insieme di procedure mutualmente esclusive, o
+equivalenti, in cui tipicamente ciascuna procedura implementa una delle
+produzioni della grammatica associata al linguaggio target dell’attività di
+parsing. Il particolare parser presente all’interno della libreria CLAST può
+inoltre essere definito un predictive-parser, un parser a discesa ricorsiva in
+grado di svolgere la propria attività di analisi e scomposizione senza
+necessità di operare backtracking, ossia senza la necessità di svolgere e
+abbandonare computazioni parziali.\\
+
+I principali vantaggi legati alla scelta di un’architettura di questo tipo
+sono principalmente due. Da un punto di vista computazionale, la proprietà più
+interessante di un predictive-parser è rappresentata dal fatto che questo è in
+grado di lavorare in tempo lineare nella dimensione del suo input. Affinché
+sia possibile definire un predictive-parser per un dato linguaggio è
+necessario che la grammatica di questo sia un grammatica di tipo context-free,
+ossia una grammatica non ambigua e per la quale vale la proprietà per cui è
+sempre possibile osservare un numero finito di token dallo stream di input per
+poter determinare la corretta produzione della grammatica da applicare. La
+grammatica del linguaggio Common Lisp è una grammatica di questo tipo.\\
+
+Un secondo vantaggio legato alla scelta di organizzare le attività di parsing
+all’interno di un predictive-parser è invece più legato agli aspetti di
+qualità del software e manutenibilità dell’implementazione prodotta. La forte
+strutturazione del parser in un insieme di procedure specifiche per ciascuna
+produzione della grammatica del linguaggio in analisi, guida l’implementazione
+nella definizione di un insieme di funzioni altamente coese nel rispetto dei
+principi di single responsibility e separation of concerns che consentono di
+ottenere un’implementazione particolarmente espressiva, manutenibile e
+facilmente testabile.\\
+
+Un parser come quello appena descritto può essere costruito utilizzando in
+maniera manuale o automatica. Approcci automatici alla creazione di un parser
+lavorano tipicamente a partire da strumento specializzato nella generazione di
+sistemi software di questo tipo. Un generatore di parser prende in input una
+descrizione formale della grammatica del linguaggio target del parsing e
+produce in output un programma in grado di operare il parsing del linguaggio
+target oppure una struttura, solitamente chiamata parse table, a partire dalla
+quale un programma driver è in grado di operare il parsing.\\
+
+Il vantaggio dell’utilizzo di strumenti automatici è chiaramente rappresentato
+dall’immediatezza con la quale questi consentono di produrre strumenti
+efficienti e per i quali è possibile compiere una verifica formale di
+correttezza. Lo svantaggio fondamentale dovuto al fatto che la loro estensione
+al fine di supportare la raccolta di informazioni aggiuntive risulta molto
+spesso difficile o impossibile. Inoltre, l’utilizzo di questi strumenti non è
+possibile nel caso in cui non sia disponibile una grammatica formale relativa
+al linguaggio target delle operazioni di parsing.\\
+
+Il requisito e lo svantaggio appena citati rendono l’applicazione di un
+approccio automatico impossibile nel contesto del progetto soggetto di questa
+tesi. Infatti, in prima battuta, non sono disponibili definizioni formali
+della grammatica completa del linguaggio Common Lisp. Inoltre, ponendosi CLAST
+come una soluzione per la creazione di strumenti di source code analysis di
+diverso tipo, risulta di fondamentale importanza la possibilità di estendere
+il processo di parsing al fine di raccogliere il maggior numero di
+informazioni possibili rispetto al codice del programma in analisi e che un
+parser generato in modo automatico da uno strumento generico non è in grado di
+fornire.\\
+
+Per queste ragioni, la scelta intrapresa è stata quella di implementare un
+parser in modo manuale. Da un punto di vista prettamente legato all’analisi
+sintattica che deve essere operata da un parser, il linguaggio Lisp ben si
+presta all’azione di strumenti di questo tipo, essendo il codice molto
+semplicemente organizzato all’interno di liste. Tuttavia, questa attività ha
+comunque necessitato di uno sforzo dal punto di vista dell’implementazione e
+del testing particolarmente significativo dato il grande numero di costrutti
+che utilizzano una sintassi speciale utilizzati dal linguaggio.\\
+
+Come precedentemente affermato la complessità di CLAST come strumento non è
+solamente rappresentata dalla fase di parsing, ma soprattutto dalla fase di
+raccolta di informazioni aggiuntive svolta parallelamente al parsing. L’output
+dell’azione del modulo di parsing è infatti, affinché sia possibile
+raccogliere informazioni come dichiarazioni di tipo, particolarmente utili
+all'analisi strumenti di type checking, sia informazioni relative all’utilizzo
+di variabili non inizializzate, particolarmente utili all’analisi svolta da
+strumenti di linting, è necessario che, comtemporaneamente alla
+formalizzazione della struttura del programma all’interno di una
+rappresentazione formale, questa rappresentazione formale venga arricchita con
+informazioni relative all’ambiente di valutazione delle diversi componenti del
+programma. Questo viene fatto a partire dal gestione di oggetti di tipo
+environment, oggetti che consentono la memorizzazione di dichiarazioni valide
+al momento della valutazione di un particolare frammento di codice. Questa
+attività di gestione di tutte le possibili informazioni relative alle
+dichiarazione presenti nel codice sorgente del programma in analisi ricalca
+molto da vicino l’attività svolta dalla componente di valutazione di un
+sistema Common Lisp e rappresentazione un’attività di molto significativa
+complessità, in quanto richiede sia la comprensione dei meccanismi interni di
+funzionamento di ciascun costrutto del linguaggio che la manipolazione,
+utilizzando un API particolarmente ristretta e relativamente poco adatta allo
+scopo, degli environment in modo parallelo al processo di navigazione del
+codice sorgente operato dal parsing, aspetti che non sempre possono essere
+combinati con facilità.
+
+\{Implementazione del modulo}
+
+L’API fondamentale offerta da questo modulo è rappresentata da un’unica
+funzione. La funzione PARSE è una funzione che prende in input una form Lisp e
+produce in output due valori, una rappresentazione in forma di AST composta da
+istanze di oggetti definiti all’interno del modulo di rappresentazione,
+presentati nella sezione precedente di questo capitolo, e un oggetto
+environment, il quale rappresenta l’environment prodotto dalla valutazione
+della form. Il listato <> mostra un estratto del codice della libreria in cui
+si mostra la definizione della funzione PARSE.\\
+
+CODICE DELLA DEFINIZIONE DI PARSE CON DOCUMENTAZIONE\\
+
+La funzione PARSE viene utilizzata per identificare ed applicare le regole più
+generali della grammatica soggetto del parsing. La funzione verifica se la
+form fornita in input alla funzione rappresenta un self-evaluating object
+oppure se rappresenta un simbolo o una compound form, i tre elementi
+fondamentali del processo di valutazione del Common Lisp presentato nel corso
+della sezione precedente.\\
+
+Nel caso in cui la form rappresenti un self-evaluating symbol, il parsing e la
+valutazione risultano banali, viene immediatamente ritornata un’istanza della
+classe CLAST-ELEMENT appartenente alla sottoclasse più appropriata alla
+rappresentazione dell’oggetto in analisi e il parsing termina immediatamente,
+riportando, insieme all’istanza appena descritta, un environment lessicale
+vuoto.\\
+
+Nel caso in cui la form rappresenti un simbolo questo viene risolto
+all’interno dell’environment opzionale specificato in fase di invocazione. Nel
+caso in cui il simbolo sia associato ad una variabile il parsing agisce in
+maniera analoga a quanto riportato in precedenza, viene ritornato un’istanza
+della classe CLAST-ELEMENT adeguata alla rappresentazione del simbolo e il
+valore associato a questo identificato nell’environment, assieme ad un
+environment lessicale vuoto, e il parsing ha fine. Nel caso in cui invece il
+simbolo rappresenti una macro, la funzione PARSE svolge un procedimento più
+complesso, andando ad operare la macro-espansione del simbolo all’interno
+dell’environment opzionale fornito in input alla funzione, per poi ritornare
+come primo valore un’istanza di EXPANSION-COMPONENT, che riporti il simbolo
+originale, il corpo ottenuto tramite macro espansione e il valore ottenuto
+dalla valutazione di questo corpo, e come secondo valore l’environment
+lessicale prodotto dall’espansione del simbolo.\\
+
+Infine, nel caso in cui invece il simbolo sia una compound form, il parsing e
+l’analisi proseguono in modo significativamente più complesso. Questo in
+quanto, come riportato nella sezione <> relativamente al processo di
+valutazione caratteristico del linguaggio Common Lisp, questo è il caso in cui
+si ha la possibilità di incontrare diversi costrutti che utilizzano una
+sintassi speciale e regole di valutazione speciali.\\
+
+Tenendo fede alla struttura precedentemente citata di definizione di un
+funzione per produzione della grammatica di parsing, la funzione PARSE delega
+ad un’altra funzione il processo di ricerca, all’interno dell’insieme delle
+diverse regole della grammatica, della corretta produzione da applicare per
+proseguire nel processo di parsing.\\
+
+La funzione PARSE si limita quindi ad operare l'estrazione dalla compound form
+identificata dell’elemento CAR e del CDR, la testa e la coda della lista che
+costituisce una compond form, come mostra il listato <>, ed invocare, a
+partire da questi due elementi, la funzione generica PARSE-FORM, responsabile
+per la prosecuzione del parsing secondo lo schema di discesa ricorsiva.\\
+
+ESEMPIO DI CAR E CDR DI UNA COMPOUND FORM\\
+
+La funzione PARSE-FORM è, come anche la funzione PARSE, una funzione generica.
+Il meccanismo delle funzioni generiche è uno dei meccanismi fondamentali
+attraverso i quali il CLOS, ossia il Common Lisp Object System, implementa il
+supporto alla programmazione object-oriented offerto dal linguaggio Common
+Lisp.\\
+
+Una funzione generica Common Lisp è una funzione il cui comportamento viene
+determinato a partire dalle classi e dalle identità dei parametri che vengono
+forniti in input a questa. Una funzione generica specifica un nome di funzione
+e una lista di parametri ma, a differenza di una funzione ordinaria, non
+specifica alcun corpo e quindi nessun comportamento che deve essere eseguito
+in risposta ad una sua invocazione. La reale implementazione del comportamento
+di una funzione generica può essere specificato attraverso la definizione di
+metodi.\\
+
+CODICE DI ESEMPIO PER LA DEFINIZIONE DI UNA FUNZIONE GENERICA\\
+
+Un metodo Common Lisp è una funzione che specifica l’implementazione di una
+funzione generica per una determinato insieme di specializzazioni dei
+parametri di questa. Ciascun parametro può essere specializzato da un metodo
+in due diversi modi: indicando la classe di appartenenza di questo, come ad
+esempio NUMBER, oppure indicando l’identità di uno specifico oggetto.\\
+
+CODICE CON DUE ESEMPI DI DEFINIZIONE DI UN METODO CHE MOSTRI I DUE DIVERSI
+TIPI DI SPECIALIZZAZIONE\\
+
+Quando una funzione generica viene invocata, il sistema Lisp analizza i
+parametri forniti in input e ricerca, dall’elenco dei metodi associati alla
+funzione, quale metodo riporti specializzazioni compatibili con i tipi e le
+identità di questi, per poi eseguire il codice associato al metodo e
+determinare così il reale comportamento della funzione generica.\\
+
+Da un punto di vista teorico, il meccanismo delle funzioni generiche Common
+Lisp rappresenta un’implementazione del concetto di polimorfismo tipico della
+programmazione Object Oriented, realizzato solitamente nel contesto di altri
+linguaggi di programmazione con tecniche di message passing e funzioni come
+SEND in Smalltalk e objc_msgSend in Objective-C.\\
+
+Dal punto di vista delle performance e della complessità algoritmica, è
+importante sottolineare che l’attività più significativa è rappresentata
+dall’identificazione della regola corretta da applicare in risposta ad un
+particolare input. L’aver strutturato il processo di parsing in maniera tale
+che questo vada a delegare questa attività interamente al sistema Lisp in
+utilizzo, tramite l’utilizzo di funzioni generiche in fase di implementazione,
+è un aspetto che rende il modulo performante e significativamente meno
+complesso.\\
+
+QUESTA PARTE SULLE FUNZIONI GENERICHE DOVREBBE ESSERE SPOSTATA PRIMA DELLA
+SPIEGAZIONE DI PARSE. IN QUESTO MODO DIVENTA POSSIBILE PRESENTARE IL CONFRONTO
+TRA IL FATTO CHE PARSE LAVORA UTILIZZANDO SPECIALIZZAZIONI DI TIPO, MENTRE
+PARSE-FORM CON SPECIALIZZAZIONI RISPETTO ALL’IDENTITÀ.\\
+
+Ritornando alla funzione PARSE-FORM, si è detto che questa è una funzione
+generica. Il comportamento di questa funzione viene specificato andando a
+definire grande insieme di metodi, sostanzialmente uno per ciascuno operatore
+Common Lisp, e quindi per ciascuna special form che utilizza una sintassi
+speciale, che a sua volta identifica ciascuna delle regole della grammatica.
+Ciascuno di questi metodi opera una specializzazione rispetto all’identità del
+primo parametro fornito in input a questa,  in particolare una
+specializzazione rispetto al particolare operatore che identifica una delle
+regole della grammatica. Questo porta ad ottenere la struttura di predictive-
+parser, già citata in precedenza in questo capitolo, con una funzione
+mutuamente esclusiva per ciascuna produzione della grammatica del linguaggio
+target. Il listato <> mostra alcuni esempi di signature dei metodi associati
+alla funzione generica PARSE-FORM.\\
+
+ESEMPI DI SIGNATURE DEI METODI PARSE-FORM\\
+
+I METODI PARSE-FORM LAVORANO IN MODO RICORSIVO\\
+
+OLTRE AD I METODI PARSE-FORM E PARSE IL MODULO CONTIENE UN GRANDE INSIEME DI
+HELPER FUNCTIONS. UNA FUNZIONE PER CIASCUNA REGOLA DELLA GRAMMATICA RELATIVA A
+COMPOUND FORM
+
+\section{Parsing e analisi in dettaglio}
+
+Per illustrare in maniera più approfondita il funzionamento della libreria, in
+questa sezione viene brevemente mostrata il del processo di parsing e analisi
+operato dalla libreria attraverso la discussione di un esempio, rappresentato
+da una semplificazione di uno dei metodi PARSE-FORM. In particolare, il metodo
+dedicato al parsing di compound form che utilizzano l’operatore LET.\\
+
+In seguito viene riportato un frammento della specifica ANSI in cui viene
+definita la sintassi del costrutto LET e vengono specificati i dettagli
+rispetto al processo di valutazione di form che utilizzano questo operatore.\\
+
+\begin{lstlisting}
+let ({var | (var [init-form])}*) declaration* form* => result*
+
+(1) LET and LET* create new variable bindings and (2) execute a series of
+forms that use these bindings. LET performs the bindings in parallel (3) and
+LET* does them sequentially.
+
+The form
+
+ (let ((var1 init-form-1)
+       (var2 init-form-2)
+       ...
+       (varm init-form-m))
+   declaration1
+   declaration2
+   ...
+   declarationp
+   form1
+   form2
+   ...
+   formn)
+
+first evaluates the expressions init-form-1, init-form-2, and so on, in that
+order, saving the resulting values. Then all of the variables varj are bound
+to the corresponding values; (4) each binding is lexical unless there is a
+special declaration to the contrary. The expressions formk are then evaluated
+in order; the values of all but the last are discarded (that is, the body of a
+let is an implicit progn).
+
+For both LET and LET*, if there is not an init-form associated with a var, var
+is initialized to NIL. \end{lstlisting}
+
+Il listato presenta una approssimazione del metodo PARSE-FORM implementato
+dalla libreria.
+
+\begin{lstlisting}
+(defmethod parse-form ((op (eql 'let*)) params top :optional env internal-env)
+ ;; 1
+ (destructuring-bind (bindings declarations :rest body-forms) params
+    ;; 2
+    (let ((body-env (clone (or internal-env body-env))))
+      ;; 3
+      (dolist (binding bindings)
+  (setf body-env (parse-binding binding body-env)))
+      ;; 4
+      (when declarations
+  (setf body-env (parse-declarations body-env)))
+      ;; 5
+      (multiple-value-bind (iprogn-forms augmented-env)
+    (if body-forms
+        (parse-iprogn-forms body-forms env body-env)
+        (values nil env))
+  ;; 6
+  (values
+   (make-instance 'let*-form
+      :source (cons operator params) :top top :type t
+      :iprogn-forms iprogn-forms :body-env body-env
+      :bindings bindings)
+   env)))))
+1
+  ;; Extracts all the various syntactic element from the provided
+  ;; params of the compound form based on the syntax rules associated
+  ;; with this special form denoted by the let* operator.
+2
+    ;; A copy of the provided environment is used in order to be able
+    ;; to represent both dynamic and lexical scope and be able to have
+    ;; local bindings and other bindings separated.
+3
+      ;; For each binding in the list of bindings invokes the
+      ;; parse-binding function on it. The parse binding function
+      ;; simply performs a side effect on the specified environment
+      ;; adding a variable declaration to it based on the name
+      ;; specified by the binding `var` portion.
+4
+      ;; For each declaration parse-declaration performs a side-effect
+      ;; on the provided environment adding informations as specified
+      ;; by the declaration.
+5
+      ;; Operates parsing of body forms. If a value for internal-env
+      ;; was specified, each parsing methods uses it to lookup
+      ;; definitions, but only augments `env`; otherwise it defaults
+      ;; to using `env` for both lookup and recording definitions.
+6
+  ;; Returns the element representation and the provided
+  ;; environment augmented only with definitions from the body
+  ;; form (i.e. that does not contain any information about
+  ;; local bindings).
+\end{lstlisting}
+
+Il metodo prende in input cinque valori, due dei quali opzionali. La prima
+operazione che viene svolta è legata al reale parsing. Il valore PARAMS, il
+quale rappresenta la lista dei parametri della compound form originale, viene
+decomposto all’interno di tre diversi elementi in base a quanto specificato
+dalla regola della grammatica del linguaggio associata al costrutto LET*. La
+regola specifica infatti che ciascuna form che abbia LET* come operatore
+prevede come primo parametro una lista di bindings, una lista di dichiarazioni
+come secondo parametro opzionale e che tutte le form che seguono queste due
+liste rappresentino una sequenza di form che devono essere eseguite
+nell’ambiente prodotto dalla valutazione di dichiarazioni di bindings e
+dichiarazioni.\\
+
+La seconda operazione svolta dal metodo è la definizione di una copia
+dell’environment fornito in input, copia che verrà utilizzata in seguito. Il
+metodo opera quindi un’invocazione del metodo parse-binding a partire da
+ciascun binding. La funzione PARSE-BINDING è quindi responsabile del parsing
+delle regole specificate dalla grammatica in relazione alla sintassi dei
+binding, ossia la regola var | (var [init-form]), e di creare un nuovo
+environment a partire da quello fornito in input contenente la definizione di
+variabile operata dal binding. Ogni invocazione di PARSE-BINDING ritorna
+quindi un nuovo oggetto environment che viene utilizzato per aggiornare
+l’environment interno al metodo.\\
+
+Il metodo prosegue quindi con l’analisi delle dichiarazioni specificate dalla
+form relativamente alle variabili dichiarate dai binding, nel caso siano
+presenti. Questa analisi viene operata dalla funzione PARSE-DECLARATIONS. Come
+la precedentemente citata PARSE-BINDING, PARSE-DECLARATIONS è quindi
+responsabile del parsing a partire dalle regole del linguaggio relativamente
+alle dichiarazioni e di restituire una nuova istanza di environment, costruita
+a partire da quello in input, contenente le informazioni specificate da
+ciascuna dichiarazione. L’istanza restituita da PARSE-DECLARATIONS viene
+quindi utilizzata per aggiornare l’environment interno al metodo.\\
+
+Il passo successivo è rappresentato dal parsing delle form innestate alla form
+LET*, operazione che viene delegata alla funzione PARSE-PROGN-FORMS. Questa
+funzione ha lo scopo di compiere la valutazione delle form specificate in
+input utilizzando i due environment specificati in input e produrre in output
+due valori, una lista contenente la rappresentazioni di ciascuna delle form
+utilizzando le strutture dal modulo di rappresentazione e un environment
+aumentato con le definizioni che occorrono all’interno delle form.\\
+
+Questa operazione consente di mostrare uno dei principi più complessi del
+funzionamento della libreria. Si può osservare infatti che la funzione prende
+in input due diversi environment. Il primo environment rappresenta
+l’environment che verrà aumentato con le dichiarazioni operate dalle form e
+quindi ritornato, il secondo environment viene invece solamente utilizzato per
+la ricerca di informazioni relativamente a variabili, simboli e funzioni
+identificati durante il parsing. La presenza di questi due environment
+distinti, uno per la scrittura e uno per la lettura, rappresenta una
+convenzione comune all’intero modulo e di particolare importanza. Questa
+convenzione consente infatti di implementare il parsing di costrutti come
+LET*, in cui l’environment in cui avviene la valutazione contiene informazioni
+aggiuntive rispetto quello in prodotto in output dalla valutazione stessa.\\
+
+PROVA AD AGGIUNGERE IL DISCORSO RELATIVO ALLA GESTIONE DEL FATTO CHE POSSONO
+ANCHE NON ESSERCI FORM INNESTATE.\\
+
+MODIFICA IL PARSING DELLE DICHIARAZIONI IN MANIERA TALE DA USARE PARSE-FORM
+CON ‘DECLARE. QUESTO È UN ALTRO ASPETTO CHE MOSTRA LA DISCESA RICORSIVA. FAI
+VEDERE ANCHE CHE L’ELEMENTO PRODOTTO DA PARSE-FORM VIENE SCARTATO E VIENE
+CONSIDERATO SOLAMENTE L’ENVIRONMENT. QUESTO PERCHÈ NEL CASO DELLE
+DICHIARAZIONI DI QUESTO TIPO RISULTA RIDONDANTE MANTENERE SIA LA
+RAPPRESENTAZIONE COME CLAST-ELEMENT CHE LA RAPPRESENTAZIONE COME INFORMAZIONE
+INTERNA ALL’ENVIRONMENT.\\
+
+L’ESEMPIO NON MOSTRA LA DISCESA RICORSIVA AL MOMENTO. MODIFICA IL CODICE IN
+MANIERA TALE CHE SI VEDA CHE VIENE CHIAMATO PARSE SULLE FORM INNESTATE.\\
+
+A partire da quanto prodotto dai passi precedenti, il metodo ritorna quindi i
+due valori comuni a qualsiasi metodo PARSE-FORM: un primo valore costituito da
+un’istanza di CLAST-ELEMENT che rappresenta il nodo radice del sottoalbero del
+quale il metodo ha effettuato il parsing, ed un secondo elemento che
+rappresenta l’environment prodotto dalla valutazione del sottoalbero.\\
+
+Questa sottosezione ha presentato, attraverso un esempio, il funzionamento e
+l’analisi svolta dalla libreria. Analisi che consente di produrre una
+rappresentazione estremamente precisa del codice fornito in input a questa.
