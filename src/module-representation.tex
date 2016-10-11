@@ -44,13 +44,18 @@ l’oggetto stesso, come il nome stesso di questa struttura suggerisce. Esempi
 di self-evaluating objects sono rappresentati da numeri, sia interi che
 complessi, stringhe, pathnames e array.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Esempi di form di tipo self-evaluating object]
 
-3                        ; 3
-#c(2/3 5/8)              ; #C(2/3 5/8)
-#p"S:[BILL]OTHELLO.TXT"  ; #P"S:[BILL]OTHELLO.TXT"
-#(a b c)                 ; #(A B C)
-"fred smith"             ; "fred smith"
+CL-USER > 3
+3
+CL-USER > #c(2/3 5/8)
+#C(2/3 5/8)
+CL-USER > #p"S:[BILL]OTHELLO.TXT"
+#P"S:[BILL]OTHELLO.TXT"
+CL-USER > #(a b c)
+#(A B C)
+CL-USER > "fred smith"
+"fred smith"
 
 \end{lstlisting}
 
@@ -68,7 +73,14 @@ il simbolo rappresenti una variabile. Il valore della variabile associata al
 simbolo viene quindi ricercato e utilizzato per ritornato come output del
 processo di valutazione.\\
 
-ESEMPIO DI SIMBOLO
+\begin{lstlisting}[caption=Esempi di form di tipo symbol]
+
+CL-USER > *STANDARD-INPUT*
+#<SWANK/GRAY::SLIME-INPUT-STREAM {1004F2D653}>
+CL-USER > *MACROEXPAND-HOOK*
+FUNCALL
+
+\end{lstlisting}
 
 Come affermato, nel caso il simbolo non sia stato identificato come symbol-
 macro, il sistema assume che questo rappresenti una variabile, nel caso in cui
@@ -96,8 +108,12 @@ viene classificata come all’interno delle seguenti 4 categorie: special form,
 macro form, function form e lambda form.
 
 \begin{lstlisting}
-(car '(+ 1 2)) => +     ; CAR is a symbol
-(cdr '(+ 1 2)) => (1 2) ; CDR is a list
+
+CL-USER > (car '(+ 1 2))
++                        ; CAR is a symbol
+CL-USER > (cdr '(+ 1 2))
+(1 2)                    ; CDR is a list
+
 \end{lstlisting}
 
 Nel caso in cui l’operatore venga identificato come il nome di una funzione,
