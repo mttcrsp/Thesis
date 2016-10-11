@@ -126,7 +126,8 @@ CL-USER > (cdr '(+ 1 2))
 
 \end{lstlisting}
 
-A questo punto il processo di valutazione prevede si ramifica a seconda di come la form sia stata classificata al passo precedente.
+A questo punto il processo di valutazione prevede si ramifica a seconda di
+come la form sia stata classificata al passo precedente.
 
 \begin{itemize}
 
@@ -185,74 +186,97 @@ facilitare i compiti di analisi del codice sorgente di un programma.
 Dopo aver brevemente presentato il processo di valutazione utilizzato da un
 sistema Common Lisp e le strutture fondamentali utilizzate da questo processo,
 questa sezione presenta i meccanismi che vengono forniti dalla libreria CLAST
-allo scopo di rappresentare un programma.\\
+allo scopo di rappresentare un programma Lisp.
 
-La rappresentazione fornita dalla libreria è organizzata all’interno di un
-grande insieme di classi, organizzate all’interno di una gerarchia sfruttando
-il supporto all’ereditarietà offerto dal linguaggio e in particolare
-all’ereditarietà multipla. In particolare, il supporto dell’ereditarietà
-multipla viene sfruttato allo scopo di definire un insieme di classi in grado
-di agire da mixins, la cui semantica verrà presentata in seguito.\\
+Come precedentemente riportato, i meccanismi di rappresentazione ricalcano
+molto da vicino le informazioni prodotte e raccolte da un sistema Lisp durante
+il processo di valutazione. Questo perché che la rappresentazione che la
+libreria vuole offrire è la più ricca possibile e quello della valutazione è
+il momento in cui viene prodotto e raccolto il maggior numero di informazioni
+rispetto alla semantica del programma in analisi.\\
 
-Un mixin o trait viene tipicamente definito come una classe che definisce un
-insieme i metodi o attributi allo scopo di facilitare il riuso di questi
-all’interno di altre classi, senza però dover forzare la definizione una
-relazione di ereditarietà diretta tra la classe mixin e la classe che opera il
-riuso. Lo scopo di soluzioni di questo tipo, implementate da linguaggio di
-programmazione diversi con modalità e nomi diversi, è quindi fondamentalmente
-quello di facilitare il riuso di codice evitando allo stesso tempo i problemi
-legati alle ambiguità che possono essere causate dall’impiego
-dell’ereditarietà multipla.\\
+Dal punto di vista pratico, la rappresentazione fornita dalla libreria è
+strutturata all’interno di un grande insieme di classi. Classi organizzate
+all’interno di una gerarchia, sfruttando il supporto offerto dal linguaggio
+all’ereditarietà e in particolare all’ereditarietà multipla.
 
-A differenza di quanto avviene nel contesto di altri linguaggio di
-programmazione, come ad esempio Scala e Swift, in Common Lisp un mixin viene
-definito attraverso una semplice definizione di classe in maniera del tutto
-analoga a quanto avverrebbe per la definizione di una classe tradizionale.\\
+\subsubsection{CLAST-ELEMENT e FORM}
 
 La classe fondamentale al vertice della gerarchia delle strutture esposte da
 CLAST è la classe \texttt{CLAST-ELEMENT}. Questa classe ha il semplice scopo
 di raccogliere le diverse strutture offerte dalla libreria all'interno di un
 unico tipo, in maniera tale da facilitare l’ispezione e l’analisi di oggetti
-prodotto dalla libreria. Per questa ragione non dichiara alcun attributo ed
-alcun metodo viene specializzato rispetto a questa.\\
+prodotti dalla libreria. Per questa ragione la classe non dichiara alcun
+attributo ed alcun metodo viene specializzato rispetto a questa.\\
 
 La prima classe concreta all’interno della gerarchia è la classe
 \texttt{FORM}. Lo scopo di questa classe è quello di rappresentare i dettagli
-fondamentali di ciascun elemento presente all’interno di un programma Common
-Lisp e in particolare, fungere da nodo, ossia unità fondamentale, della
-rappresentazione mediante AST fornita dalla libreria. Questa classe espone
-quindi tre attributi fondamentali.\\
+fondamentali di qualsiasi elemento presente all’interno di un programma Common
+Lisp e, in particolare, fungere da nodo ossia unità fondamentale della
+rappresentazione mediante AST fornita dalla libreria.\\
+
+La classe \texttt{FORM} espone quindi tre attributi fondamentali.
 
 \begin{itemize}
 
-\item Un attributo \texttt{SOURCE}, il quale riporta il codice sorgente
-associato al nodo, form, in analisi, il quale facilita allo scopo di
-facilitare il compito di un analizzatore che lavora a partire dalla libreria.
+\item Un attributo \texttt{SOURCE} che riporta il codice sorgente associato al
+nodo, form, in analisi. La presenza di questo attributo ha lo scopo di
+facilitare il compito di un analizzatore che lavora a partire dalla libreria,
+interessato in particolar modo ad aspetti testuali del codice sorgente.
 
-\item Un attributo \texttt{TOP},  il quale rappresenta form all’interno della
-quale, la form è innestata. Questo attributo risulta di fondamentale
-importanza per la libreria in quanto consente di rappresentare un programma
-all’interno di una struttura ad albero, un AST, come anticipato all’interno
-dei capitoli precendenti. Questo consente di ottenere una rappresentazione
+\item Un attributo \texttt{TOP} indica l'istanza \texttt{FORM} all’interno
+della quale questa istanza è innestata. Questo attributo risulta di
+fondamentale importanza, sia per gli utenti della libreria, sia per la
+libreria stessa, in quanto è l'elemento che consente di implementare una
+navigazione all'interno del codice di un programma di rappresentare un
+programma all’interno di una struttura ad albero, un AST, come anticipato dai
+capitoli precendenti. Questo consente di ottenere una rappresentazione
 universalmente nota e per la quale le operazioni di traversal risultano
 particolarmente semplici.
 
-\item Un attributo \texttt{TYPE}, il quale riporta il tipo, dichiarato o
-potenzialmente inferito del nodo, form, in analisi. Questo allo scopo di
+\item Un attributo \texttt{TYPE} riporta invece il tipo dichiarato, o
+potenzialmente inferito, del nodo o form in analisi. Questo allo scopo di
 facilitare il lavoro di strumenti come type checkers, che cerchino di
 aggiungere una tipizzazione statica ad un linguaggio di programmazione
-dinamico come il Common Lisp.\\
+dinamico come il Common Lisp.
 
 \end{itemize}
 
+\subsubsection{Mixins}
+
+Come precedentemente affermato, il modulo fa utilizzo del supporto
+all'ereditarietà multiple offerto dal linguaggio. In particolare, questo il
+meccanismo dell'ereditarietà multipla viene sfruttato allo scopo di definire
+un insieme di classi in grado di agire da mixins, la cui semantica verrà
+presentata in seguito.\\
+
+Un mixin o trait viene definito come una classe che definisce un insieme i
+metodi e/o attributi allo scopo di facilitare il riuso di questi da parte di
+altre classi, senza però forzare la definizione una relazione di ereditarietà
+diretta tra di essa e la classe che opera il riuso. Lo scopo di soluzioni di
+questo tipo, implementate da diversi linguaggio di programmazione con modalità
+e nomi differenti, è quindi fondamentalmente quello di facilitare il riuso di
+codice evitando allo stesso tempo i problemi legati alle ambiguità che possono
+essere causate dall’impiego dell’ereditarietà multipla, legate ad esempio a
+problemi come il Diamond Problem\cite{martin1997}.\\
+
+A differenza di quanto avviene nel contesto di altri linguaggi di
+programmazione, come ad esempio Scala, un linguaggio che specifica un
+costrutto dedicato esclusivamente alla definizione di mixins, in Common Lisp
+un mixin viene definito attraverso una semplice definizione di classe in
+maniera del tutto analoga a quanto avverrebbe per la definizione di una classe
+tradizionale.\\
+
 Alla base della libreria vengono quindi definite altre due classi che, come
-anticipato in precedenza, hanno lo scopo di agire da mixin. La prima di queste
-classi è chiamata \texttt{IMPLICIT-PROGN}, la seconda è chiamata \texttt
-{EXPANSION-COMPONENT}.\\
+anticipato, hanno lo scopo di agire da mixin. La prima di queste classi è
+chiamata \texttt{IMPLICIT-PROGN}, la seconda è chiamata \texttt {EXPANSION-
+COMPONENT}.
+
+\subsubsection{IMPLICIT-PROGN e EXPANSION-COMPONENT}
 
 Lo scopo della classe \texttt{IMPLICIT-PROGN} è quello di raccogliere gli
-attributi ed i metodi necessari all’analisi di form che contengono una
-implicita form di tipo \texttt{PROGN}. Il costrutto \texttt{PROGN} è il
+attributi ed i metodi necessari all’analisi di compound form che contengono
+una implicita form di tipo \texttt{PROGN}. Il costrutto \texttt{PROGN} è il
 costrutto fondamentale alla definizione di codice imperativo in Common Lisp,
 valuta l’insieme di form fornite in input in sequenza e ritorna il risultato
 dell’ultima di queste, scartando il risultato di tutte le precedenti. Essendo
@@ -262,22 +286,38 @@ funzionamento di diversi altri costrutti, come ad esempio \texttt{DEFUN} e
 responsabilità e le strutture fondamentali al parsing e all’analisi di form di
 questo tipo all’interno di questo mixin, allo scopo di facilitare il riuso
 all’interno delle funzioni e delle strutture dedicate al parsing dei diversi
-costrutti che compiono un \texttt{IMPLICIT-PROGN}. I due slot fondamentali
-esposti da questa classe sono i seguenti.\\
+costrutti che compiono un \texttt{IMPLICIT-PROGN}.
+
+\begin{lstlisting}[caption=Esempio di costrutto che fa utilizzo di del
+costrutto PROGN in modo implicito]
+
+(defun sum-and-log (x y)
+  (format t "~a plus ~a equals..." x y) ; The form on this line will be implicitly
+                                        ; wrapped in a PROGN
+  (+ x y)                               ; together with the on on this line
+  )
+
+\end{lstlisting}
+
+I due slot fondamentali esposti da questa classe sono i seguenti.\\
 
 \begin{itemize}
 
-\item \texttt{IPROGN-FORMS} è un attributo che tiene traccia delle form
-innestate all’interno di questa e che verranno implicitamente eseguite
-all’interno di una form di tipo \texttt{PROGN}.
+\item \texttt{IPROGN-FORMS} è un attributo utilizzato allo scopo di tenere
+traccia delle form innestate all’interno di quella rappresentata da questa
+istanza di CLAST-ELEMENT e che verranno implicitamente eseguite all’interno di
+una form di tipo \texttt{PROGN}. Un secondo scopo di questa classe, non meno
+importante del primo, è quello di mantenere la relazione tra una form e le sue
+sotto-form; ciò consentira infatti la navigazione all'interno del codice,
+specificando le foglie di un determinato nodo appartenente all'AST.
 
 \item \texttt{BODY-ENV} è invece un attributo che riporta un oggetto di tipo
 environment, il quale rappresenta l’environment all’interno del quale verrà
 eseguita la valutazione delle form memorizzate dall’attributo \texttt{IPROGN-
 FORMS} appena riportato. È importante notare che nel caso di molte special
 forms, questo attributo risulta di fondamentale importanza agli scopi di uno
-strumento di analisi, in quanto consente di osservare il reale ambiente di
-valutazione.
+strumento di analisi, in quanto consente di osservare il reale ambiente
+all'interno del quale verrà eseguita una determinata form.
 
 \end{itemize}
 
@@ -289,34 +329,46 @@ INFORMAZIONI A QUESTO, ALL’INTERNO DEL QUALE VERRANO VALUTATE LE IMPROGN-
 FORMS. SE INVECE VIENE MESSA PRIMA È NECESSARIO SPIEGARE NELLA SEZIONE
 RELATIVA AL PARSING CHE IN ALCUNI CASI SI HA QUESTA DIFFERENZA.\\
 
-La classe EXPANSION-COMPONENT è invece responsabile per la definizione delle
-strutture e dei metodi che consentono il parsing di form soggette a processo
-di valutazione tipico di una macro. Questa classe in particolare espone un
-altro attributo fondamentale ad uno strumento per l’analisi di un programma
-Lisp, ossia la risultato dell’espansione della form rappresentata dal nodo.\\
+La classe \texttt{EXPANSION-COMPONENT} è invece responsabile per la
+definizione delle strutture e dei metodi che consentono il parsing di form
+soggette al processo di valutazione tipico di una macro presentato nel corso
+dalla sezione <>.
+
+In particolare, questa classe espone un altro attributo, chiamato \texttt
+{FORM-EXPANSION}, fondamentale ad uno strumento per l’analisi di un programma
+Lisp, ossia la risultato dell’espansione della macro rappresentata dal nodo.\\
+
+\subsubsection{Strutture di dettaglio}
 
 Le tre classi appena riportate rappresentano il substrato fondamentale della
 rappresentazione offerta dalla libreria CLAST. Il livello di dettaglio offerto
 dalla libreria è però molto maggiore rispetto a quello possibile utilizzando
-solamente queste tre classi. La libreria infatti dichiara più di cento classi
+solamente queste tre classi. La libreria dichiara infatti più di cento classi
 che vengono utilizzate per rappresentare istruzioni ad un livello di dettaglio
-di singolo operatore. Il diagramma in seguito presenta i principali
-raggruppamenti delle classi facenti parte del modulo di rappresentazione. Una
-discussione di ciascuna di queste risulterebbe troppo estesa per essere
-riportata all’interno di questa tesi e viene rimandata alla documentazione
-fornita in accompagnamento alla libreria.\\
+di singolo operatore.
 
-AGGIUNGI QUALI COMPOUND FORM VENGONO RAPPRESENTATE NEL DETTAGLIO E QUALI
-VENGONO RAPPRESENTATE SEMPLICEMENTE COME APPLICAZIONI DI MACRO O FUNZIONE.\\
+Il diagramma in seguito presenta i principali raggruppamenti delle classi
+facenti parte del modulo di rappresentazione. Una discussione di ciascuna di
+queste risulterebbe troppo estesa per essere riportata all’interno di questa
+tesi e viene rimandata alla documentazione fornita in accompagnamento alla
+libreria.\\
 
-Gli operatori speciali indicati dallo standard ANSI Common Lisp, sezione
-3.1.2.1.2 listato 2, più tutti gli operatori interessanti dal punto di vista
-dell’analisi non presentati all’interno di quella lista. questi operatori
-aggiuntivi sono quelli legati al CLOS, al meccanismo delle dichiarazioni e al
-costrutto loop, in quanto particolarmente utilizzati e potenzialmente molto
-significativi dal punto di vista dell’analisi. In presenza di qualsiasi altro
-operatore, la rappresentazione si limita a riportare, l’applicazione di
-questo, distinguendo se si tratta dell’applicazione di una funzione o di una
-macro. Questa modalità di analisi consente di rappresentare qualsiasi
-possibile compound form con il maggiore grado di precisione possibile a
-seconda dello specifico caso in analisi.
+Non sarebbe possibile e nemmeno utile, avere un classe specifica per la
+rappresentazioni qualsiasi possibile operatore definito da un utente e
+linguaggio. In particolare, vengono considerati nel dettaglio gli operatori
+speciali indicati dallo standard ANSI Common Lisp, Sezione 3.1.2.1.2 Listato
+2, più tutti gli operatori ritenuti di particolare interesse dal punto di
+vista dell’analisi non presentati all’interno di quella lista.
+
+L'insieme di questi operatori aggiuntivi consiste principalmente degli
+operatori legati al CLOS, al meccanismo delle dichiarazioni e al costrutto
+loop, in quanto particolarmente utilizzati dagli utenti del linguaggio Common
+Lisp e quindi significativamente più rilevanti dal punto di vista
+dell’analisi.\\
+
+Qualsiasi compound form viene tuttavia rappresentata con il maggiore grado di
+precisione possibile, a seconda dello specifico caso in analisi. In presenza
+di operatori non trattati in modo specifico dalla libreria, come
+un'applicazione dell'operatore della compound form, distinguendo se si tratta
+dell’applicazione di una funzione o di una macro a partire dalla ricerca
+dell'operatore all'interno dell'environment in uso.
