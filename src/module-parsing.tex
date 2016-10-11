@@ -127,6 +127,13 @@ oppure se rappresenta un simbolo o una compound form, i tre elementi
 fondamentali del processo di valutazione del Common Lisp presentato nel corso
 della sezione precedente.\\
 
+DEVI SPIEGARE IL FATTO CHE BODY-ENV, NEL CASO DI ISTRUZIONI COME LET, È MOLTO
+DIVERSO DALL’ENVIRONMENT RITORNATO, IN QUANTO ISTRUZIONI COME LET SONO IN
+GRADO DI PRODURRE UN NUOVO ENVIRONMENT, LESSICALE O DINAMICO, AGGIUNGENDO
+NUOVE INFORMAZIONI A QUESTO, ALL’INTERNO DEL QUALE VERRANO VALUTATE LE
+IMPROGN- FORMS. SE INVECE VIENE MESSA PRIMA È NECESSARIO SPIEGARE NELLA
+SEZIONE RELATIVA AL PARSING CHE IN ALCUNI CASI SI HA QUESTA DIFFERENZA.\\
+
 Nel caso in cui la form rappresenti un self-evaluating symbol, il parsing e la
 valutazione risultano banali, viene immediatamente ritornata un’istanza della
 classe CLAST-ELEMENT appartenente alla sottoclasse più appropriata alla
