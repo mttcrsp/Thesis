@@ -55,13 +55,13 @@
 
 \def\afterpreface{
 	\newpage
-    
+
     \tableofcontents
     \listoftables
 	\listoffigures
-	
+
     \cleardoublepage
-	
+
     \pagenumbering{arabic}
 	\pagestyle{headings}
 }
@@ -134,17 +134,18 @@ TREES
 % RAGIONE PUÒ AVER SENSO ANCHE SPOSTARLO ALL'INTERNO DEL CAPITOLO RELATIVO
 % ALL'IMPLEMENTAZIONE DELLA LIBRERIA STESSA
 
-
-\chapter{Libreria}
-
-%%% SECTION: STRUCTURE
-\include{src/structure}
 %%% SECTION: ENVIRONMENTS
 \include{src/environment}
 
+\chapter{Libreria}
+
+\include{src/module-representation}
+\include{src/module-parsing}
+\include{src/module-traversal}
+
 % \subsubsection{LOOP parsing}
 % APPROFONDIMENTO SUL PARSING DI LOOP. DOVREBBE ESSERE UN ESEMPIO PARTICOLARMENTE
-% INTERESSANTE PERCHÉ SI TRATTA DI UNA MACRO CHE PERÒ NON VIENE ANALIZZATA A 
+% INTERESSANTE PERCHÉ SI TRATTA DI UNA MACRO CHE PERÒ NON VIENE ANALIZZATA A
 % LIVELLO DI MACROESPANSIONE MA PIUTTOSTO A LIVELLO DI CODICE SORGENTE. IN PIÙ È
 % ANCHE UN OTTIMO ESEMPIO DI COME IL PARSING VENGA OPERATO IN MODO RICORSIVO E DI
 % COME VENGA UTILIZZATA L'API RELATIVA AGLI ENVIRONMENT.
