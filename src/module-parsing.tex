@@ -4,45 +4,55 @@ Dopo aver approfondito, nel corso della precedente sezione, le strutture che
 la libreria CLAST offre per la rappresentazione di codice sorgente, questa
 sezione ha l’obiettivo di presentare e discutere la progettazione e
 implementazione del secondo modulo facente parte libreria. Il modulo di
-parsing è responsabile dello svolgimento delle reali operazioni di analisi
-sintattica, e in parte semantica, del codice sorgente fornito in input alla
-libreria al fine di produrre una rappresentazione costruita a partire dalle
-strutture esposte dal modulo di rappresentazione.
+parsing ed analisi è responsabile dello svolgimento delle reali operazioni di
+analisi sintattica, e in parte semantica, del codice sorgente fornito in input
+alla libreria. Attività che producono come output la rappresentazione del
+programma Common Lisp soggetto in forma di abstract syntax tree da cui la
+libreria prende nome.\\
 
-\section{Architettura del modulo}
+Dal punto di vista strutturale, il modulo consiste di un parser a discesa
+ricorsiva, una particolare tipologia di parser che verrà brevemente discussa
+nel corso dei prossimi paragrafi.
 
-Dal punto di vista architetturale, il modulo consiste di un parser a discesa
-ricorsiva, una particolare tipologia di parser. Formalmente, un parser a
-discesa ricorsiva è definito come un parser che opera in modo top-down,
-costruito a partire da un insieme di procedure mutualmente esclusive, o
-equivalenti, in cui tipicamente ciascuna procedura implementa una delle
-produzioni della grammatica associata al linguaggio target dell’attività di
-parsing. Il particolare parser presente all’interno della libreria CLAST può
-inoltre essere definito un predictive-parser, un parser a discesa ricorsiva in
+\subsubsection{Parser a discesa ricorsiva}
+
+Formalmente, un parser a discesa ricorsiva è definito come un parser che opera
+in modo top-down, costruito a partire da un insieme di procedure mutualmente
+esclusive, o equivalenti, in cui tipicamente ciascuna procedura implementa una
+delle produzioni della grammatica associata al linguaggio target dell’attività
+di parsing.
+
+Il particolare parser presente all’interno della libreria CLAST può inoltre
+essere definito un predictive-parser, ossia un parser a discesa ricorsiva in
 grado di svolgere la propria attività di analisi e scomposizione senza
-necessità di operare backtracking, ossia senza la necessità di svolgere e
-abbandonare computazioni parziali.\\
+necessità di operare backtracking o, in altri termini, senza la necessità di
+svolgere e abbandonare computazioni parziali.\\
 
-I principali vantaggi legati alla scelta di un’architettura di questo tipo
-sono principalmente due. Da un punto di vista computazionale, la proprietà più
-interessante di un predictive-parser è rappresentata dal fatto che questo è in
-grado di lavorare in tempo lineare nella dimensione del suo input. Affinché
-sia possibile definire un predictive-parser per un dato linguaggio è
-necessario che la grammatica di questo sia un grammatica di tipo context-free,
-ossia una grammatica non ambigua e per la quale vale la proprietà per cui è
-sempre possibile osservare un numero finito di token dallo stream di input per
-poter determinare la corretta produzione della grammatica da applicare. La
-grammatica del linguaggio Common Lisp è una grammatica di questo tipo.\\
+I principali vantaggi legati alla scelta di organizzare il processo di parsing
+come un parser di questo tipo sono principalmente due. Da un punto di vista
+computazionale, la proprietà più interessante di un predictive-parser è
+rappresentata dal fatto che questo è in grado di lavorare in tempo lineare
+nella dimensione del suo input.
 
 Un secondo vantaggio legato alla scelta di organizzare le attività di parsing
-all’interno di un predictive-parser è invece più legato agli aspetti di
-qualità del software e manutenibilità dell’implementazione prodotta. La forte
-strutturazione del parser in un insieme di procedure specifiche per ciascuna
-produzione della grammatica del linguaggio in analisi, guida l’implementazione
-nella definizione di un insieme di funzioni altamente coese nel rispetto dei
-principi di single responsibility e separation of concerns che consentono di
-ottenere un’implementazione particolarmente espressiva, manutenibile e
+come un predictive-parser è invece più legato ad aspetti di qualità del
+software e manutenibilità dell’implementazione prodotta. La forte
+strutturazione del parser all'interno un insieme di procedure specifiche per
+ciascuna produzione della grammatica del linguaggio in analisi, guida infatti
+l’implementazione nella definizione di un insieme di funzioni altamente coese
+nel rispetto dei principi di single responsibility e separation of concerns
+che consentono di ottenere codice particolarmente espressivo, manutenibile e
 facilmente testabile.\\
+
+È importante sottolineare che, affinché sia possibile definire un predictive-
+parser per un dato linguaggio, è necessario che la grammatica di questo sia un
+grammatica di tipo context-free, ossia una grammatica non ambigua e per la
+quale vale la proprietà per cui è sempre possibile osservare un numero finito
+di token dallo stream di input per poter determinare la corretta produzione
+della grammatica da applicare. Fortunatamente, la grammatica del linguaggio
+Common Lisp è una grammatica di tipo context-free.
+
+\subsubsection{Strategie per la costruzione di un parser}
 
 Un parser come quello appena descritto può essere costruito utilizzando in
 maniera manuale o automatica. Approcci automatici alla creazione di un parser
@@ -84,8 +94,9 @@ che utilizzano una sintassi speciale utilizzati dal linguaggio.\\
 
 Come precedentemente affermato la complessità di CLAST come strumento non è
 solamente rappresentata dalla fase di parsing, ma soprattutto dalla fase di
-raccolta di informazioni aggiuntive svolta parallelamente al parsing. L’output
-dell’azione del modulo di parsing è infatti, affinché sia possibile
+raccolta di informazioni aggiuntive svolta parallelamente al parsing.
+
+L’output dell’azione del modulo di parsing è infatti, affinché sia possibile
 raccogliere informazioni come dichiarazioni di tipo, particolarmente utili
 all'analisi strumenti di type checking, sia informazioni relative all’utilizzo
 di variabili non inizializzate, particolarmente utili all’analisi svolta da
@@ -264,6 +275,7 @@ definita la sintassi del costrutto LET e vengono specificati i dettagli
 rispetto al processo di valutazione di form che utilizzano questo operatore.\\
 
 \begin{lstlisting}
+
 let ({var | (var [init-form])}*) declaration* form* => result*
 
 (1) LET and LET* create new variable bindings and (2) execute a series of
@@ -293,7 +305,9 @@ in order; the values of all but the last are discarded (that is, the body of a
 let is an implicit progn).
 
 For both LET and LET*, if there is not an init-form associated with a var, var
-is initialized to NIL. \end{lstlisting}
+is initialized to NIL.
+
+\end{lstlisting}
 
 Il listato presenta una approssimazione del metodo PARSE-FORM implementato
 dalla libreria.
