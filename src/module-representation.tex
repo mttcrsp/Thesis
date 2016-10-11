@@ -1,31 +1,39 @@
 \section{Modulo di rappresentazione}
 
-La struttura del modulo di rappresentazione sviluppato all’interno della
-libreria CLAST ricalca molto da vicino il processo di valutazione del codice
-sorgente di un programma Common Lisp. Questo allo scopo di ottenere delle
-strutture che consentano di ottenere una rappresentazione molto vicina a
-quella utilizzata internamente da un reale sistema Common Lisp, ossia la più
-ricca possibile. Tutto questo mentendo sempre il riferimento al codice
-sorgente vero e proprio, in maniera tale da ottenere sia informazioni rispetto
-alla semantica del programma a livello macchina, sia informazioni rispetto
-alla semantica desiderata dall’autore del programma.
+In questa sezione viene approfondita la struttura e il contenuto del modulo di
+rappresentazione presente all'interno della libreria CLAST. In particolare,
+questa sezione discute le scelte compiute e il metodo utilizzato per la
+definizione delle diverse classi che potranno verranno poi utilizzate dal
+modulo di parsing in fase di generazione dell'AST associato al programma in
+analisi.
+
+La struttura del modulo di rappresentazione ricalca molto da vicino il
+processo di valutazione del codice sorgente di un programma Common Lisp.
+Questo allo scopo di ottenere delle strutture che consentano di ottenere una
+rappresentazione molto vicina a quella utilizzata internamente da un reale
+sistema Common Lisp, ossia la più ricca possibile. Tutto questo mentendo
+sempre il riferimento al codice sorgente vero e proprio, in maniera tale da
+ottenere sia informazioni rispetto alla semantica del programma a livello
+macchina, sia informazioni rispetto alla semantica desiderata dall’autore del
+programma.
 
 \subsection{Processo di valutazione}
 
-Come affermato nel paragrafo precedente, le strutture facenti parte del modulo
-di rappresentazione sono particolarmente legate al processo di valutazione
-utilizzato dal linguaggio. Per questa ragione, allo scopo di fornire al
-lettore una migliore comprensione delle strutture pratiche che verranno
-presentate nel dettaglio in seguito, in questa sottosezione viene presentato
+Come affermato nel precedente paragrafo, le componenti facenti parte del
+modulo di rappresentazione sono particolarmente legate al processo di
+valutazione utilizzato dal linguaggio. Per questa ragione, allo scopo di
+fornire al lettore una migliore comprensione degli elementi che verranno
+presentati nel dettaglio in seguito, in questa sottosezione viene presentato
 un breve sunto del processo di valutazione e delle strutture fondamentali di
 un programma scritto utilizzando il linguaggio di programmazione Common
 Lisp.\\
 
 La struttura fondamentale alla base del processo di valutazione di un
 programma Lisp è la form. Una form viene infatti definita formalmente dallo
-standard ANSI Common Lisp come “an object meant to be evaluated”. Dal punto di
-vista pratico una form può essere rappresentata sia da un atomo che da una
-lista.\\
+standard ANSI Common Lisp come “an object meant to be evaluated”.
+
+Dal punto di vista pratico una form può essere rappresentata sia da un atomo
+che da una lista.
 
 Il caso in cui una form è rappresentata da un atomo è il caso più semplice
 all’interno del processo di valutazione. Una volta identificato un atomo, il
@@ -37,11 +45,13 @@ di self-evaluating objects sono rappresentati da numeri, sia interi che
 complessi, stringhe, pathnames e array.
 
 \begin{lstlisting}
-3 =>  3
-#c(2/3 5/8) =>  #C(2/3 5/8)
-#p"S:[BILL]OTHELLO.TXT" =>  #P"S:[BILL]OTHELLO.TXT"
-#(a b c) =>  #(A B C)
-"fred smith" =>  "fred smith"
+
+3                        ; 3
+#c(2/3 5/8)              ; #C(2/3 5/8)
+#p"S:[BILL]OTHELLO.TXT"  ; #P"S:[BILL]OTHELLO.TXT"
+#(a b c)                 ; #(A B C)
+"fred smith"             ; "fred smith"
+
 \end{lstlisting}
 
 Nel caso in cui un atomo non sia un self-evaluating object, il sistema Lisp lo
@@ -57,6 +67,8 @@ definizione di macro all’interno dell’ambiente, il sistema Lisp assume che i
 il simbolo rappresenti una variabile. Il valore della variabile associata al
 simbolo viene quindi ricercato e utilizzato per ritornato come output del
 processo di valutazione.\\
+
+ESEMPIO DI SIMBOLO
 
 Come affermato, nel caso il simbolo non sia stato identificato come symbol-
 macro, il sistema assume che questo rappresenti una variabile, nel caso in cui
