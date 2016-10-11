@@ -54,47 +54,59 @@ Common Lisp è una grammatica di tipo context-free.
 
 \subsubsection{Strategie per la costruzione di un parser}
 
-Un parser come quello appena descritto può essere costruito utilizzando in
-maniera manuale o automatica. Approcci automatici alla creazione di un parser
-lavorano tipicamente a partire da strumento specializzato nella generazione di
-sistemi software di questo tipo. Un generatore di parser prende in input una
-descrizione formale della grammatica del linguaggio target del parsing e
-produce in output un programma in grado di operare il parsing del linguaggio
-target oppure una struttura, solitamente chiamata parse table, a partire dalla
-quale un programma driver è in grado di operare il parsing.\\
+Un parser come quello appena descritto può essere costruito utilizzando un
+approccio di tipo automatico oppure utilizzando un approccio manuale.\\
 
-Il vantaggio dell’utilizzo di strumenti automatici è chiaramente rappresentato
-dall’immediatezza con la quale questi consentono di produrre strumenti
-efficienti e per i quali è possibile compiere una verifica formale di
-correttezza. Lo svantaggio fondamentale dovuto al fatto che la loro estensione
-al fine di supportare la raccolta di informazioni aggiuntive risulta molto
-spesso difficile o impossibile. Inoltre, l’utilizzo di questi strumenti non è
-possibile nel caso in cui non sia disponibile una grammatica formale relativa
-al linguaggio target delle operazioni di parsing.\\
+Approcci automatici alla creazione di un parser lavorano tipicamente a partire
+da uno strumento specializzato nella generazione di sistemi software di questo
+tipo, detti appunto generatori di parser. Un generatore di parser prende in
+input una descrizione formale della grammatica del linguaggio target del
+parsing e produce in output un programma in grado di operare il parsing del
+linguaggio target. Alternativamente, alcuni generatori di parser producono in
+output una struttura, solitamente chiamata parse table, a partire dalla quale
+un programma driver generico è in grado di operare il parsing.\\
+
+Il vantaggio principale dell’utilizzo di strumenti automatici è chiaramente
+rappresentato dall’immediatezza con la quale questi consentono di produrre
+strumenti efficienti. Un secondo vantaggio particolarmente significativo è
+rappresentato dal fatto che, in molti casi, il parser generato dallo strumento
+è corretto in modo formalmente dimostrabile.
+
+Lo svantaggio fondamentale legato all'utilizzo di un generatore di parser è
+dovuto al fatto che la loro estensione, al fine di supportare la raccolta di
+informazioni aggiuntive, risulta molto spesso difficile se non impossibile.
+Inoltre, l’utilizzo di questi strumenti non è possibile nel caso in cui non
+sia disponibile una descrizione formale della grammatica del linguaggio target
+delle operazioni di parsing che possa essere fornita in input allo
+strumento.\\
 
 Il requisito e lo svantaggio appena citati rendono l’applicazione di un
 approccio automatico impossibile nel contesto del progetto soggetto di questa
 tesi. Infatti, in prima battuta, non sono disponibili definizioni formali
 della grammatica completa del linguaggio Common Lisp. Inoltre, ponendosi CLAST
 come una soluzione per la creazione di strumenti di source code analysis di
-diverso tipo, risulta di fondamentale importanza la possibilità di estendere
-il processo di parsing al fine di raccogliere il maggior numero di
-informazioni possibili rispetto al codice del programma in analisi e che un
-parser generato in modo automatico da uno strumento generico non è in grado di
-fornire.\\
+molteplici tipologie, la possibilità di estendere il processo di parsing al
+fine di raccogliere il maggior numero di informazioni possibili rispetto al
+codice del programma in analisi risulta di fondamentale importanza.
+Informazioni che un parser generato in modo automatico da uno strumento
+generico non è tipicamente in grado di fornire.\\
 
 Per queste ragioni, la scelta intrapresa è stata quella di implementare un
 parser in modo manuale. Da un punto di vista prettamente legato all’analisi
 sintattica che deve essere operata da un parser, il linguaggio Lisp ben si
-presta all’azione di strumenti di questo tipo, essendo il codice molto
-semplicemente organizzato all’interno di liste. Tuttavia, questa attività ha
-comunque necessitato di uno sforzo dal punto di vista dell’implementazione e
-del testing particolarmente significativo dato il grande numero di costrutti
-che utilizzano una sintassi speciale utilizzati dal linguaggio.\\
+presta alla costruzione di strumenti di questo tipo, essendo il codice Lisp
+organizzato all’interno di semplici liste. Tuttavia, questa attività ha
+comunque necessitato di uno sforzo particolarmente significativo dal punto di
+vista implementativo e del testing. Questo soprattutto a causa del grande
+numero di costrutti che utilizzano una sintassi speciale utilizzati dal
+linguaggio e della mancanza di una definizione formale che potesse
+automatizzare, almeno in parte, la generazione del codice di implementazione e
+la ricerca di casi di test.\\
 
 Come precedentemente affermato la complessità di CLAST come strumento non è
 solamente rappresentata dalla fase di parsing, ma soprattutto dalla fase di
-raccolta di informazioni aggiuntive svolta parallelamente al parsing.
+raccolta di informazioni aggiuntive, fase che viene svolta parallelamente al
+parsing.
 
 L’output dell’azione del modulo di parsing è infatti, affinché sia possibile
 raccogliere informazioni come dichiarazioni di tipo, particolarmente utili
