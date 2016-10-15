@@ -1,4 +1,4 @@
-\section{Modulo di parsing}
+\section{Modulo di parsing e analisi}
 
 Dopo aver approfondito, nel corso della precedente sezione, le strutture che
 la libreria CLAST offre per la rappresentazione di codice sorgente, questa
@@ -14,7 +14,7 @@ Dal punto di vista strutturale, il modulo consiste di un parser a discesa
 ricorsiva, una particolare tipologia di parser che verrà brevemente discussa
 nel corso dei prossimi paragrafi.
 
-\subsubsection{Parser a discesa ricorsiva}
+\subsubsection{Attività parsing}
 
 Formalmente, un parser a discesa ricorsiva è definito come un parser che opera
 in modo top-down, costruito a partire da un insieme di procedure mutualmente
@@ -107,6 +107,8 @@ Come precedentemente affermato la complessità di CLAST come strumento non è
 solamente rappresentata dalla fase di parsing, ma soprattutto dalla fase di
 raccolta di informazioni aggiuntive, fase che viene svolta parallelamente al
 parsing.
+
+\subsubsection{Attività analisi}
 
 L’output dell’azione del modulo di parsing è infatti, affinché sia possibile
 raccogliere informazioni come dichiarazioni di tipo, particolarmente utili
