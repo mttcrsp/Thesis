@@ -1,4 +1,4 @@
-\section{Modulo di parsing e analisi}
+\section{Modulo di parsing}
 
 Dopo aver approfondito, nel corso della precedente sezione, le strutture che
 la libreria CLAST offre per la rappresentazione di codice sorgente, questa
@@ -110,27 +110,37 @@ parsing.
 
 \subsubsection{Attività analisi}
 
-L’output dell’azione del modulo di parsing è infatti, affinché sia possibile
-raccogliere informazioni come dichiarazioni di tipo, particolarmente utili
-all'analisi strumenti di type checking, sia informazioni relative all’utilizzo
-di variabili non inizializzate, particolarmente utili all’analisi svolta da
-strumenti di linting, è necessario che, comtemporaneamente alla
-formalizzazione della struttura del programma all’interno di una
-rappresentazione formale, questa rappresentazione formale venga arricchita con
-informazioni relative all’ambiente di valutazione delle diversi componenti del
-programma. Questo viene fatto a partire dal gestione di oggetti di tipo
-environment, oggetti che consentono la memorizzazione di dichiarazioni valide
-al momento della valutazione di un particolare frammento di codice. Questa
-attività di gestione di tutte le possibili informazioni relative alle
-dichiarazione presenti nel codice sorgente del programma in analisi ricalca
-molto da vicino l’attività svolta dalla componente di valutazione di un
-sistema Common Lisp e rappresentazione un’attività di molto significativa
-complessità, in quanto richiede sia la comprensione dei meccanismi interni di
-funzionamento di ciascun costrutto del linguaggio che la manipolazione,
-utilizzando un API particolarmente ristretta e relativamente poco adatta allo
-scopo, degli environment in modo parallelo al processo di navigazione del
-codice sorgente operato dal parsing, aspetti che non sempre possono essere
-combinati con facilità.
+Molte delle informazioni utili ed interessanti a strumenti di source code
+analisys non sono immediatamente ottenibili dalla strutturazione struttura di
+AST prodotta dal parsing di un programma e realizzata, nel contesto di CLAST,
+come descritto delle precedenti sottosezioni.
+
+Esempi di informazioni di questo tipo sono le informazioni relative
+all'utilizzo da parte del programma di variabili libere, particolarmente
+interessanti per la realizzazione di strumenti per il linting, o informazioni
+relative al tipo delle form che rappresentano i nodi dell'AST, particolarmente
+interessati per la realizzazione type checkers.\\
+
+Per questa ragione, parallelamente all'attività di parsing vera a propria, il
+modulo di parsing descritto da questa sezione opera un'attività di analisi e
+raccolta di informazioni riguardo all'ambiente di valutazione del codice del
+programma soggetto.
+
+Questo attività di analisi lavora a partire dal gestione di oggetti di tipo
+environment, oggetti che consentono la memorizzazione di definizioni e
+dichiarazioni valide al momento della valutazione di un particolare frammento
+di codice, e ricalca ricalca molto da vicino l’attività svolta dalla
+componente di valutazione di un sistema Common Lisp.\\
+
+La progettazione e realizzazione dell'attività appena descritta rappresenta
+uno degli aspetti di maggiore complessità svolta dalla libreria, in quanto
+richiede sia la comprensione del meccanismo interno di valutazione
+caratteristico del linguaggio Common Lisp e del funzionamento di ciascun
+costrutto del linguaggio che la manipolazione, utilizzando un API
+particolarmente ristretta e relativamente poco adatta allo scopo, degli
+environment in modo parallelo al processo di navigazione del codice sorgente
+operato dal parsing, aspetti che non sempre possono essere combinati con
+facilità.
 
 \subsection{Implementazione del modulo}
 
@@ -140,8 +150,12 @@ produce in output due valori, una rappresentazione in forma di AST composta da
 istanze di oggetti definiti all’interno del modulo di rappresentazione,
 presentati nella sezione precedente di questo capitolo, e un oggetto
 environment, il quale rappresenta l’environment prodotto dalla valutazione
-della form. Il listato <> mostra un estratto del codice della libreria in cui
-si mostra la definizione della funzione PARSE.\\
+della form. La coppia prodotta come output raccoglie il risultato delle
+attività parallele di parsing e analisi precedentemente descritte e raccoglie
+il massimo insieme di formazioni che risulta possibile raccogliere rispetto ad
+un dato frammento di codice Common Lisp utilizzando la libreria. Il listato <>
+mostra un estratto del codice della libreria in cui si mostra la definizione
+della funzione PARSE.\\
 
 CODICE DELLA DEFINIZIONE DI PARSE CON DOCUMENTAZIONE\\
 
