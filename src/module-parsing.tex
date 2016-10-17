@@ -284,25 +284,49 @@ illustra brevemente il meccanismo delle funzioni generiche Common Lisp.\\
 
 \subsubsection{Funzioni generiche}
 
-Una funzione generica Common Lisp è una funzione il cui comportamento viene
-determinato a partire dalle classi e dalle identità dei parametri che vengono
-forniti in input a questa. Una funzione generica specifica un nome di funzione
-e una lista di parametri ma, a differenza di una funzione ordinaria, non
-specifica alcun corpo e quindi nessun comportamento che deve essere eseguito
-in risposta ad una sua invocazione. La reale implementazione del comportamento
-di una funzione generica può essere specificato attraverso la definizione di
-metodi.\\
+Formalmente, una funzione generica Common Lisp può essere definita come una
+funzione il cui comportamento viene determinato a partire dalle classi e dalle
+identità dei parametri che vengono forniti in input.\\
 
-CODICE DI ESEMPIO PER LA DEFINIZIONE DI UNA FUNZIONE GENERICA\\
+Una funzione generica specifica un nome di funzione e una lista di parametri
+ma, a differenza di una funzione ordinaria, non specifica alcun corpo e quindi
+nessun comportamento che deve essere eseguito in risposta ad una sua
+invocazione. La reale implementazione del comportamento di una funzione
+generica può essere specificato attraverso la definizione di metodi.\\
+
+\begin{lstlisting}[caption=Confronto tra definizione di funzioni generiche e
+ordinarie]
+
+;; A generic function definition. Note that no body for the function
+;; needs to be specified.
+(defgeneric id (x))
+
+;; An ordinary function definition. A body needs to be specified,
+;; otherwise an empty body is implicit nil return form is assumed.
+(defun id (x)
+  x)
+
+\end{lstlisting}
 
 Un metodo Common Lisp è una funzione che specifica l’implementazione di una
 funzione generica per una determinato insieme di specializzazioni dei
 parametri di questa. Ciascun parametro può essere specializzato da un metodo
 in due diversi modi: indicando la classe di appartenenza di questo, come ad
-esempio NUMBER, oppure indicando l’identità di uno specifico oggetto.\\
+esempio \texttt{NUMBER}, oppure indicando l’identità di uno specifico
+oggetto, come ad esempio il valore 9.\\
 
-CODICE CON DUE ESEMPI DI DEFINIZIONE DI UN METODO CHE MOSTRI I DUE DIVERSI
-TIPI DI SPECIALIZZAZIONE\\
+\begin{lstlisting}[caption=Esempi definizione di metodi Common Lisp]
+
+CL-USER > (defgeneric some-method (x))
+#<STANDARD-GENERIC-FUNCTION COMMON-LISP-USER::SOME-METHOD (0)>
+CL-USER > (defmethod some-method ((x number))
+     "NUMBER")
+#<STANDARD-METHOD COMMON-LISP-USER::SOME-METHOD (NUMBER) {10037A9953}>
+CL-USER > (defmethod some-method ((x (eql 42)))
+     "This method is eql specialized")
+#<STANDARD-METHOD COMMON-LISP-USER::SOME-METHOD ((EQL 42)) {1003843553}>
+
+\end{lstlisting}
 
 Quando una funzione generica viene invocata, il sistema Lisp analizza i
 parametri forniti in input e ricerca, dall’elenco dei metodi associati alla
@@ -310,11 +334,24 @@ funzione, quale metodo riporti specializzazioni compatibili con i tipi e le
 identità di questi, per poi eseguire il codice associato al metodo e
 determinare così il reale comportamento della funzione generica.\\
 
+\begin{lstlisting}[caption=Esempi di invocazione di metodi Common Lisp]
+
+CL-USER > (some-method 9)
+"NUMBER"
+CL-USER > (some-method 42)
+"This method is eql specialized"
+CL-USER > (some-method "invalid")
+;; Evaluation aborted on #<SIMPLE-ERROR "~@<There is no applicable
+;; method for the generic function ~2I~_~S~~I~_when called with
+;; arguments ~2I~_~S.~:>" {1003B3E8F3}>.
+
+\end{lstlisting}
+
 Da un punto di vista teorico, il meccanismo delle funzioni generiche Common
 Lisp rappresenta un’implementazione del concetto di polimorfismo tipico della
 programmazione Object Oriented, realizzato solitamente nel contesto di altri
 linguaggi di programmazione con tecniche di message passing e funzioni come
-SEND in Smalltalk e objc\_msgSend in Objective-C.\\
+\texttt{SEND} in Smalltalk e \texttt{objc\_msgSend} in Objective-C.\\
 
 Dal punto di vista delle performance e della complessità algoritmica, è
 importante sottolineare che l’attività più significativa è rappresentata
@@ -430,8 +467,8 @@ is initialized to NIL.
 Il listato presenta una approssimazione del metodo PARSE-FORM implementato
 dalla libreria.
 
-\begin{lstlisting}[caption=Semplificazione del metodo texttt{PARSE-FORM} per
-il parsing del costrutto texttt{LET*}]
+\begin{lstlisting}[caption=Semplificazione del metodo \texttt{PARSE-FORM} per
+il parsing del costrutto \texttt{LET*}]
 
 (defmethod parse-form ((op (eql 'let*)) params top :optional env internal-env)
 
@@ -552,9 +589,7 @@ aggiuntive rispetto quello in prodotto in output dalla valutazione stessa.\\
 PROVA AD AGGIUNGERE IL DISCORSO RELATIVO ALLA GESTIONE DEL FATTO CHE POSSONO
 ANCHE NON ESSERCI FORM INNESTATE.\\
 
-MODIFICA IL PARSING DELLE DICHIARAZIONI IN MANIERA TALE DA USARE PARSE-FORM
-CON ‘DECLARE. QUESTO È UN ALTRO ASPETTO CHE MOSTRA LA DISCESA RICORSIVA. FAI
-VEDERE ANCHE CHE L’ELEMENTO PRODOTTO DA PARSE-FORM VIENE SCARTATO E VIENE
+FAI VEDERE ANCHE CHE L’ELEMENTO PRODOTTO DA PARSE-FORM VIENE SCARTATO E VIENE
 CONSIDERATO SOLAMENTE L’ENVIRONMENT. QUESTO PERCHÈ NEL CASO DELLE
 DICHIARAZIONI DI QUESTO TIPO RISULTA RIDONDANTE MANTENERE SIA LA
 RAPPRESENTAZIONE COME CLAST-ELEMENT CHE LA RAPPRESENTAZIONE COME INFORMAZIONE
