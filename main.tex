@@ -14,10 +14,10 @@
 \usepackage{url}
 
 \usepackage[
-	backend=biber,
-    sorting=ynt,
-	style=ieee-alphabetic,
-    defernumbers=true
+  backend=biber,
+  sorting=ynt,
+  style=ieee-alphabetic,
+  defernumbers=true
 ]{biblatex}
 \addbibresource{bib/papers.bib}
 \addbibresource{bib/books.bib}
@@ -43,29 +43,6 @@
   captionpos=b,
 }
 
-\def\beforepreface{
-	\pagenumbering{roman}
-	\pagestyle{plain}
-}
-
-\def\prefacesection#1{%
-	\chapter*{#1}
-	\addcontentsline{toc}{chapter}{#1}
-}
-
-\def\afterpreface{
-	\newpage
-
-    \tableofcontents
-    \listoftables
-	\listoffigures
-
-    \cleardoublepage
-
-    \pagenumbering{arabic}
-	\pagestyle{headings}
-}
-
 \title{CLAST}
 \author{Matteo Crespi 748274}
 \date{Agosto 2016}
@@ -85,8 +62,6 @@
 
 % \brokenpenalty=10000
 
-\pagestyle{headings}
-
 \linespread{1.3}
 
 %% Content
@@ -95,12 +70,14 @@
 
 \maketitle
 
-\beforepreface
+\newpage
 
-\prefacesection{Prefazione}
-\prefacesection{Dedica}
+\tableofcontents
+\listoftables
+\listoffigures
+\lstlistoflistings
 
-\afterpreface
+\cleardoublepage
 
 \chapter{Introduzione}
 
@@ -173,4 +150,3 @@ TREES
 \printbibliography[type=misc,title={Sitografia}]
 
 \end{document}
-
