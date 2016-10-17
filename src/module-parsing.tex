@@ -210,68 +210,79 @@ Il precedente paragrafo ha discusso la funzione \texttt{PARSE} dal punto di
 vista dell'API offerta, ossia dal punto di vista dell'utente della libreria.
 Dal punto di vista del funzionamento interno alla libreria, la funzione
 \texttt{PARSE} viene utilizzata per identificare ed applicare le regole più
-generali della grammatica del linguaggio Common Lisp.
+generali della grammatica del linguaggio Common Lisp.\\
 
-La funzione verifica se la form fornita in input alla funzione rappresenta un
-self-evaluating object oppure se rappresenta un simbolo o una compound form, i
-tre elementi fondamentali del processo di valutazione del Common Lisp
-presentato nel corso della sezione precedente.\\
+\subsubsection{La funzione \texttt{PARSE}}
 
-DEVI SPIEGARE IL FATTO CHE BODY-ENV, NEL CASO DI ISTRUZIONI COME LET, È MOLTO
-DIVERSO DALL’ENVIRONMENT RITORNATO, IN QUANTO ISTRUZIONI COME LET SONO IN
-GRADO DI PRODURRE UN NUOVO ENVIRONMENT, LESSICALE O DINAMICO, AGGIUNGENDO
-NUOVE INFORMAZIONI A QUESTO, ALL’INTERNO DEL QUALE VERRANO VALUTATE LE
-IMPROGN- FORMS. SE INVECE VIENE MESSA PRIMA È NECESSARIO SPIEGARE NELLA
-SEZIONE RELATIVA AL PARSING CHE IN ALCUNI CASI SI HA QUESTA DIFFERENZA.\\
+Dal punto di vista pratico, questo significa che la funzione verifica se la
+form fornita in input alla funzione rappresenta un self-evaluating object, un
+simbolo o una compound form: i tre elementi fondamentali della grammatica e
+del processo di valutazione del Common Lisp presentato nel corso della sezione
+precedente.\\
 
 Nel caso in cui la form rappresenti un self-evaluating symbol, il parsing e la
-valutazione risultano banali, viene immediatamente ritornata un’istanza della
-classe CLAST-ELEMENT appartenente alla sottoclasse più appropriata alla
-rappresentazione dell’oggetto in analisi e il parsing termina immediatamente,
-riportando, insieme all’istanza appena descritta, un environment lessicale
-vuoto.\\
+valutazione risultano relativamente semplici. Viene infatti immediatamente
+ritornata un’istanza della classe \texttt{CLAST-ELEMENT} appartenente alla
+sottoclasse più appropriata alla rappresentazione del self-evaluating object
+in analisi e il parsing termina immediatamente, riportando, insieme
+all’istanza appena descritta, un environment lessicale vuoto. Questo in quanto
+la valutazione di self-evaluating objects non produce alcuna variazione
+rispetto al contenuto dell'environment.\\
 
 Nel caso in cui la form rappresenti un simbolo questo viene risolto
-all’interno dell’environment opzionale specificato in fase di invocazione. Nel
-caso in cui il simbolo sia associato ad una variabile il parsing agisce in
-maniera analoga a quanto riportato in precedenza, viene ritornato un’istanza
-della classe CLAST-ELEMENT adeguata alla rappresentazione del simbolo e il
-valore associato a questo identificato nell’environment, assieme ad un
-environment lessicale vuoto, e il parsing ha fine. Nel caso in cui invece il
-simbolo rappresenti una macro, la funzione PARSE svolge un procedimento più
-complesso, andando ad operare la macro-espansione del simbolo all’interno
-dell’environment opzionale fornito in input alla funzione, per poi ritornare
-come primo valore un’istanza di EXPANSION-COMPONENT, che riporti il simbolo
-originale, il corpo ottenuto tramite macro espansione e il valore ottenuto
-dalla valutazione di questo corpo, e come secondo valore l’environment
-lessicale prodotto dall’espansione del simbolo.\\
+all’interno dell’environment opzionale specificato in fase di invocazione. A questo punto, i processi di parsing e analisi prendono due possibili percorsi diversi.
 
-Infine, nel caso in cui invece il simbolo sia una compound form, il parsing e
-l’analisi proseguono in modo significativamente più complesso. Questo in
-quanto, come riportato nella sezione <> relativamente al processo di
-valutazione caratteristico del linguaggio Common Lisp, questo è il caso in cui
-si ha la possibilità di incontrare diversi costrutti che utilizzano una
-sintassi speciale e regole di valutazione speciali.\\
+\begin{enumerate}
 
-Tenendo fede alla struttura precedentemente citata di definizione di un
-funzione per produzione della grammatica di parsing, la funzione PARSE delega
-ad un’altra funzione il processo di ricerca, all’interno dell’insieme delle
-diverse regole della grammatica, della corretta produzione da applicare per
-proseguire nel processo di parsing.\\
+\item Nel caso in cui il simbolo sia associato ad una variabile, il parsing
+agisce in maniera analoga a quanto riportato in precedenza. Viene ritornato
+un’istanza della classe \texttt{CLAST-ELEMENT} adeguata alla rappresentazione
+del simbolo e il valore associato a questo identificato nell’environment,
+assieme ad un environment lessicale vuoto, e il parsing ha fine.
 
-La funzione PARSE si limita quindi ad operare l'estrazione dalla compound form
-identificata dell’elemento CAR e del CDR, la testa e la coda della lista che
-costituisce una compond form, come mostra il listato <>, ed invocare, a
-partire da questi due elementi, la funzione generica PARSE-FORM, responsabile
-per la prosecuzione del parsing secondo lo schema di discesa ricorsiva.\\
+\item Nel caso in cui invece il simbolo rappresenti una macro, la funzione
+\texttt{PARSE} svolge un procedimento più complesso, andando ad operare la
+macro-espansione del simbolo all’interno dell’environment opzionale fornito in
+input alla funzione, per poi ritornare come primo valore un’istanza di \texttt
+{EXPANSION-COMPONENT}, che riporti il simbolo originale, il corpo ottenuto
+tramite macro espansione e il valore ottenuto dalla valutazione di questo
+corpo, e come secondo valore l’environment lessicale prodotto dall’espansione
+del simbolo.
 
-ESEMPIO DI CAR E CDR DI UNA COMPOUND FORM\\
+\end{enumerate}
 
-La funzione PARSE-FORM è, come anche la funzione PARSE, una funzione generica.
-Il meccanismo delle funzioni generiche è uno dei meccanismi fondamentali
-attraverso i quali il CLOS, ossia il Common Lisp Object System, implementa il
-supporto alla programmazione object-oriented offerto dal linguaggio Common
-Lisp.\\
+Infine, nel caso in cui invece la form fornita in input alla funzione
+\texttt{PARSE} sia una compound form, il parsing e l’analisi proseguono in
+modo significativamente più complesso. Questo in quanto, come riportato nella
+sezione <> relativamente al processo di valutazione caratteristico del
+linguaggio Common Lisp, questo è il caso in cui si ha la possibilità di
+incontrare diversi costrutti che utilizzano una sintassi speciale e regole di
+valutazione speciali.\\
+
+Tenendo fede alla struttura precedentemente citata, in cui si ha una
+definizione di un funzione per ciascuna produzione della grammatica del
+linguaggio target e il parsing viene organizzato costruendo un predictive
+parser, la funzione \texttt{PARSE} delega ad un’altra funzione il processo di
+ricerca, all’interno dell’insieme delle diverse regole della grammatica, della
+corretta produzione da applicare per proseguire nel processo di parsing.\\
+
+La funzione \texttt{PARSE} si limita quindi ad operare l'estrazione dalla
+compound form identificata dell’elemento \texttt{CAR} e del \texttt{CDR}, la
+testa e la coda della lista che costituisce una compond form, come mostra il
+listato <>, ed invocare, a partire da questi due elementi, la funzione
+generica \texttt{PARSE-FORM}, responsabile per la prosecuzione del parsing
+secondo lo schema di discesa ricorsiva.\\
+
+La funzione \texttt{PARSE-FORM} è, come anche la funzione \texttt{PARSE}, una
+funzione generica. Il meccanismo delle funzioni generiche è uno dei meccanismi
+fondamentali attraverso i quali il CLOS, ossia il Common Lisp Object System,
+implementa il supporto alla programmazione object-oriented offerto dal
+linguaggio Common Lisp. Come verrà presentato in seguito, le funzioni
+generiche rappresentano anche uno degli strumenti che la libreria CLAST
+utilizza in modo più intensivo. Per questa ragione, la prossima sezione
+illustra brevemente il meccanismo delle funzioni generiche Common Lisp.\\
+
+\subsubsection{Funzioni generiche}
 
 Una funzione generica Common Lisp è una funzione il cui comportamento viene
 determinato a partire dalle classi e dalle identità dei parametri che vengono
@@ -314,10 +325,7 @@ utilizzo, tramite l’utilizzo di funzioni generiche in fase di implementazione,
 è un aspetto che rende il modulo performante e significativamente meno
 complesso.\\
 
-QUESTA PARTE SULLE FUNZIONI GENERICHE DOVREBBE ESSERE SPOSTATA PRIMA DELLA
-SPIEGAZIONE DI PARSE. IN QUESTO MODO DIVENTA POSSIBILE PRESENTARE IL CONFRONTO
-TRA IL FATTO CHE PARSE LAVORA UTILIZZANDO SPECIALIZZAZIONI DI TIPO, MENTRE
-PARSE-FORM CON SPECIALIZZAZIONI RISPETTO ALL’IDENTITÀ.\\
+CODICE DEFINIZIONE E DOCUMENTAZIONE DELLA FUNZIONE PARSE-FORM\\
 
 Ritornando alla funzione PARSE-FORM, si è detto che questa è una funzione
 generica. Il comportamento di questa funzione viene specificato andando a
@@ -337,11 +345,16 @@ ESEMPI DI SIGNATURE DEI METODI PARSE-FORM\\
 
 I METODI PARSE-FORM LAVORANO IN MODO RICORSIVO\\
 
+LA PARTE SULLE FUNZIONI GENERICHE DOVREBBE ESSERE SPOSTATA PRIMA DELLA
+SPIEGAZIONE DI PARSE. IN QUESTO MODO DIVENTA POSSIBILE PRESENTARE IL CONFRONTO
+TRA IL FATTO CHE PARSE LAVORA UTILIZZANDO SPECIALIZZAZIONI DI TIPO, MENTRE
+PARSE-FORM CON SPECIALIZZAZIONI RISPETTO ALL’IDENTITÀ.\\
+
 OLTRE AD I METODI PARSE-FORM E PARSE IL MODULO CONTIENE UN GRANDE INSIEME DI
 HELPER FUNCTIONS. UNA FUNZIONE PER CIASCUNA REGOLA DELLA GRAMMATICA RELATIVA A
 COMPOUND FORM
 
-\section{Parsing e analisi in dettaglio}
+\subsection{Parsing e analisi in dettaglio}
 
 Per illustrare in maniera più approfondita il funzionamento della libreria, in
 questa sezione viene brevemente mostrata il del processo di parsing e analisi
@@ -522,3 +535,10 @@ rappresenta l’environment prodotto dalla valutazione del sottoalbero.\\
 Questa sottosezione ha presentato, attraverso un esempio, il funzionamento e
 l’analisi svolta dalla libreria. Analisi che consente di produrre una
 rappresentazione estremamente precisa del codice fornito in input a questa.
+
+DEVI SPIEGARE IL FATTO CHE BODY-ENV, NEL CASO DI ISTRUZIONI COME LET, È MOLTO
+DIVERSO DALL’ENVIRONMENT RITORNATO, IN QUANTO ISTRUZIONI COME LET SONO IN
+GRADO DI PRODURRE UN NUOVO ENVIRONMENT, LESSICALE O DINAMICO, AGGIUNGENDO
+NUOVE INFORMAZIONI A QUESTO, ALL’INTERNO DEL QUALE VERRANO VALUTATE LE
+IMPROGN- FORMS. SE INVECE VIENE MESSA PRIMA È NECESSARIO SPIEGARE NELLA
+SEZIONE RELATIVA AL PARSING CHE IN ALCUNI CASI SI HA QUESTA DIFFERENZA.\\
