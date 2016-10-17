@@ -439,14 +439,16 @@ I METODI PARSE-FORM LAVORANO IN MODO RICORSIVO\\
 \subsection{Parsing e analisi in dettaglio}
 
 Per illustrare in maniera più approfondita il funzionamento della libreria, in
-questa sezione viene brevemente mostrata il del processo di parsing e analisi
-operato dalla libreria attraverso la discussione di un esempio, rappresentato
-da una semplificazione di uno dei metodi PARSE-FORM. In particolare, il metodo
-dedicato al parsing di compound form che utilizzano l’operatore LET.\\
+questa sezione viene brevemente vengono discusse nel dettaglio le attività di
+parsing e analisi operate dalla libreria attraverso la discussione di un
+esempio, rappresentato da una semplificazione di uno dei metodi \texttt
+{PARSE-FORM}. In particolare, per quanto riguarda parsing ed analisi di
+compound form che utilizzano l’operatore \texttt{LET*}.\\
 
 In seguito viene riportato un frammento della specifica ANSI in cui viene
-definita la sintassi del costrutto LET e vengono specificati i dettagli
-rispetto al processo di valutazione di form che utilizzano questo operatore.\\
+definita la sintassi del costrutto \texttt{LET*} e vengono specificati i
+dettagli rispetto al processo di valutazione di form che utilizzano questo
+operatore.
 
 \begin{lstlisting}[caption=Estratto della documentazione relativa al costrutto
 \texttt{LET*}]
@@ -484,8 +486,10 @@ is initialized to NIL.
 
 \end{lstlisting}
 
-Il listato presenta una approssimazione del metodo PARSE-FORM implementato
-dalla libreria.
+Il listato in seguito presenta invece una approssimazione del metodo \texttt
+{PARSE-FORM} implementato dalla libreria specializzato rispetto all'operatore
+\texttt{LET*}. I dettagli rispetto alle diverse operazioni compiute dal metodo
+verranno approfondite nei prossimi paragrafi.
 
 \begin{lstlisting}[caption=Semplificazione del metodo \texttt{PARSE-FORM} per
 il parsing del costrutto \texttt{LET*}]
@@ -512,21 +516,20 @@ il parsing del costrutto \texttt{LET*}]
       ;; adding a variable declaration to it based on the name
       ;; specified by the binding `var` portion.
       (dolist (binding bindings)
-  (setf body-env (parse-binding binding body-env)))
+        (setf body-env (parse-binding binding body-env)))
 
       ;; 4. For each declaration parse-declaration performs a
       ;; side-effect on the provided environment adding informations
       ;; as specified by the declaration.
       (when declarations
-  (multiple-value-bind (declaration-form
-            body-env-with-declarations)
-      (parse 'declare declarations body-env)
+        (multiple-value-bind (declaration-form body-env-with-declarations)
+            (parse 'declare (cdr declarations) body-env)
 
-    ;; 5. Updates the body-env with information from all
-    ;; declarations. Since the declarations themselves are not
-    ;; tracked directly the representation object is discarded.
-    (declare (ignore declaration-form))
-    (setf body-env body-env-with-declarations)))
+          ;; 5. Updates the body-env with information from all
+          ;; declarations. Since the declarations themselves are not
+          ;; tracked directly the representation object is discarded.
+          (declare (ignore declaration-form))
+          (setf body-env body-env-with-declarations)))
 
       ;; 6. Operates parsing of body forms. If a value for
       ;; internal-env was specified, each parsing methods uses it to
@@ -535,102 +538,159 @@ il parsing del costrutto \texttt{LET*}]
       ;; definitions. This step represents the recursive descent
       ;; portion of the parsing algorithm.
       (multiple-value-bind (iprogn-forms augmented-env)
-    (if body-forms
-        (parse-iprogn-forms body-forms env body-env)
-      (values nil env))
+          (if body-forms
+              (parse-iprogn-forms body-forms env body-env)
+            (values nil env))
 
-  ;; 7. Returns the element representation of the input form and
-  ;; the provided environment augmented only with definitions
-  ;; from the body forms (i.e. that does not contain any
-  ;; information about local bindings).
-  (values
-   (make-instance 'let*-form
-      :source (cons operator params) :top top :type t
-      :iprogn-forms iprogn-forms :body-env body-env
-      :bindings bindings)
-   env)))))
+        ;; 7. Returns the element representation of the input form and
+        ;; the provided environment augmented only with definitions
+        ;; from the body forms (i.e. that does not contain any
+        ;; information about local bindings).
+        (values
+         (make-instance 'let*-form
+            :source (cons operator params) :top top :type t
+            :iprogn-forms iprogn-forms :body-env body-env
+            :bindings bindings)
+         env)))))
 
 \end{lstlisting}
 
-Il metodo prende in input cinque valori, due dei quali opzionali. La prima
-operazione che viene svolta è legata al reale parsing. Il valore PARAMS, il
-quale rappresenta la lista dei parametri della compound form originale, viene
-decomposto all’interno di tre diversi elementi in base a quanto specificato
-dalla regola della grammatica del linguaggio associata al costrutto LET*. La
-regola specifica infatti che ciascuna form che abbia LET* come operatore
-prevede come primo parametro una lista di bindings, una lista di dichiarazioni
-come secondo parametro opzionale e che tutte le form che seguono queste due
-liste rappresentino una sequenza di form che devono essere eseguite
-nell’ambiente prodotto dalla valutazione di dichiarazioni di bindings e
-dichiarazioni.\\
+Il metodo prende in input cinque valori, tre dei quali opzionali. Il parametro
+\texttt{OP} rappresenta il parametro rispetto al quale il metodo specializza
+la funzione generica \texttt{PARSE-FORM}. Questo in maniera tale da consentire
+l'identificazione della particolare regola nella grammatica Common Lisp di cui
+il metodo di occupa di compiere il parsing.
 
-La seconda operazione svolta dal metodo è la definizione di una copia
-dell’environment fornito in input, copia che verrà utilizzata in seguito. Il
-metodo opera quindi un’invocazione del metodo parse-binding a partire da
-ciascun binding. La funzione PARSE-BINDING è quindi responsabile del parsing
-delle regole specificate dalla grammatica in relazione alla sintassi dei
-binding, ossia la regola var | (var [init-form]), e di creare un nuovo
-environment a partire da quello fornito in input contenente la definizione di
-variabile operata dal binding. Ogni invocazione di PARSE-BINDING ritorna
-quindi un nuovo oggetto environment che viene utilizzato per aggiornare
-l’environment interno al metodo.\\
+\texttt{PARAMS} rappresenta invece la lista dei parametri ceh insieme
+all'operatore formano la compound form originale che deve essere analizzata
+dal metodo.
 
-Il metodo prosegue quindi con l’analisi delle dichiarazioni specificate dalla
-form relativamente alle variabili dichiarate dai binding, nel caso siano
-presenti. Questa analisi viene operata dalla funzione PARSE-DECLARATIONS. Come
-la precedentemente citata PARSE-BINDING, PARSE-DECLARATIONS è quindi
-responsabile del parsing a partire dalle regole del linguaggio relativamente
-alle dichiarazioni e di restituire una nuova istanza di environment, costruita
-a partire da quello in input, contenente le informazioni specificate da
-ciascuna dichiarazione. L’istanza restituita da PARSE-DECLARATIONS viene
-quindi utilizzata per aggiornare l’environment interno al metodo.\\
+Il parametro opzionale \texttt{ENCLOSING-FORM} rappresenta invece un puntatore
+alla form all'interno della quale la form attualmente in analisi è contenuta.
+Questo consente, in fase di inizializzazione del nodo che rappresenta la form
+all'interno dell'AST prodotto in output dalla libreria, di specificare un
+valore per l'attributo \texttt{TOP} del nodo. Come specificato in precedenza,
+questo attributo risulta di fondamentale importanza in quanto rappresenta un
+arco all'interno dell'AST.
+
+Il parametro \texttt{ENV} rappresenta l'environment principale utilizzato dal
+metodo, ossia l'environment a partire dal quale verranno aggiunte le
+informazioni prodotte dalla valutazione della form e identificate durante
+l'attività di analisi. Si tratta di un valore opzionale, in fase di analisi
+della radice dell'AST non sarà infatti presente alcun environment precedente
+che dovrà essere arrichito. In questo caso il comportamento di default è
+quello di definire un oggetto environment vuoto.
+
+Infine, il parametro \texttt{INTERNAL-ENV} rappresenta un environment
+secondario, il quale viene utilizzato per la ricerca delle informazioni
+necessarie al processo di analisi. Questa divisione risulta particolarmente
+utile all'interno dell'intero modulo in quanto consente di mantenere
+l'environment di valutazione della form distinto dall'environment che verrà
+arricchito con le informazioni prodotte dalla valutazione stessa e ritornato.
+In molti casi infatti, come ad esempio nel caso del costrutto \texttt{LET*}
+analizzato dall'esempio presentato in questa sezione, l'environment di
+definizione presenta infatti informazioni aggiuntive, non accessibili
+esternamente alla form, e che quindi non dovranno fare parte dell'environment
+ritornato dal parsing.
+
+La prima operazione svolta dal metodo è legata all'attività di parsing.
+\textit{1.} Il valore \texttt{PARAMS}, il quale rappresenta la lista dei
+parametri della compound form originale, viene infatti decomposto all’interno
+di tre diversi elementi in base a quanto specificato dalla regola della
+grammatica del linguaggio associata al costrutto \texttt{LET*}. La regola
+specifica infatti che ciascuna form che abbia \texttt{LET*} come operatore
+prevede:
+
+\begin{itemize}
+
+\item come primo parametro, una lista di bindings;
+
+\item come secondo parametro opzionale, una lista di dichiarazioni;
+
+\item che tutte le form successive rappresentino il corpo della compound form
+complessiva, una sequenza di form che dovranno essere eseguite nell’ambiente
+prodotto dalla valutazione di bindings e dichiarazioni.
+
+\end{itemize}
+
+La seconda operazione svolta dal metodo è \textit{2.} la generazione di una
+copia dell’environment fornito in input, copia che verrà utilizzata in
+seguito. Questa copia risulta fondamentale in quanto è necessario che la
+libreria mantenga due oggetti environment distinti durante le attività di
+analisi:
+
+\begin{itemize}
+
+\item un environment che verrà arricchito con le informazioni relative ai
+binding specificati dalla form e all'interno del quale avverrà la valutazione
+del corpo della form,
+
+\item un environment all'interno del quale verranno aggiunte dichiarazioni e
+definizioni presenti nel corpo della form e che verrà ritornato.
+
+\end{itemize}
+
+% Questa operazione consente di mostrare uno dei principi più complessi del
+% funzionamento della libreria. Si può osservare infatti che la funzione prende
+% in input due diversi environment. Il primo environment rappresenta
+% l’environment che verrà aumentato con le dichiarazioni operate dalle form e
+% quindi ritornato, il secondo environment viene invece solamente utilizzato per
+% la ricerca di informazioni relativamente a variabili, simboli e funzioni
+% identificati durante il parsing. La presenza di questi due environment
+% distinti, uno per la scrittura e uno per la lettura, rappresenta una
+% convenzione comune all’intero modulo e di particolare importanza. Questa
+% convenzione consente infatti di implementare il parsing di costrutti come
+% \texttt{LET*}, in cui l’environment in cui avviene la valutazione contiene
+% informazioni aggiuntive rispetto quello in prodotto in output dalla
+% valutazione stessa.\\
+
+Il metodo opera quindi \textit{3.} un’invocazione del metodo \texttt
+{PARSE-BINDING} a partire da ciascun binding. La funzione \texttt
+{PARSE-BINDING} è responsabile del parsing delle regole specificate dalla
+grammatica in relazione alla sintassi dei binding, ossia la regola \textit
+{var | (var [init-form])}, e della creazione un nuovo environment, a partire
+da quello fornito in input, contenente la definizione di variabile operata dal
+binding in analisi. Ogni invocazione della funzione \texttt{PARSE-BINDING}
+ritorna quindi un nuovo oggetto environment che viene utilizzato per
+aggiornare l’environment interno al metodo.\\
+
+Il metodo prosegue con \textit{4.} l’analisi delle dichiarazioni specificate
+dalla form relativamente alle variabili dichiarate dai binding. Chiaramente,
+solo nel caso in cui queste siano presenti. Questa analisi viene operata
+procedendo in modo ricorsivo e invocando la funzione \texttt{PARSE} a partire
+dalla form di specifica delle dichiarazioni. Una particolarità di questa
+operazione è rappresentata dal fatto che, in questo caso, \texttt{5.} la
+rappresentazione della form \texttt{DECLARE} viene scartata e viene
+considerato solamente l'environment prodotto dalla valutazione di questa come
+aggiornamento dell'environment interno al metodo. Questo perchè le
+informazioni prodotte dalle dichiarazioni vengono già conservate all'interno
+dell'environment ritornato. Sarebbe quindi ridondante e relativamente poco
+utile tracciare la presenza di dichiarazioni di questo tipo.
 
 Il passo successivo è rappresentato dal parsing delle form innestate alla form
-LET*, operazione che viene delegata alla funzione PARSE-PROGN-FORMS. Questa
-funzione ha lo scopo di compiere la valutazione delle form specificate in
-input utilizzando i due environment specificati in input e produrre in output
-due valori, una lista contenente la rappresentazioni di ciascuna delle form
-utilizzando le strutture dal modulo di rappresentazione e un environment
-aumentato con le definizioni che occorrono all’interno delle form.\\
+\texttt{LET*}, operazione che viene delegata alla funzione \texttt
+{PARSE-IPROGN-FORMS}. Questa funzione ha lo scopo di compiere la valutazione
+delle form specificate in input utilizzando i due environment specificati in
+input e produrre in output due valori, una lista contenente la
+rappresentazioni di ciascuna delle form utilizzando le strutture dal modulo di
+rappresentazione e un environment aumentato con le definizioni che occorrono
+all’interno delle form. Questa funzione rappresenta l'effettiva operazione di
+discesa ricorsiva operata dal modulo. Dal punto di vista pratico, la funzione
+si limita ad operare una chiamata ricorsiva alla funzione \texttt{PARSE} per
+ciascuna form innestata.\\
 
-Questa operazione consente di mostrare uno dei principi più complessi del
-funzionamento della libreria. Si può osservare infatti che la funzione prende
-in input due diversi environment. Il primo environment rappresenta
-l’environment che verrà aumentato con le dichiarazioni operate dalle form e
-quindi ritornato, il secondo environment viene invece solamente utilizzato per
-la ricerca di informazioni relativamente a variabili, simboli e funzioni
-identificati durante il parsing. La presenza di questi due environment
-distinti, uno per la scrittura e uno per la lettura, rappresenta una
-convenzione comune all’intero modulo e di particolare importanza. Questa
-convenzione consente infatti di implementare il parsing di costrutti come
-LET*, in cui l’environment in cui avviene la valutazione contiene informazioni
-aggiuntive rispetto quello in prodotto in output dalla valutazione stessa.\\
-
-PROVA AD AGGIUNGERE IL DISCORSO RELATIVO ALLA GESTIONE DEL FATTO CHE POSSONO
-ANCHE NON ESSERCI FORM INNESTATE.\\
-
-FAI VEDERE ANCHE CHE L’ELEMENTO PRODOTTO DA PARSE-FORM VIENE SCARTATO E VIENE
-CONSIDERATO SOLAMENTE L’ENVIRONMENT. QUESTO PERCHÈ NEL CASO DELLE
-DICHIARAZIONI DI QUESTO TIPO RISULTA RIDONDANTE MANTENERE SIA LA
-RAPPRESENTAZIONE COME CLAST-ELEMENT CHE LA RAPPRESENTAZIONE COME INFORMAZIONE
-INTERNA ALL’ENVIRONMENT.\\
-
-L’ESEMPIO NON MOSTRA LA DISCESA RICORSIVA AL MOMENTO. MODIFICA IL CODICE IN
-MANIERA TALE CHE SI VEDA CHE VIENE CHIAMATO PARSE SULLE FORM INNESTATE.\\
-
-A partire da quanto prodotto dai passi precedenti, il metodo ritorna quindi i
-due valori comuni a qualsiasi metodo PARSE-FORM: un primo valore costituito da
-un’istanza di CLAST-ELEMENT che rappresenta il nodo radice del sottoalbero del
-quale il metodo ha effettuato il parsing, ed un secondo elemento che
-rappresenta l’environment prodotto dalla valutazione del sottoalbero.\\
+Infine, a partire da quanto prodotto dai passi precedenti, il metodo si limita
+a \texttt{7.} ritornare i due valori descritti in apertura di questa
+sottosezione e comuni a qualsiasi metodo \texttt{PARSE-FORM}: un'istanza di
+\texttt{CLAST-ELEMENT} che riporta tutti dettagli relativi all'utilizzo della
+form \texttt{LET*} fornita in input, che rappresenta il nodo radice del
+sottoalbero del quale il metodo ha effettuato il parsing, e un secondo valore
+rappresentato dall'oggetto environment contenente tutte le informazioni
+raccolte durante la discesa ricorsiva attraverso la form operata dal parser.\\
 
 Questa sottosezione ha presentato, attraverso un esempio, il funzionamento e
 l’analisi svolta dalla libreria. Analisi che consente di produrre una
 rappresentazione estremamente precisa del codice fornito in input a questa.
+Questo conclude la discussione rispetto al modulo di parsing e analisi offerto
+dalla libreria CLAST.
 
-DEVI SPIEGARE IL FATTO CHE BODY-ENV, NEL CASO DI ISTRUZIONI COME LET, È MOLTO
-DIVERSO DALL’ENVIRONMENT RITORNATO, IN QUANTO ISTRUZIONI COME LET SONO IN
-GRADO DI PRODURRE UN NUOVO ENVIRONMENT, LESSICALE O DINAMICO, AGGIUNGENDO
-NUOVE INFORMAZIONI A QUESTO, ALL’INTERNO DEL QUALE VERRANO VALUTATE LE
-IMPROGN- FORMS. SE INVECE VIENE MESSA PRIMA È NECESSARIO SPIEGARE NELLA
-SEZIONE RELATIVA AL PARSING CHE IN ALCUNI CASI SI HA QUESTA DIFFERENZA.\\
