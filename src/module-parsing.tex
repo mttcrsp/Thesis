@@ -140,31 +140,82 @@ costrutto del linguaggio che la manipolazione, utilizzando un API
 particolarmente ristretta e relativamente poco adatta allo scopo, degli
 environment in modo parallelo al processo di navigazione del codice sorgente
 operato dal parsing, aspetti che non sempre possono essere combinati con
-facilità.
+facilità.\\
+
+I precedenti paragrafi hanno descritto, ad alto livello, le principali
+funzionalità e il funzionamento del modulo di parsing. La prossima
+sottosezione entrerà nel dettaglio dell'API offerta dal modulo agli utenti
+della libreria e del funzionamento interno al modulo.
 
 \subsection{Implementazione del modulo}
 
-L’API fondamentale offerta da questo modulo è rappresentata da un’unica
-funzione. La funzione PARSE è una funzione che prende in input una form Lisp e
-produce in output due valori, una rappresentazione in forma di AST composta da
-istanze di oggetti definiti all’interno del modulo di rappresentazione,
-presentati nella sezione precedente di questo capitolo, e un oggetto
-environment, il quale rappresenta l’environment prodotto dalla valutazione
-della form. La coppia prodotta come output raccoglie il risultato delle
-attività parallele di parsing e analisi precedentemente descritte e raccoglie
-il massimo insieme di formazioni che risulta possibile raccogliere rispetto ad
-un dato frammento di codice Common Lisp utilizzando la libreria. Il listato <>
-mostra un estratto del codice della libreria in cui si mostra la definizione
-della funzione PARSE.\\
+L’API fondamentale realizzata dal modulo di parsing viene offerta agli utenti
+della libreria attraverso un'interfaccia rappresentata da un’unica funzione,
+la funzione \texttt{PARSE}. La funzione \texttt{PARSE} è una funzione che
+prende in input una form Lisp e produce in output due valori.
 
-CODICE DELLA DEFINIZIONE DI PARSE CON DOCUMENTAZIONE\\
+\begin{itemize}
 
-La funzione PARSE viene utilizzata per identificare ed applicare le regole più
-generali della grammatica soggetto del parsing. La funzione verifica se la
-form fornita in input alla funzione rappresenta un self-evaluating object
-oppure se rappresenta un simbolo o una compound form, i tre elementi
-fondamentali del processo di valutazione del Common Lisp presentato nel corso
-della sezione precedente.\\
+\item Il primo valore ritornato consiste in una rappresentazione del programma
+LISP, rappresentato dalla form fornita in input, in forma di AST. Un AST in
+cui nodi sono rappresentati dagli oggetti definiti all’interno del modulo di
+rappresentazione, presentati nella sezione precedente di questo capitolo.
+
+\item Il secondo valore ritornato consiste invece di un oggetto environment,
+il quale rappresenta l’environment prodotto dalla valutazione della form e
+arricchito durante l'attività di analisi svolta dal modulo parallelamente al
+parsing.
+
+\end{itemize}
+
+La coppia prodotta come output costituisce il risultato delle attività
+parallele di parsing e analisi precedentemente descritte e rappresenta il
+massimo insieme di formazioni che risulta possibile raccogliere, rispetto ad
+un dato frammento di codice Common Lisp, utilizzando la libreria CLAST. Il
+listato <> mostra un estratto del codice della libreria in cui si mostra la
+definizione della funzione \texttt{PARSE}.\\
+
+\begin{lstlisting}[caption=Definizione e documentazione relative alla funzione
+\texttt{PARSE}]
+
+(defgeneric parse (form &rest keys
+                        &key
+                        enclosing-form
+                        macroexpand
+                        environment
+                        &allow-other-keys)
+  (:documentation "Parses a form in a given 'environment'.
+
+The methods of this generic function return a AST 'node' (a CLAST-ELEMENT)
+and the - possibly modified - ENVIRONMENT.
+
+The methods of PARSE dispatch on 'atomic' and on 'compound' (i.e.,
+CONS) forms.  Atomic forms - numbers, string, arrays, and symbols -
+are dealt with directly.  Compound forms are dispatched to PARSE-FORM.
+
+Arguments and Values:
+
+form : the form to be parsed.
+keys : the collection of key-value pairs passed to the call.
+enclosing-form : the form that \"contains\" the form beling parsed.
+environment : the environment in which the form is being parsed.
+element : a CLAST-ELEMENT representing the AST node just parsed.
+environment1 : the environment resulting from parsing the FORM.
+")
+  )
+
+\end{lstlisting}
+
+Il precedente paragrafo ha discusso la funzione \texttt{PARSE} dal punto di
+vista dell'API offerta, ossia dal punto di vista dell'utente della libreria.
+Dal punto di vista del funzionamento interno alla libreria, la funzione
+\texttt{PARSE} viene utilizzata per identificare ed applicare le regole più
+generali della grammatica del linguaggio Common Lisp.
+
+La funzione verifica se la form fornita in input alla funzione rappresenta un
+self-evaluating object oppure se rappresenta un simbolo o una compound form, i
+tre elementi fondamentali del processo di valutazione del Common Lisp
+presentato nel corso della sezione precedente.\\
 
 DEVI SPIEGARE IL FATTO CHE BODY-ENV, NEL CASO DI ISTRUZIONI COME LET, È MOLTO
 DIVERSO DALL’ENVIRONMENT RITORNATO, IN QUANTO ISTRUZIONI COME LET SONO IN
