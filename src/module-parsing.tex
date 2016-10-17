@@ -173,7 +173,7 @@ parallele di parsing e analisi precedentemente descritte e rappresenta il
 massimo insieme di formazioni che risulta possibile raccogliere, rispetto ad
 un dato frammento di codice Common Lisp, utilizzando la libreria CLAST. Il
 listato <> mostra un estratto del codice della libreria in cui si mostra la
-definizione della funzione \texttt{PARSE}.\\
+definizione della funzione \texttt{PARSE}.
 
 \begin{lstlisting}[caption=Definizione e documentazione relative alla funzione
 \texttt{PARSE}]
@@ -210,7 +210,7 @@ Il precedente paragrafo ha discusso la funzione \texttt{PARSE} dal punto di
 vista dell'API offerta, ossia dal punto di vista dell'utente della libreria.
 Dal punto di vista del funzionamento interno alla libreria, la funzione
 \texttt{PARSE} viene utilizzata per identificare ed applicare le regole più
-generali della grammatica del linguaggio Common Lisp.\\
+generali della grammatica del linguaggio Common Lisp.
 
 \subsubsection{La funzione \texttt{PARSE}}
 
@@ -280,7 +280,7 @@ implementa il supporto alla programmazione object-oriented offerto dal
 linguaggio Common Lisp. Come verrà presentato in seguito, le funzioni
 generiche rappresentano anche uno degli strumenti che la libreria CLAST
 utilizza in modo più intensivo. Per questa ragione, la prossima sezione
-illustra brevemente il meccanismo delle funzioni generiche Common Lisp.\\
+illustra brevemente il meccanismo delle funzioni generiche Common Lisp.
 
 \subsubsection{Funzioni generiche}
 
@@ -292,7 +292,7 @@ Una funzione generica specifica un nome di funzione e una lista di parametri
 ma, a differenza di una funzione ordinaria, non specifica alcun corpo e quindi
 nessun comportamento che deve essere eseguito in risposta ad una sua
 invocazione. La reale implementazione del comportamento di una funzione
-generica può essere specificato attraverso la definizione di metodi.\\
+generica può essere specificato attraverso la definizione di metodi.
 
 \begin{lstlisting}[caption=Confronto tra definizione di funzioni generiche e
 ordinarie]
@@ -313,7 +313,7 @@ funzione generica per una determinato insieme di specializzazioni dei
 parametri di questa. Ciascun parametro può essere specializzato da un metodo
 in due diversi modi: indicando la classe di appartenenza di questo, come ad
 esempio \texttt{NUMBER}, oppure indicando l’identità di uno specifico
-oggetto, come ad esempio il valore 9.\\
+oggetto, come ad esempio il valore 9.
 
 \begin{lstlisting}[caption=Esempi definizione di metodi Common Lisp]
 
@@ -332,7 +332,7 @@ Quando una funzione generica viene invocata, il sistema Lisp analizza i
 parametri forniti in input e ricerca, dall’elenco dei metodi associati alla
 funzione, quale metodo riporti specializzazioni compatibili con i tipi e le
 identità di questi, per poi eseguire il codice associato al metodo e
-determinare così il reale comportamento della funzione generica.\\
+determinare così il reale comportamento della funzione generica.
 
 \begin{lstlisting}[caption=Esempi di invocazione di metodi Common Lisp]
 
@@ -354,13 +354,16 @@ linguaggi di programmazione con tecniche di message passing e funzioni come
 \texttt{SEND} in Smalltalk e \texttt{objc\_msgSend} in Objective-C.\\
 
 Dal punto di vista delle performance e della complessità algoritmica, è
-importante sottolineare che l’attività più significativa è rappresentata
-dall’identificazione della regola corretta da applicare in risposta ad un
-particolare input. L’aver strutturato il processo di parsing in maniera tale
-che questo vada a delegare questa attività interamente al sistema Lisp in
-utilizzo, tramite l’utilizzo di funzioni generiche in fase di implementazione,
-è un aspetto che rende il modulo performante e significativamente meno
-complesso.\\
+importante sottolineare che una delle operazioni più significative nel
+contesto di un predictive parser è rappresentata dall’identificazione della
+regola corretta da applicare in risposta ad un particolare input. L’aver
+strutturato il processo di parsing in maniera tale che questo vada a delegare
+questa attività interamente al sistema Lisp in utilizzo, sistema già
+largamente ottimizzato e studiato da questo punto di vista, tramite l’utilizzo
+di funzioni generiche in fase di implementazione, è un aspetto che rende il
+modulo performante e significativamente meno complesso di quanto sarebbe
+altrimenti necessario nel caso in cui il processo di ottimizzazione della
+ricerca dovesse essere svolto internamente alla libreria stessa.
 
 \begin{lstlisting}[caption=Signature della funzione \texttt{PARSE-FORM}]
 
@@ -389,32 +392,49 @@ environment1 : the environment resulting from parsing the FORM.
 
 \end{lstlisting}
 
-Ritornando alla funzione PARSE-FORM, si è detto che questa è una funzione
-generica. Il comportamento di questa funzione viene specificato andando a
-definire grande insieme di metodi, sostanzialmente uno per ciascuno operatore
-Common Lisp, e quindi per ciascuna special form che utilizza una sintassi
-speciale, che a sua volta identifica ciascuna delle regole della grammatica.
-Ciascuno di questi metodi opera una specializzazione rispetto all’identità del
-primo parametro fornito in input a questa,  in particolare una
+\subsubsection{La funzione \texttt{PARSE-FORM}}
+
+Ritornando alla funzione \texttt{PARSE-FORM}, si è detto che questa è una
+funzione generica. Il comportamento di questa funzione viene quindi
+specificato andando a definire un certo insieme di metodi. In particolare, la
+libreria riporta sostanzialmente la dichiarazione di un metodo per ciascuno
+operatore Common Lisp, ossia uno per ciascuna special form che utilizza una
+sintassi particolare, la quale a sua volta identifica una particolare regola
+della grammatica.
+
+Dal punto di vista pratico, ciascuno di questi metodi opera una
+specializzazione rispetto all’identità del primo parametro che riceve in
+input, il parametro \texttt{OP} o \texttt{OPERATOR}, in particolare una
 specializzazione rispetto al particolare operatore che identifica una delle
 regole della grammatica. Questo porta ad ottenere la struttura di predictive-
-parser, già citata in precedenza in questo capitolo, con una funzione
-mutuamente esclusiva per ciascuna produzione della grammatica del linguaggio
-target. Il listato <> mostra alcuni esempi di signature dei metodi associati
-alla funzione generica PARSE-FORM.\\
+parser, già citata in precedenza in questo capitolo, in cui si ha la
+definizione di una funzione mutuamente esclusiva per ciascuna produzione della
+grammatica. Il listato <> mostra alcuni esempi di signature dei metodi
+associati alla funzione generica \texttt{PARSE-FORM}.
 
-ESEMPI DI SIGNATURE DEI METODI PARSE-FORM\\
+
+% SI POTREBBE PRESENTARE IL CONFRONTO TRA LA FUNZIONE PARSE CHE LAVORA
+% UTILIZZANDO SPECIALIZZAZIONI DI TIPO E LA FUNZINOE PARSE-FORM CHE LAVORA
+% OPERANDO SPECIALIZZAZIONI RISPETTO ALL’IDENTITÀ DEI PROPRI PARAMETRI.
+
+\begin{lstlisting}[caption=Esempi di specializzazione operata dai metodi
+\texttt{PARSE-FORM}]
+
+(defmethod parse-form ((op (eql 'block)) form |# #|)
+  ;; ...
+  )
+
+(defmethod parse-form ((op (eql 'declare)) form |# #|)
+  ;; ...
+  )
+
+(defmethod parse-form ((op (eql 'let*)) form |# #|)
+  ;; ...
+  )
+
+\end{lstlisting}
 
 I METODI PARSE-FORM LAVORANO IN MODO RICORSIVO\\
-
-LA PARTE SULLE FUNZIONI GENERICHE DOVREBBE ESSERE SPOSTATA PRIMA DELLA
-SPIEGAZIONE DI PARSE. IN QUESTO MODO DIVENTA POSSIBILE PRESENTARE IL CONFRONTO
-TRA IL FATTO CHE PARSE LAVORA UTILIZZANDO SPECIALIZZAZIONI DI TIPO, MENTRE
-PARSE-FORM CON SPECIALIZZAZIONI RISPETTO ALL’IDENTITÀ.\\
-
-OLTRE AD I METODI PARSE-FORM E PARSE IL MODULO CONTIENE UN GRANDE INSIEME DI
-HELPER FUNCTIONS. UNA FUNZIONE PER CIASCUNA REGOLA DELLA GRAMMATICA RELATIVA A
-COMPOUND FORM
 
 \subsection{Parsing e analisi in dettaglio}
 
