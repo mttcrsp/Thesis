@@ -325,7 +325,32 @@ utilizzo, tramite l’utilizzo di funzioni generiche in fase di implementazione,
 è un aspetto che rende il modulo performante e significativamente meno
 complesso.\\
 
-CODICE DEFINIZIONE E DOCUMENTAZIONE DELLA FUNZIONE PARSE-FORM\\
+\begin{lstlisting}[caption=Signature della funzione \texttt{PARSE-FORM}]
+
+(defgeneric parse-form (op form &rest keys
+                        &key
+                        enclosing-form
+                        macroexpand
+                        environment
+                        &allow-other-keys)
+  (:documentation "Parses a form in a given 'ENVIRONMENT' given its 'op'.
+
+The methods of PARSE-FORM descend recursively in a form, by
+dispatching on the form 'operator'.  Each sub-form is passed,
+recursively to PARSE.
+
+Arguments and Values:
+
+form : the form to be parsed.
+keys : the collection of key-value pairs passed to the call.
+enclosing-form : the form that \"contains\" the form beling parsed.
+environment : the environment in which the form is being parsed.
+element : a CLAST-ELEMENT representing the AST node just parsed.
+environment1 : the environment resulting from parsing the FORM.
+")
+  )
+
+\end{lstlisting}
 
 Ritornando alla funzione PARSE-FORM, si è detto che questa è una funzione
 generica. Il comportamento di questa funzione viene specificato andando a
@@ -366,7 +391,8 @@ In seguito viene riportato un frammento della specifica ANSI in cui viene
 definita la sintassi del costrutto LET e vengono specificati i dettagli
 rispetto al processo di valutazione di form che utilizzano questo operatore.\\
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Estratto della documentazione relativa al costrutto
+\texttt{LET*}]
 
 let ({var | (var [init-form])}*) declaration* form* => result*
 
@@ -404,58 +430,69 @@ is initialized to NIL.
 Il listato presenta una approssimazione del metodo PARSE-FORM implementato
 dalla libreria.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Semplificazione del metodo texttt{PARSE-FORM} per
+il parsing del costrutto texttt{LET*}]
+
 (defmethod parse-form ((op (eql 'let*)) params top :optional env internal-env)
- ;; 1
- (destructuring-bind (bindings declarations :rest body-forms) params
-    ;; 2
+
+  ;; 1. Extracts all the various syntactic elements from the compound
+  ;; form based on the syntax rules associated with the special form
+  ;; denoted by the let* operator.
+  (destructuring-bind (bindings declarations :rest body-forms) params
+
+    ;; 2. A copy of the provided environment is used in order to be
+    ;; able to reproduce both the environment that is produced by the
+    ;; evaluation of the form and the environment `body-env` in with
+    ;; the form is evaluated. For case forms this difference is pretty
+    ;; important, the evaluation environment will contain variable
+    ;; definitions specified by the bindings, but the returned
+    ;; environment will not.
     (let ((body-env (clone (or internal-env body-env))))
-      ;; 3
+
+      ;; 3. For each binding in the list of bindings invokes the
+      ;; parse-binding function on it. The parse binding function
+      ;; simply performs a side effect on the specified environment
+      ;; adding a variable declaration to it based on the name
+      ;; specified by the binding `var` portion.
       (dolist (binding bindings)
   (setf body-env (parse-binding binding body-env)))
-      ;; 4
+
+      ;; 4. For each declaration parse-declaration performs a
+      ;; side-effect on the provided environment adding informations
+      ;; as specified by the declaration.
       (when declarations
-  (setf body-env (parse-declarations body-env)))
-      ;; 5
+  (multiple-value-bind (declaration-form
+            body-env-with-declarations)
+      (parse 'declare declarations body-env)
+
+    ;; 5. Updates the body-env with information from all
+    ;; declarations. Since the declarations themselves are not
+    ;; tracked directly the representation object is discarded.
+    (declare (ignore declaration-form))
+    (setf body-env body-env-with-declarations)))
+
+      ;; 6. Operates parsing of body forms. If a value for
+      ;; internal-env was specified, each parsing methods uses it to
+      ;; lookup definitions, but only augments `env`; otherwise it
+      ;; defaults to using `env` for both lookup and recording
+      ;; definitions. This step represents the recursive descent
+      ;; portion of the parsing algorithm.
       (multiple-value-bind (iprogn-forms augmented-env)
     (if body-forms
         (parse-iprogn-forms body-forms env body-env)
-        (values nil env))
-  ;; 6
+      (values nil env))
+
+  ;; 7. Returns the element representation of the input form and
+  ;; the provided environment augmented only with definitions
+  ;; from the body forms (i.e. that does not contain any
+  ;; information about local bindings).
   (values
    (make-instance 'let*-form
       :source (cons operator params) :top top :type t
       :iprogn-forms iprogn-forms :body-env body-env
       :bindings bindings)
    env)))))
-1
-  ;; Extracts all the various syntactic element from the provided
-  ;; params of the compound form based on the syntax rules associated
-  ;; with this special form denoted by the let* operator.
-2
-    ;; A copy of the provided environment is used in order to be able
-    ;; to represent both dynamic and lexical scope and be able to have
-    ;; local bindings and other bindings separated.
-3
-      ;; For each binding in the list of bindings invokes the
-      ;; parse-binding function on it. The parse binding function
-      ;; simply performs a side effect on the specified environment
-      ;; adding a variable declaration to it based on the name
-      ;; specified by the binding `var` portion.
-4
-      ;; For each declaration parse-declaration performs a side-effect
-      ;; on the provided environment adding informations as specified
-      ;; by the declaration.
-5
-      ;; Operates parsing of body forms. If a value for internal-env
-      ;; was specified, each parsing methods uses it to lookup
-      ;; definitions, but only augments `env`; otherwise it defaults
-      ;; to using `env` for both lookup and recording definitions.
-6
-  ;; Returns the element representation and the provided
-  ;; environment augmented only with definitions from the body
-  ;; form (i.e. that does not contain any information about
-  ;; local bindings).
+
 \end{lstlisting}
 
 Il metodo prende in input cinque valori, due dei quali opzionali. La prima
