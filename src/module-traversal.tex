@@ -8,8 +8,6 @@ dalla sezione precedente. Si tratta quindi del modulo più critico dal punto di
 vista dell'API, in quanto rappresenta la principale interfaccia tra CLAST ed
 un analizzatore costruito a partire da questa.\\
 
-Proprio perchè il modulo rappresenta
-
 \image{img/visitor-pattern}
       {Diagramma delle classi relativo al design pattern Visitor}
       {fig:visitor-pattern}
@@ -20,32 +18,6 @@ Proprio perchè il modulo rappresenta
 % (diagramma veramente bello. Fai anche un discorso sull'ereditarietà multipla
 % (e come questa venga utilizzata come mixin/trait per la rappresentazione di
 % (IMPLICIT-PROGN forms e un altro tipo di forms.)
-
-% (Aggiungi una parte in cui dici che a differenza di quanto avviene in altri
-% (contesti, come ad esempio quello dei compilatori, in cui si ha la
-% (generazione di un parse tree e, solo a partire da questo, si ha la
-% (generazione dell'AST vero e proprio, nel caso di CLAST si ha una
-% (generazione diretta dell'AST. Inventa una motivazione per cui questo viene
-% (fatto. Una buona motivazione iniziale potrebbe essere perché dal punto di
-% (vista dell'API risulterebbe scomodo avere a che fare con questi due step e
-% (la libreria cerca di sollevare lo sviluppo e la progettazione di uno
-% (strumento di source code analysis da tutto ciò che non riguarda la fase di
-% (analisi vera e proprio obiettivo dello strumento. Questa è una motivazione
-% (per cui questo non si vede dall'esterno. Spiegare perché questo non viene
-% (fatto nemmeno internamente non è altrettanto semplice. Si può fare leva sul
-% (fatto che a differenza del contesto della compilazione in cui si vuole
-% (operare anche una validazione del codice soggetto, al fine di identificare
-% (errori logici o sintattici, questo non è uno degli obiettivi di CLAST.
-% (CLAST si limita a produrre l'AST di un programma Common LISP, senza
-% (effettuare una validazione di questo. Da questo punto di vista la libreria
-% (potrebbe produrre in output anche un AST per un programma che non ha senso
-% (dal punto di vista sintattico. Fai un esempio in cui mostri che un
-% (programma che contiene una chiamata ad una funzione che non è definita
-% (viene parsato senza alcun problema e viene prodotto in output un AST
-% (perfettamente valido. Questo perché la validazione e la compilazione non
-% (sono obiettivi dello strumento.)
-
-% — discuti gli slot delle strutture al livello più alto della gerarchia —
 
 % MODULO DI TRAVERSAL
 
