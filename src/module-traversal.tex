@@ -1,3 +1,88 @@
 \section{Modulo di traversal}
 
-CONTENUTI
+% (In questa sezione presenta un diagramma delle classi che indichi la
+% (struttura gerarchica utilizzata per la rappresentazione. Qua ci vuole un
+% (diagramma veramente bello. Fai anche un discorso sull'ereditarietà multipla
+% (e come questa venga utilizzata come mixin/trait per la rappresentazione di
+% (IMPLICIT-PROGN forms e un altro tipo di forms.)
+
+% (Aggiungi una parte in cui dici che a differenza di quanto avviene in altri
+% (contesti, come ad esempio quello dei compilatori, in cui si ha la
+% (generazione di un parse tree e, solo a partire da questo, si ha la
+% (generazione dell'AST vero e proprio, nel caso di CLAST si ha una
+% (generazione diretta dell'AST. Inventa una motivazione per cui questo viene
+% (fatto. Una buona motivazione iniziale potrebbe essere perché dal punto di
+% (vista dell'API risulterebbe scomodo avere a che fare con questi due step e
+% (la libreria cerca di sollevare lo sviluppo e la progettazione di uno
+% (strumento di source code analysis da tutto ciò che non riguarda la fase di
+% (analisi vera e proprio obiettivo dello strumento. Questa è una motivazione
+% (per cui questo non si vede dall'esterno. Spiegare perché questo non viene
+% (fatto nemmeno internamente non è altrettanto semplice. Si può fare leva sul
+% (fatto che a differenza del contesto della compilazione in cui si vuole
+% (operare anche una validazione del codice soggetto, al fine di identificare
+% (errori logici o sintattici, questo non è uno degli obiettivi di CLAST.
+% (CLAST si limita a produrre l'AST di un programma Common LISP, senza
+% (effettuare una validazione di questo. Da questo punto di vista la libreria
+% (potrebbe produrre in output anche un AST per un programma che non ha senso
+% (dal punto di vista sintattico. Fai un esempio in cui mostri che un
+% (programma che contiene una chiamata ad una funzione che non è definita
+% (viene parsato senza alcun problema e viene prodotto in output un AST
+% (perfettamente valido. Questo perché la validazione e la compilazione non
+% (sono obiettivi dello strumento.)
+
+% — discuti gli slot delle strutture al livello più alto della gerarchia —
+
+% MODULO DI TRAVERSAL
+
+% AGGIUNGI APPROFONDIMENTO SUL DESIGN PATTERN VISITOR
+
+% clast-element-subforms: form to list-of-subforms (clast-elements.lisp)
+
+% (correggi questa funzione non viene specializzata per ogni possibile form,
+% (viene specializzata per ogni sottoclasse di CLAST-ELEMENT in maniera tale
+% (da incapsulare la nozione rispetto alle foglie di ciascun nodo,
+% (rappresentato da un'istanza di CLAST-ELEMENT) Questa funzione data una form
+% (restituisce l'insieme di tutte le sottoform contenute da questa. Questa
+% (funzione risulta fondamentale alla porzione della libreria che si occupa
+% (della visita dell'AST prodotto al termine del parsing, in quanto consente
+% (la navigazione all'interno di questo. (aggiungi che parte del pattern
+% (Visitor implementa questa funzione)
+
+% map-subforms: form func result-type to form (walk.lisp)
+
+% MAP-SUBFORMS è una funzione generica che rappresenta lo strumento a partire
+% dalla quale viene implementata la visita dell'AST, accessibile dagli utenti
+% della libreria tramite la funzione WALK. Ciascun metodo si occupa di
+% implementare la navigazione all'interno di una specifica sottoclasse di
+% CLAST-ELEMENT, lavorando a partire da CLAST-ELEMENT-SUBFORMS. Mentre la
+% funzione, precedentemente illustrata, incapsula la conoscenza rispetto alla
+% presenza di foglie di ciascuno nodo dell'AST, rappresentato da un oggetto di
+% tipo CLAST-ELEMENT, questa funzione incapsula la conoscenza rispetto alle
+% modalità di traversal di ciascun sottoalbero presente a partire dal nodo in
+% analisi. (indica quale parte del pattern Visitor viene realizzata da questa
+% funzione)
+
+% walk clast-element to void (walk.lisp)
+
+% Funzione particolarmente importante perché fornisce accesso alla
+% funzionalità di traversal dell'AST prodotto in output dalla libreria. Questa
+% è la funzione che opera la visita dei diversi nodi, istanze della classe
+% CLAST-ELEMENT, che compongono l'AST; visita a partire dalla quale è
+% possibile ispezionare la struttura del programma in analisi. (indica quale
+% parte del pattern Visitor viene invece realizzata da questa funzione)
+
+% as-string: form to string (clast-printing.lisp)
+
+% AS-STRING è una funzione che prende in input un'istanza di CLAST-ELEMENT e
+% una rappresentazione testuale dei dati relativi a questa. Oltre a
+% rappresentare una funzione particolarmente utile in fase di debugging e
+% costruzione della libreria, questa funzione risulta particolarmente
+% importante in quanto, essendo in grado di produrre un rappresentazione
+% testuale, consente l'analisi di programmi Common LISP anche da parte di
+% sistemi scritti utilizzando un linguaggio di programmazione differente, come
+% ad esempio sistemi di source code translation, fornendo un elemento che ad
+% esempio potrebbe consentire la produzione di codice in un qualsiasi
+% linguaggio di programmazione a partire dalla ricca rappresentazione di una
+% programma LISP prodotta in output proprio da questa funzione.
+
+% — dettaglio anche su query functions —
