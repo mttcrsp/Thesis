@@ -6,49 +6,208 @@ utenti della libreria, la ricerca e l'ispezione delle strutture di
 rappresentazione prodotte in output dal modulo di parsing ed analisi descritto
 dalla sezione precedente. Si tratta quindi del modulo più critico dal punto di
 vista dell'API, in quanto rappresenta la principale interfaccia tra CLAST ed
-un analizzatore costruito a partire da questa.\\
+un analizzatore costruito a partire da questa.
+
+\subsection{Funzionalità traversal}
+
+In questa sezione viene fornita al lettore una presentazione ad alto livello
+del funzionamento interno del modulo, per poi proseguire presentando le
+diverse funzionalità che vengono offerte dal modulo di traversal agli utenti
+della libreria.\\
+
+La struttura interna del modulo ricalca molto da vicino il design pattern
+Visitor, presentato da Gamma et al. in <>. In seguito, viene presentato il
+funzionamento di base del design pattern e come questo sia stato esteso per
+adattarsi allo specifico contesto in analisi.\\
+
+Si è scelto di sfruttare il design pattern Visitor principalmente per come
+questo consenta di ottenere una separazione tra una dato insieme di operazioni
+e gli oggetti su cui queste operazioni vengono operate. Separazione che,
+all'interno della libreria CLAST, consente di isolare all'interno di un modulo
+specifico per il traversal dell'AST tutte le operazioni relative alla visita
+dei nodi e isolare all'interno di un modulo differente, come presentato in
+precedenza, tutte le strutture e gli oggetti che rappresentano i nodi.
 
 \image{img/visitor-pattern}
       {Diagramma delle classi relativo al design pattern Visitor}
       {fig:visitor-pattern}
       {0.5}
 
-% AGGIUNGI APPROFONDIMENTO SUL DESIGN PATTERN VISITOR
+\subsubsection{Design pattern Visitor}
 
-% clast-element-subforms: form to list-of-subforms (clast-elements.lisp)
+Come mostrato dal diagramma in figura <>, estratto da <>, il pattern descrive
+una collaborazione tra 5 diversi elementi:
 
-% (correggi, questa funzione non viene specializzata per ogni possibile form,
-% (viene specializzata per ogni sottoclasse di CLAST-ELEMENT in maniera tale
-% (da incapsulare la nozione rispetto alle foglie di ciascun nodo,
-% (rappresentato da un'istanza di CLAST-ELEMENT) Questa funzione data una form
-% (restituisce l'insieme di tutte le sottoform contenute da questa. Questa
-% (funzione risulta fondamentale alla porzione della libreria che si occupa
-% (della visita dell'AST prodotto al termine del parsing, in quanto consente
-% (la navigazione all'interno di questo. (aggiungi che parte del pattern
-% (Visitor implementa questa funzione)
+\begin{itemize}
 
-% map-subforms: form func result-type to form (walk.lisp)
+\item \texttt{Visitor} dichiara un'operazione di visita per ciascuna classe
+che sarà toccata dal processo di visita, ossia ciascun
+\texttt{ConcreteElement} che compone la \texttt{ObjectStructure}.
 
-% MAP-SUBFORMS è una funzione generica che rappresenta lo strumento a partire
-% dalla quale viene implementata la visita dell'AST, accessibile dagli utenti
-% della libreria tramite la funzione WALK. Ciascun metodo si occupa di
-% implementare la navigazione all'interno di una specifica sottoclasse di
-% CLAST-ELEMENT, lavorando a partire da CLAST-ELEMENT-SUBFORMS. Mentre la
-% funzione, precedentemente illustrata, incapsula la conoscenza rispetto alla
-% presenza di foglie di ciascuno nodo dell'AST, rappresentato da un oggetto di
-% tipo CLAST-ELEMENT, questa funzione incapsula la conoscenza rispetto alle
-% modalità di traversal di ciascun sottoalbero presente a partire dal nodo in
-% analisi. (indica quale parte del pattern Visitor viene realizzata da questa
-% funzione)
+\item \texttt{ConcreteVisitor} implementa ciascuna operazione dichiarata dal
+\texttt{Visitor}. Ciascuna operazione implementa la specifico frammento della
+logica di visita associata alla specifica classe soggetto dell'operazione.
 
-% walk clast-element to void (walk.lisp)
+\item \texttt{Element} definisce un'operazione accetta che presente in input un
+oggetto di tipo \texttt{Visitor}.
 
-% Funzione particolarmente importante perché fornisce accesso alla
-% funzionalità di traversal dell'AST prodotto in output dalla libreria. Questa
-% è la funzione che opera la visita dei diversi nodi, istanze della classe
-% CLAST-ELEMENT, che compongono l'AST; visita a partire dalla quale è
-% possibile ispezionare la struttura del programma in analisi. (indica quale
-% parte del pattern Visitor viene invece realizzata da questa funzione)
+\item \texttt{ConcreteElement} implementa l'operazione definita da
+\texttt{Element}.
+
+\item \texttt{ObjectStructure} incapsula la logica di enumerazione dei propri
+elementi, fornendo ad un visitor un'interfaccia semplificata per la visita di
+ciascuno dei propri elementi.
+
+\end{itemize}
+
+Le modalità di interazione vengono quindi riassunte dal diagramma di attività
+in Figura <>:
+
+\begin{enumerate}
+
+\item l'interazione ha inizio con l'invocazione del metodo della classe
+\texttt{ObjectStructure} che raccoglie la conoscenza rispetto all'ordine di
+visita dei diversi elementi che compongono la propria struttura;
+
+\item il metodo opera quindi un invocazione del metodo texttt{accept} di
+ciascun elemento (texttt{ConcreteElement});
+
+\item secondo le modalità specifiche della classe di appartenenza, ciascuna
+elemento opera quindi un invocazione del metodo \texttt{visit}, fornendo
+tipicamente sé stesso come oggetto parametro dell'invocazione.
+
+\end{enumerate}
+
+Dopo aver brevemente presentato il design pattern a cui la struttura del
+modulo fa riferimento, le prossime sottosezioni presentano l'API del modulo e
+alcuni dettagli del funzionamento interno.
+
+\subsubsection{\texttt{CLAST-ELEMENT-SUBFORMS}} clast-elements.lisp
+
+La funzione \texttt{CLAST-ELEMENT-SUBFORMS} è una funzione generica. Questa
+funzione può essere considerata come il corrispondente della classe
+\texttt{ObjectStructure} e dell'interfaccia \texttt{Element} descritte dal
+design pattern. Lo scopo di questa funzione è infatti quello di raccogliere
+l'informazione rispetto alla struttura di ciascun elemento interessato dal
+processo di visita e guidare il processo di visita all'interno di una dato
+elemento; scopo che, nel contesto della libreria CLAST, si traduce
+nell'identificazione della struttura interna di ciascuna form e nella guida
+del processo di visita attraverso ciascuna form. La funzione opera quindi un
+mapping tra una form e le sue sottoform, dal punto di vista pratico, data una
+form, produce in output una lista contenente le diverse sottoform contenute in
+questa, ordinate in accordo a quanto richiesto dal processo di visita.
+
+\begin{lstlisting}[caption=Definizione della funzione \texttt
+{CLAST-ELEMENT-SUBFORMS}]
+
+(defgeneric clast-element-subforms (form)
+  (:documentation "Returns a list of 'subforms' of a given FORM.
+
+The methods of this generic form operate on the different kinds of AST
+nodes that are of class FORM.  Other Common Lisp objects have NULL
+subforms and LISTs are returned as they are.
+
+Arguments and Values:
+
+form : an instance of class FORM or LIST or a Common Lisp object.
+result : a list of 'subforms' (or NIL).
+"))
+
+\end{lstlisting}
+
+La funzione generica viene quindi specializzata da uno specifico metodo per
+ciascun \texttt{CLAST-ELEMENT}, ossia per ciascun potenziale form LISP e nodo
+dell'AST. Dal punto di vista teorico quindi, ciasuna metodo può essere visto
+come l'estensione di ciascun \texttt{ConcreteElement} per la definizione del
+metodo \texttt{accept}.\\
+
+Chiaramente, essendo il metodo comune a tutte le diverse form, una data
+implementazione potrebbe un certo numero di elementi, ad esempio nel caso
+dell'implementazione relativa ad una form \texttt{LET*}, o una lista vuota, ad
+esempio nel caso di un self-evalutating object come la form \texttt{9}.
+
+\begin{lstlisting}
+
+;; Simple implementation example
+(defmethod clast-element-subforms ((ce constant-form)) ())
+
+;; Complex implementation example
+(defmethod clast-element-subforms ((df do-form))
+  (list (form-binds df)
+        (form-test df)
+        (return-form df)
+        (form-body df)))
+
+\end{lstlisting}
+
+\subsubsection{WALK}
+
+A partire dalla funzione \texttt{CLAST-ELEMENT-SUBFORMS} lavora la funzione
+probabilmente più importante a livello di API dell'intero modulo, la funzione
+\texttt{WALK}. Lo scopo di questa funzione è quello di consentire ad un utente
+della libreria di operare il reale traversal della rappresentazione in forma
+di AST prodotta dal modulo di parsing ed analisi.
+
+Per continuare il parallelo tra struttura della libreria e il design pattern
+Visitor, precedentemente illustrato, la funzione \texttt{WALK} può essere
+vista, con una certa approssimazione, come la classe astratta
+\texttt{Visitor}, la quale può essere estesa per implementare un particolare
+processo di visita.
+
+% Prova a modificare la parte che segue in maniera tale che sia più coerente
+% con la parte che la precede. Prova con qualcosa come "la modalità di
+% estensione offerta dalla libreria è rappresentata dal meccanismo delle high
+% order functions..."
+
+La funzione \texttt{WALK} è una high order function, ossia una funzione che
+prende in input o restituisce altre funzioni. Proprio questa aspetto
+rappresenta il meccanismo di estensione attraverso il quale un utente della
+libreria può adattare il processo di visita alle proprie necessità e
+specificare le operazioni che desidare vengano compiute in risposta alla
+visita di un nodo o porzione dell'AST.
+
+Le diverse funzioni che vengono fornite in input alla funzione \texttt{WALK}
+possono quindi invece essere viste come classi \texttt{ConcreteVisitor}.
+
+Da un punto di vista pratico, data un'istanza di \texttt{CLAST-ELEMENT}, la
+funzione \texttt{WALK} opera una visita dell'AST radicato in questa in modo
+ricorsivo, depth-first.
+
+% Chiedi al professore più informazioni rispetto allo schema map-reduce
+% utilizzato da WALK, probabilmente si può aggiungere qualcosa a partire da
+% quello.
+
+Oltre alla funzionalità di visita vera e propria esposta dalla funzione
+\texttt{WALK}, la quale rappresenta il cuore del funzinamento del modulo, il
+modulo di traversal offre diverse altre funzionalità. Tali funzionalità
+vengono costruite a partire dal meccanismo di visita appena presentato e sono
+rappresentaze dalla funzionalità di query di un AST e dal supporto
+all'interoperabilità tra la libreria e sistemi software scritti utilizzando
+linguaggi di programmazione differenti, attraverso la definizione di un
+formato testuale per la rappresentazione dei nodi di un AST.
+
+Entrambe queste funzionalità verranno approfondite nelle prossime
+sottosezioni.
+
+\subsection{Interrogazione di un AST e Interoperabilità}
+
+% \begin{lstlisting}
+
+% (defun free-variables (form) ; Ok.  All this work to be able to write
+%                              ; this function!!!!
+%   "Returns all the 'free' variables present in FORM.
+
+% Arguments and Values:
+
+% form   : a CLAST-ELEMENT.
+% result : a LIST of SYMBOLS."
+%   (walk form
+%         :map (lambda (e)
+%                (typecase e
+%                  (free-variable-ref (list (form-symbol e)))))
+%         ))
+
+% \end{lstlisting}
 
 % as-string: form to string (clast-printing.lisp)
 
@@ -63,5 +222,3 @@ un analizzatore costruito a partire da questa.\\
 % esempio potrebbe consentire la produzione di codice in un qualsiasi
 % linguaggio di programmazione a partire dalla ricca rappresentazione di una
 % programma LISP prodotta in output proprio da questa funzione.
-
-% — dettaglio anche su query functions —
