@@ -36,7 +36,7 @@ settore che si occupa della manipolazione di codice sorgente, è viene utilizzta
 la sigla SCAM, Source Code Analysis and Manipulation, per riferirsi a questo
 particolare ambito di ricerca. \cite{DBLP:conf/scam/2001}\\
 
-Come accennato in apertura di questa sezione, la source code analysis ricopre
+Come accennato in apertura di questa Sezione, la source code analysis ricopre
 un ruolo di grande importanza nel contesto dell'ingegneria del software, tanto
 che tecniche di SCAM possono essere trovate in diversi parti del ciclo di vita
 di un sistema software.
@@ -67,9 +67,9 @@ presenza di queste incongruenze a rendere il codice l’unica fonte di
 informazioni realmente attendibili rispetto all’effettivo funzionamento di un
 sistema software.\\
 
-Questa sottosezione ha fornito una definizione di source code analysis, allo
+Questa Sottosezione ha fornito una definizione di source code analysis, allo
 scopo di indicare l'ambito di ricerca all'interno del quale lo strumento
-discusso da questa tesi si colloca. Nella prossima sottosezione, viene
+discusso da questa tesi si colloca. Nella prossima Sottosezione, viene
 approfondita la struttura di uno strumento di source code analysis, in maniera
 tale da fornire al lettore una panoramica rispetto alla tipologia di strumenti
 che CLAST consente di creare.
@@ -131,21 +131,21 @@ rappresentata dall’effettivo analizzatore.
 
 Nel corso degli anni sono state definite e impiegate una grande quantità di
 meccanismi e tipi di analisi. Un approfondimento di ciascuna di questi esula
-dagli obiettivi di questa tesi. All’interno del capitolo <> di questa tesi,
-verranno invece analizzati i principali, e anticipati, tipi di analisi che la
-rappresentazione offerta dalla libreria CLAST consente con maggiore
-dettaglio.\\
+dagli obiettivi di questa tesi. All’interno del Capitolo \ref{applications} di
+questa tesi, verranno invece analizzati i principali, e anticipati, tipi di
+analisi che la rappresentazione offerta dalla libreria CLAST consente con
+maggiore dettaglio.\\
 
 Dopo aver presentato le principali componenti per la creazione di uno strumento
-di source code analysis, la prossima sezione approfondisce i principali approcci
-alla creazione di uno strumento di questo tipo.
+di source code analysis, la Sottosezione \ref{sca-approches} approfondisce i
+principali approcci alla creazione di uno strumento di questo tipo.
 
 \image{img/sca-tool-architecture}
       {Architettura di uno strumento di Source Code Analysis}
       {fig:sca-tool-architecture}
       {0.5}
-      
-Nel contesto dell'architettura appena illustrata, la libreria CLAST, soggetto di 
+
+Nel contesto dell'architettura appena illustrata, la libreria CLAST, soggetto di
 questa tesi, va a definire sia la prima componente, un parser per il linguaggio
 di programmazione Common Lisp, sia la seconda componente, ossia una struttura
 dati organizzata in forma di AST che raccoglie il maggior numero possibile di
@@ -161,6 +161,7 @@ sarebbe altrimenti obbligatorio costruire.
 
 \subsection{Approcci per la costruzione di uno strumento di Source Code
 Analysis}
+\label{sca-approches}
 
 Gli attuali strumenti di source code analysis sono sviluppati utilizzando
 principalmente due diverse strategie di sviluppo. Alcuni strumenti inglobano e
@@ -233,7 +234,7 @@ Per questa ragione, a seconda del compilatore e a
 seconda dell’API offerta da questo, è possibile seguire due strade distinte per
 poter costruire uno strumento per la source code analysis a partire da questo:
 modificare il codice del compilatore, in maniera tale da permettere l’accesso
-ai meccanismi di rappresentazione interni a questo: 
+ai meccanismi di rappresentazione interni a questo:
 
 \begin{itemize}
 
@@ -301,7 +302,7 @@ come uno strumento completamente distinto da un compilatore e implementare le
 strutture necessarie per la creazione di strumenti di source code analysis per
 il linguaggio Common Lisp.\\
 
-Questa sezione ha presentato il campo della source code analysis, ossia
+Questa Sezione ha presentato il campo della source code analysis, ossia
 l'ambito di ricerca all'interno del quale questa tesi si colloca, fornendo al
 lettore alcuni spunti per comprendere l'importanza che questa ricopre
 all'interno del più generale campo dell'ingegneria del software. Si è inoltre

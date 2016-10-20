@@ -1,8 +1,9 @@
 \section{Modulo di rappresentazione}
+\label{representation}
 
-In questa sezione viene approfondita la struttura e il contenuto del modulo di
+In questa Sezione viene approfondita la struttura e il contenuto del modulo di
 rappresentazione presente all'interno della libreria CLAST. In particolare,
-questa sezione discute le scelte compiute e il metodo utilizzato per la
+questa Sezione discute le scelte compiute e il metodo utilizzato per la
 definizione delle diverse classi che potranno verranno poi utilizzate dal
 modulo di parsing in fase di generazione dell'AST associato al programma in
 analisi.
@@ -18,12 +19,13 @@ macchina, sia informazioni rispetto alla semantica desiderata dall’autore del
 programma.
 
 \subsection{Processo di valutazione}
+\label{CL-valutazione}
 
 Come affermato nel precedente paragrafo, le componenti facenti parte del
 modulo di rappresentazione sono particolarmente legate al processo di
 valutazione utilizzato dal linguaggio. Per questa ragione, allo scopo di
 fornire al lettore una migliore comprensione degli elementi che verranno
-presentati nel dettaglio in seguito, in questa sottosezione viene presentato
+presentati nel dettaglio in seguito, in questa Sottosezione viene presentato
 un breve sunto del processo di valutazione e delle strutture fondamentali di
 un programma scritto utilizzando il linguaggio di programmazione Common
 Lisp.\\
@@ -66,17 +68,17 @@ CL-USER > "fred smith"
 Nel caso in cui un atomo non sia un self-evaluating object, il sistema Lisp lo
 identifica come automaticamente come simbolo. A sua volta, un simbolo può
 rappresentare o una symbol macro, una form utilizzata in sostituzione di
-un’altra form, o una variabile. La prima operazione compiuta da un sistema
-Lisp aderente allo standard in questo caso è una verifica della presenza o
-meno di una definizione di macro all’interno dell’environment lessicale in uso
-al momento della valutazione. Se una definizione è effettivamente presente
-allora viene applicata la funzione associata a questa al fine di produrre una
-form che verrà valutata al posto del simbolo stesso, esattamente come
-descritto dal processo di macro-espansione illustrato nella sezione <>. Se non
-dovesse essere presente una definizione di macro all’interno dell’ambiente, il
-sistema Lisp assume che il il simbolo rappresenti una variabile. Il valore
-della variabile associata al simbolo viene quindi ricercato e utilizzato per
-ritornato come output del processo di valutazione.\\
+un’altra form, o una variabile. La prima operazione compiuta da un sistema Lisp
+aderente allo standard in questo caso è una verifica della presenza o meno di
+una definizione di macro all’interno dell’environment lessicale in uso al
+momento della valutazione. Se una definizione è effettivamente presente allora
+viene applicata la funzione associata a questa al fine di produrre una form che
+verrà valutata al posto del simbolo stesso, esattamente come descritto dal
+processo di macro-espansione illustrato nella Sottosezione \ref{macroexpansion}.
+Se non dovesse essere presente una definizione di macro all’interno
+dell’ambiente, il sistema Lisp assume che il il simbolo rappresenti una
+variabile. Il valore della variabile associata al simbolo viene quindi ricercato
+e utilizzato per ritornato come output del processo di valutazione.\\
 
 \begin{lstlisting}[caption=Esempi di form di tipo symbol]
 
@@ -116,8 +118,11 @@ da questa ricerca la compound form viene classificata come all’interno di una
 delle seguenti 4 categorie: special form, macro form, function form o lambda
 form.
 
-\begin{lstlisting}[caption=Esempio di estrazione degli elementi operatore e
-parametri di una compound form]
+\begin{lstlisting}[
+  caption=Esempio di estrazione degli elementi operatore e parametri di una
+  compound form,
+  label={lst:car-cdr}
+]
 
 CL-USER > (car '(+ 1 2))
 +                        ; Operator: CAR is a symbol
@@ -139,7 +144,7 @@ di parametri identificata al passo precedente.
 \item Nel caso in cui l’operatore venga identificato come nome di una macro, e
 quindi la compound form sia stata classificata come \textit{macro form} la
 valutazione prosegue dando inizio al processo di valutazione delle macro
-illustrato nel corso del capitolo precedente, sezione <>.
+illustrato nel corso del capitolo precedente, Sottosezione \ref{macroexpansion}.
 
 \item Nel caso in cui l’environment in cui viene eseguita la ricerca contenga
 alcuna definizione per il simbolo operatore, la compound form viene
@@ -173,19 +178,19 @@ grammatica target del parser.\\
 
 Questo conclude la breve panoramica del processo di valutazione di un
 programma Common Lisp e delle strutture fondamentali che caratterizzano questo
-processo offerta da questa sezione. Panoramica che ha mostrato le modalità con
+processo offerta da questa Sezione. Panoramica che ha mostrato le modalità con
 il quale opera il processo di valutazione di un programma Lisp rispetto alle
 principali componenti di questo.
 
-Nel corso della prossima sezione verrano quindi approfonditi meccanismi che la
-libreria CLAST utilizza per la rappresentazione di queste strutture al fine di
-facilitare i compiti di analisi del codice sorgente di un programma.
+Nel corso della prossima Sottosezione verrano quindi approfonditi meccanismi che
+la libreria CLAST utilizza per la rappresentazione di queste strutture al fine
+di facilitare i compiti di analisi del codice sorgente di un programma.
 
 \subsection{Strutture di rappresentazione}
 
 Dopo aver brevemente presentato il processo di valutazione utilizzato da un
 sistema Common Lisp e le strutture fondamentali utilizzate da questo processo,
-questa sezione presenta i meccanismi che vengono forniti dalla libreria CLAST
+questa Sezione presenta i meccanismi che vengono forniti dalla libreria CLAST
 allo scopo di rappresentare un programma Lisp.
 
 Come precedentemente riportato, i meccanismi di rappresentazione ricalcano
@@ -325,7 +330,7 @@ all'interno del quale verrà eseguita una determinata form.
 La classe \texttt{EXPANSION-COMPONENT} è invece responsabile per la
 definizione delle strutture e dei metodi che consentono il parsing di form
 soggette al processo di valutazione tipico di una macro presentato nel corso
-dalla sezione <>.
+dalla Sottosezione \ref{macroexpansion}.
 
 In particolare, questa classe espone un altro attributo, chiamato \texttt
 {FORM-EXPANSION}, fondamentale ad uno strumento per l’analisi di un programma
@@ -366,9 +371,9 @@ un'applicazione dell'operatore della compound form, distinguendo se si tratta
 dell’applicazione di una funzione o di una macro a partire dalla ricerca
 dell'operatore all'interno dell'environment in uso.\\
 
-Questa sezione ha presentato in dettaglio la struttura e le componenti
+Questa Sezione ha presentato in dettaglio la struttura e le componenti
 fondamentali del modulo di rappresentazione presente nella libreria CLAST.
-Nella prossima sezione verrà approfondito invece il funzionamento del modulo
+Nella prossima Sezione verrà approfondito invece il funzionamento del modulo
 dedicato a parsing e analisi del codice sorgente di un programma, mostrando
 quindi come gli elementi del modulo di rappresentazione vengono realmente
 impiegati.

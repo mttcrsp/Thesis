@@ -32,7 +32,7 @@ di avere una migliore comprensione rispetto alle caratteristiche di
 correttezza e funzionamento del sistema che sta costruendo.\\
 
 La caratteristica fondamentale che distingue una form macro dalle altre form
-Lisp é che, come accennato in apertura di questa sezione, una macro non
+Lisp é che, come accennato in apertura di questa Sezione, una macro non
 produce in output un valore. Ogni macro produce come output una nuova form
 costruita a partire da quella in input, rappresentata dal parametro body
 specificato in fase di invocazione della macro.\\
@@ -131,6 +131,7 @@ definizione di una macro. In seguito viene invece analizzato il momento
 successivo alla definizione, ossia il processo di espansione di una macro.
 
 \subsection{Processo di macro-espansione}
+\label{macroexpansion}
 
 Quando la funzione \texttt{EVAL} riceve in input una lista il cui CAR (primo
 elemento) è un simbolo, Lisp procede con la verifica della presenza del

@@ -84,10 +84,10 @@ linguaggi di programmazione e la velocità con la quale ne vengono introdotti di
 nuovi rappresentano altri due fattori renderebbe una strategia indipendente dal
 linguaggio poco efficace e rapidamente obsoleta.\\
 
-Come affermato nella sezione precedente non è possibile definire una strategia
-di generazione degli ASTs univoca. Un AST viene costruito in maniera specifica
-per un linguaggio di programmazione e per la realizzazione di una specifica
-funzionalità.
+Come affermato nel corso della Sezione precedente non è possibile definire una
+strategia di generazione degli ASTs univoca. Un AST viene costruito in maniera
+specifica per un linguaggio di programmazione e per la realizzazione di una
+specifica funzionalità.
 
 Tuttavia, nel caso in cui si abbia una famiglia di linguaggi di programmazione
 molto simili tra loro, ossia che condividono gran parse della sintassi
@@ -116,7 +116,7 @@ clone-detection \cite{DBLP:conf/saci/LazarB14}. Anche all’interno di un
 compilatore stesso però, l’applicazione degli AST non si limita alla solo
 supporto della generazione di codice macchina. Altre applicazioni all’interno
 di un compilatore vanno dal supporto tipizzazione statica a quello per il
-pattern matching. La prossima sezione di questo capitolo presenta quindi le
+pattern matching. La prossima Sezione di questo capitolo presenta quindi le
 principali applicazioni degli AST nei diversi contesti che fanno un utilizzo di
 questo meccanismo di rappresentazione. Questo allo scopo di introdurre al
 lettore i requisiti che una libreria per la generazione di ASTs per un
@@ -127,7 +127,7 @@ La libreria CLAST, soggetto di questa tesi, utilizza questi come meccanismo per
 la rappresentazione di un programma al fine di consentire la creazione di
 strumenti di source code analysis. Data quindi l'importanza sia dal punto di
 vista teorico che dal punto di vista pratico che queste strutture dati hanno
-all'interno di CLAST, si è scelto di presentare, attraverso questa sezione, un
+all'interno di CLAST, si è scelto di presentare, attraverso questa Sezione, un
 approfondimento rispetto alla teoria alla base degli AST e alle applicazioni di
 questi nel contesto di strumenti per l'analisi ed elaborazione di sistemi
 software.
@@ -135,7 +135,7 @@ software.
 \subsection{Applicazioni degli AST}
 
 Le applicazioni degli Abstract Syntax Trees sono diverse sia nel mondo della
-ricerca che nel mondo dell’industria. All’interno di questa sezione vengono
+ricerca che nel mondo dell’industria. All’interno di questa Sezione vengono
 presentati alcuni esempi da entrambi questi mondi per sottolineare l’importanza
 della disponibilità di uno strumento per la generazione di AST per un dato
 linguaggio di programmazione. Questo viene fatto al fine di mostrare al lettore
@@ -143,9 +143,10 @@ l’utilità, i requisiti e la tradizionale collocazione di uno strumento per la
 generazione di ASTs come quello che viene trattato da questa tesi.
 
 Essendo il maggiore campo di applicazione degli ASTs quello dei compilatori, la
-prossima sezione ne presenta un approfondimento.
+Sezione \ref{ast-compilers} ne presenta un approfondimento.
 
 \subsubsection{Nei compilatori}
+\label{ast-compilers}
 
 Un compilatore prende in input un programma scritto un linguaggio di
 programmazione e produce come output una programma equivalente scritto in
@@ -176,7 +177,7 @@ Le entità sintattiche sopraccitate vengono quindi poste, sempre durante questa
 fase, all’interno di un Parse Tree, struttura a partire dalla quale viene
 prodotto l’AST del programma, procedendo per eliminazione degli elementi
 ridondanti o poco interessanti alle fasi successive, come spiegato nella
-precedente sezione.
+precedente Sezione.
 
 Nel caso in cui il linguaggio di programmazione utilizzato per la scrittura del
 programma in compilazione abbia una struttura sintattica particolarmente
@@ -266,20 +267,21 @@ ciascuno di questi questo, fornendo allo stesso tempo un interfaccia nota e
 standard agli utenti dell’API.\\
 
 Dopo aver illustrato il principale campo di applicazione degli ASTs, e di
-riflesso di uno strumento per la generazione di ASTs, la prossima sezione di
-questo capitolo presenta alcuni dei principali lavori presenti nella
+riflesso di uno strumento per la generazione di ASTs, la prossima Sottosezione
+di questo capitolo presenta alcuni dei principali lavori presenti nella
 letteratura del settore rispetto agli AST, indicando alcune delle principali
 linee di ricerca in questo ambito.
 
 \subsubsection{Nella ricerca}
+\label{ast-research}
 
-In questa sezione vengono presentati alcuni lavori correlati a quanto esposto
-all’interno di questa tesi. Lo scopo di questa sezione è quindi quello di
-fornire al lettore una panoramica del settore in cui questa tesi opera, quello
-della creazione di sistemi per la generazione di AST, dal punto di vista della
-ricerca. A questo scopo vengono elencati alcuni articoli relativi al mondo
-degli Abstract Syntax Trees che presentano il problema della progettazione di
-AST  e meccanismi di generazione per ASTs per la realizzazione di sistemi che
+In questa Sottosezione vengono presentati alcuni lavori correlati a quanto
+esposto all’interno di questa tesi. Lo scopo di questa Sottosezione è quindi
+quello di fornire al lettore una panoramica del settore in cui questa tesi
+opera, quello della creazione di sistemi per la generazione di AST, dal punto di
+vista della ricerca. A questo scopo vengono elencati alcuni articoli relativi al
+mondo degli Abstract Syntax Trees che presentano il problema della progettazione
+di AST  e meccanismi di generazione per ASTs per la realizzazione di sistemi che
 realizzano svariate funzionalità a partire dall’elaborazione delle informazioni
 a cui questi danno accesso.\\
 
@@ -362,18 +364,19 @@ per quanto concerne gli aspetti architetturali del sistema.
 
 \subsubsection{Nell’industria}
 
-Mentre la sezione precedente ha indicato alcuni degli utilizzi degli AST nel
-mondo della ricerca, all’interno di questa sezione vengono presentate alcune
-applicazione degli AST che possono essere trovate nel mondo dell’industria e
-dei sistemi di comune utilizzo. Questo al fine di completare la panoramica che
-queste ultime sezioni hanno offerto sui requisiti e sulle applicazioni degli
-Abstract Syntax Trees e dei sistemi per la loro generazione.\\
+Mentre la Sottosezione \ref{ast-research} ha indicato alcuni degli utilizzi
+degli AST nel mondo della ricerca, all’interno di questa Sottosezione vengono
+presentate alcune applicazione degli AST che possono essere trovate nel mondo
+dell’industria e dei sistemi di comune utilizzo. Questo al fine di completare la
+panoramica che queste ultime sezioni hanno offerto sui requisiti e sulle
+applicazioni degli Abstract Syntax Trees e dei sistemi per la loro
+generazione.\\
 
 Oltre alle alla più tradizionale applicazione degli ASTs, illustrata nella
-sezione relativa all’utilizzo degli ASTs nel contesto di un compilatore, la
-seconda applicazione più significativa degli ASTs è all’interno di strumenti
-per il supporto allo sviluppo, in particolare all’interno di sistemi per
-l'analisi e modifica di codice sorgente.\\
+Sottosezione \ref{ast-compilers}, relativa all’utilizzo degli ASTs nel contesto
+di un compilatore, la seconda applicazione più significativa degli ASTs è
+all’interno di strumenti per il supporto allo sviluppo, in particolare
+all’interno di sistemi per l'analisi e modifica di codice sorgente.\\
 
 Per molti programmatori, la possibilità di utilizzare all’interno del proprio
 IDE una funzionalità che consenta di selezionare un insieme di istruzioni e

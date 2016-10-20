@@ -1,6 +1,7 @@
 \section{Modulo di parsing}
+\label{parsing}
 
-Dopo aver approfondito, nel corso della precedente sezione, le strutture che
+Dopo aver approfondito, nel corso della precedente Sezione, le strutture che
 la libreria CLAST offre per la rappresentazione di codice sorgente, questa
 sezione ha l’obiettivo di presentare e discutere la progettazione e
 implementazione del secondo modulo facente parte libreria. Il modulo di
@@ -157,9 +158,10 @@ prende in input una form Lisp e produce in output due valori.
 \begin{itemize}
 
 \item Il primo valore ritornato consiste in una rappresentazione del programma
-LISP, rappresentato dalla form fornita in input, in forma di AST. Un AST in
-cui nodi sono rappresentati dagli oggetti definiti all’interno del modulo di
-rappresentazione, presentati nella sezione precedente di questo capitolo.
+LISP, rappresentato dalla form fornita in input, in forma di AST. Un AST in cui
+nodi sono rappresentati dagli oggetti definiti all’interno del modulo di
+rappresentazione, presentati nella Sezione \ref{representation} di questo
+capitolo.
 
 \item Il secondo valore ritornato consiste invece di un oggetto environment,
 il quale rappresenta l’environment prodotto dalla valutazione della form e
@@ -168,15 +170,17 @@ parsing.
 
 \end{itemize}
 
-La coppia prodotta come output costituisce il risultato delle attività
-parallele di parsing e analisi precedentemente descritte e rappresenta il
-massimo insieme di formazioni che risulta possibile raccogliere, rispetto ad
-un dato frammento di codice Common Lisp, utilizzando la libreria CLAST. Il
-listato <> mostra un estratto del codice della libreria in cui si mostra la
-definizione della funzione \texttt{PARSE}.
+La coppia prodotta come output costituisce il risultato delle attività parallele
+di parsing e analisi precedentemente descritte e rappresenta il massimo insieme
+di formazioni che risulta possibile raccogliere, rispetto ad un dato frammento
+di codice Common Lisp, utilizzando la libreria CLAST. Il Listato \ref
+{lst:parse-function} mostra un estratto del codice della libreria in cui si
+mostra la definizione della funzione \texttt{PARSE}.
 
-\begin{lstlisting}[caption=Definizione e documentazione relative alla funzione
-\texttt{PARSE}]
+\begin{lstlisting}[
+  caption=Definizione e documentazione relative alla funzione \texttt{PARSE},
+  label={lst:parse-function}
+]
 
 (defgeneric parse (form &rest keys
                         &key
@@ -186,8 +190,8 @@ definizione della funzione \texttt{PARSE}.
                         &allow-other-keys)
   (:documentation "Parses a form in a given 'environment'.
 
-The methods of this generic function return a AST 'node' (a CLAST-ELEMENT)
-and the - possibly modified - ENVIRONMENT.
+The methods of this generic function return a AST 'node' (a
+CLAST-ELEMENT) and the - possibly modified - ENVIRONMENT.
 
 The methods of PARSE dispatch on 'atomic' and on 'compound' (i.e.,
 CONS) forms.  Atomic forms - numbers, string, arrays, and symbols -
@@ -253,12 +257,12 @@ del simbolo.
 \end{enumerate}
 
 Infine, nel caso in cui invece la form fornita in input alla funzione
-\texttt{PARSE} sia una compound form, il parsing e l’analisi proseguono in
-modo significativamente più complesso. Questo in quanto, come riportato nella
-sezione <> relativamente al processo di valutazione caratteristico del
-linguaggio Common Lisp, questo è il caso in cui si ha la possibilità di
-incontrare diversi costrutti che utilizzano una sintassi speciale e regole di
-valutazione speciali.\\
+\texttt{PARSE} sia una compound form, il parsing e l’analisi proseguono in modo
+significativamente più complesso. Questo in quanto, come riportato nella
+Sottosezione \ref{CL-valutazione} relativamente al processo di valutazione
+caratteristico del linguaggio Common Lisp, questo è il caso in cui si ha la
+possibilità di incontrare diversi costrutti che utilizzano una sintassi speciale
+e regole di valutazione speciali.\\
 
 Tenendo fede alla struttura precedentemente citata, in cui si ha una
 definizione di un funzione per ciascuna produzione della grammatica del
@@ -270,9 +274,9 @@ corretta produzione da applicare per proseguire nel processo di parsing.\\
 La funzione \texttt{PARSE} si limita quindi ad operare l'estrazione dalla
 compound form identificata dell’elemento \texttt{CAR} e del \texttt{CDR}, la
 testa e la coda della lista che costituisce una compond form, come mostra il
-listato <>, ed invocare, a partire da questi due elementi, la funzione
-generica \texttt{PARSE-FORM}, responsabile per la prosecuzione del parsing
-secondo lo schema di discesa ricorsiva.\\
+Listato \ref{lst:car-cdr}, ed invocare, a partire da questi due elementi, la
+funzione generica \texttt{PARSE-FORM}, responsabile per la prosecuzione del
+parsing secondo lo schema di discesa ricorsiva.\\
 
 La funzione \texttt{PARSE-FORM} è, come anche la funzione \texttt{PARSE}, una
 funzione generica. Il meccanismo delle funzioni generiche è uno dei meccanismi
@@ -403,23 +407,25 @@ operatore Common Lisp, ossia uno per ciascuna special form che utilizza una
 sintassi particolare, la quale a sua volta identifica una particolare regola
 della grammatica.
 
-Dal punto di vista pratico, ciascuno di questi metodi opera una
-specializzazione rispetto all’identità del primo parametro che riceve in
-input, il parametro \texttt{OP} o \texttt{OPERATOR}, in particolare una
-specializzazione rispetto al particolare operatore che identifica una delle
-regole della grammatica. Questo porta ad ottenere la struttura di predictive-
-parser, già citata in precedenza in questo capitolo, in cui si ha la
-definizione di una funzione mutuamente esclusiva per ciascuna produzione della
-grammatica. Il listato <> mostra alcuni esempi di signature dei metodi
-associati alla funzione generica \texttt{PARSE-FORM}.
+Dal punto di vista pratico, ciascuno di questi metodi opera una specializzazione
+rispetto all’identità del primo parametro che riceve in input, il parametro
+\texttt{OP} o \texttt{OPERATOR}, in particolare una specializzazione rispetto al
+particolare operatore che identifica una delle regole della grammatica. Questo
+porta ad ottenere la struttura di predictive- parser, già citata in precedenza
+in questo capitolo, in cui si ha la definizione di una funzione mutuamente
+esclusiva per ciascuna produzione della grammatica. Il Listato \ref
+{lst:metodi-parse-form} mostra alcuni esempi di signature dei metodi associati
+alla funzione generica \texttt{PARSE-FORM}.
 
 
 % SI POTREBBE PRESENTARE IL CONFRONTO TRA LA FUNZIONE PARSE CHE LAVORA
 % UTILIZZANDO SPECIALIZZAZIONI DI TIPO E LA FUNZINOE PARSE-FORM CHE LAVORA
 % OPERANDO SPECIALIZZAZIONI RISPETTO ALL’IDENTITÀ DEI PROPRI PARAMETRI.
 
-\begin{lstlisting}[caption=Esempi di specializzazione operata dai metodi
-\texttt{PARSE-FORM}]
+\begin{lstlisting}[
+  caption=Esempi di specializzazione operata dai metodi \texttt{PARSE-FORM},
+  label={lst:metodi-parse-form}
+]
 
 (defmethod parse-form ((op (eql 'block)) form |# #|)
   ;; ...
@@ -486,13 +492,16 @@ with a var, var is initialized to NIL.
 
 \end{lstlisting}
 
-Il listato in seguito presenta invece una approssimazione del metodo \texttt
-{PARSE-FORM} implementato dalla libreria specializzato rispetto all'operatore
-\texttt{LET*}. I dettagli rispetto alle diverse operazioni compiute dal metodo
-verranno approfondite nei prossimi paragrafi.
+Il Listato \ref{lst:parse-form-let} presenta invece una approssimazione del
+metodo \texttt{PARSE-FORM} implementato dalla libreria specializzato rispetto
+all'operatore \texttt{LET*}. I dettagli rispetto alle diverse operazioni
+compiute dal metodo verranno approfondite nei prossimi paragrafi.
 
-\begin{lstlisting}[caption=Semplificazione del metodo \texttt{PARSE-FORM} per
-il parsing del costrutto \texttt{LET*}]
+\begin{lstlisting}[
+  caption=Semplificazione del metodo \texttt{PARSE-FORM} per il parsing del
+  costrutto \texttt{LET*},
+  label={lst:parse-form-let}
+]
 
 (defmethod parse-form ((op (eql 'let*)) params top
                        :optional env internal-env)
@@ -589,7 +598,7 @@ utile all'interno dell'intero modulo in quanto consente di mantenere
 l'environment di valutazione della form distinto dall'environment che verrà
 arricchito con le informazioni prodotte dalla valutazione stessa e ritornato.
 In molti casi infatti, come ad esempio nel caso del costrutto \texttt{LET*}
-analizzato dall'esempio presentato in questa sezione, l'environment di
+analizzato dall'esempio presentato in questa Sezione, l'environment di
 definizione presenta infatti informazioni aggiuntive, non accessibili
 esternamente alla form, e che quindi non dovranno fare parte dell'environment
 ritornato dal parsing.
@@ -682,14 +691,14 @@ ciascuna form innestata.\\
 
 Infine, a partire da quanto prodotto dai passi precedenti, il metodo si limita
 a \texttt{7.} ritornare i due valori descritti in apertura di questa
-sottosezione e comuni a qualsiasi metodo \texttt{PARSE-FORM}: un'istanza di
+Sottosezione e comuni a qualsiasi metodo \texttt{PARSE-FORM}: un'istanza di
 \texttt{CLAST-ELEMENT} che riporta tutti dettagli relativi all'utilizzo della
 form \texttt{LET*} fornita in input, che rappresenta il nodo radice del
 sottoalbero del quale il metodo ha effettuato il parsing, e un secondo valore
 rappresentato dall'oggetto environment contenente tutte le informazioni
 raccolte durante la discesa ricorsiva attraverso la form operata dal parser.\\
 
-Questa sottosezione ha presentato, attraverso un esempio, il funzionamento e
+Questa Sottosezione ha presentato, attraverso un esempio, il funzionamento e
 l’analisi svolta dalla libreria. Analisi che consente di produrre una
 rappresentazione estremamente precisa del codice fornito in input a questa.
 Questo conclude la discussione rispetto al modulo di parsing e analisi offerto

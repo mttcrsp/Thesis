@@ -30,7 +30,7 @@ funzionamento complessivo del linguaggio, rappresentando lo strumento
 fondamentale, e più appropriato, per la gestione dei tipi di dato algebrici che
 contraddistinguono Haskell. Per concludere questo riferimento storico, è
 importante sottolineare che anche linguaggi molto recenti, come Rust
-\cite{rust2016}, Elixir \cite{laurent2014introducing} ed Elm \cite{elm2016}, 
+\cite{rust2016}, Elixir \cite{laurent2014introducing} ed Elm \cite{elm2016},
 hanno scelto di introdurre un supporto al pattern matching.
 
 Per meglio illustrare la definizione di fornita nel paragrafo precedente, in
@@ -58,7 +58,7 @@ end
 \end{lstlisting}
 
 Nell'esempio i $p_i$ rappresentano i pattern che dovranno essere verificati
-all’esecuzione del costrutto, $e$ rappresenta un’espressione, detta 
+all’esecuzione del costrutto, $e$ rappresenta un’espressione, detta
 \textit{discriminante}, ossia un valore o insieme di valori a partire dai quali
 devono essere verificati i pattern $p_i$ per identificare la presenza di
 un match, infine ciascun $e_i$ rappresenta l'espressione che deve essere
@@ -198,7 +198,7 @@ Dopo aver presentato nei precedenti paragrafi una definizione di pattern
 matching, i principi alla base di questo e alcuni esempi di utilizzo di questo
 meccanismo, in seguito vengono analizzati i principali vantaggi che un
 linguaggio di programmazione può ottenere introducendo un supporto al pattern
-matching e come il linguaggio Common Lisp si relazioni con il pattern 
+matching e come il linguaggio Common Lisp si relazioni con il pattern
 matching.\\
 
 Alcuni dei vantaggi che l'introduzione di un supporto al pattern matching porta
@@ -240,7 +240,7 @@ Ad esempio, il costrutto \texttt{DESTRUCTURING-BIND} è una macro fornita
 nativamente dal linguaggio per la destrutturazione di liste, anche
 arbitrariamente innestate, all’interno delle loro componenti elementari.
 
-\begin{lstlisting}[caption=Esempio utilizzo della macro 
+\begin{lstlisting}[caption=Esempio utilizzo della macro
   \texttt{DESTRUCTURING-BIND}.]
 (destructuring-bind (a (b) c)
     (list 1 (list 2) 3)
@@ -264,4 +264,4 @@ scomposizione di questi all'interno dell'insieme di variabili specificato.}
 Tuttavia, nonostante l'assenza di un supporto nativo al pattern matching, la
 forte estensibilità che contraddistingue Common Lisp rende possibile
 l'introduzione di un costrutto per il pattern matching in maniera naturale.
-Come verrà approfondito all'interno delle prossime sezioni.
+Come verrà approfondito all'interno delle prossime Sezioni.
