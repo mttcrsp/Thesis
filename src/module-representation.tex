@@ -292,9 +292,10 @@ costrutti che compiono un \texttt{IMPLICIT-PROGN}.
 costrutto PROGN in modo implicito]
 
 (defun sum-and-log (x y)
-  (format t "~a plus ~a equals..." x y) ; The form on this line will be implicitly
-                                        ; wrapped in a PROGN
-  (+ x y)                               ; together with the on on this line
+  ;; Forms on these next two lines will be implicitly wrapped in a
+  ;; PROGN form together and thus executed sequentially.
+  (format t "~a plus ~a equals..." x y)
+  (+ x y)
   )
 
 \end{lstlisting}
