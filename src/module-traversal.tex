@@ -16,9 +16,9 @@ diverse funzionalità che vengono offerte dal modulo di traversal agli utenti
 della libreria.\\
 
 La struttura interna del modulo ricalca molto da vicino il design pattern
-Visitor, presentato da Gamma et al. in <>. In seguito, viene presentato il
-funzionamento di base del design pattern e come questo sia stato esteso per
-adattarsi allo specifico contesto in analisi.\\
+Visitor, presentato da Gamma et al. in \cite{gamma1995design}. In seguito, viene
+presentato il funzionamento di base del design pattern e come questo sia stato
+esteso per adattarsi allo specifico contesto in analisi.\\
 
 Si è scelto di sfruttare il design pattern Visitor principalmente per come
 questo consenta di ottenere una separazione tra una dato insieme di operazioni
@@ -28,15 +28,16 @@ specifico per il traversal dell'AST tutte le operazioni relative alla visita
 dei nodi e isolare all'interno di un modulo differente, come presentato in
 precedenza, tutte le strutture e gli oggetti che rappresentano i nodi.
 
-\image{img/visitor-pattern}
-      {Diagramma delle classi relativo al design pattern Visitor}
-      {fig:visitor-pattern}
+\image{img/visitor-classi}
+      {Design Pattern Visitor - Diagramma delle classi}
+      {fig:visitor-classi}
       {0.5}
 
 \subsubsection{Design pattern Visitor}
 
-Come mostrato dal diagramma in figura <>, estratto da <>, il pattern descrive
-una collaborazione tra 5 diversi elementi:
+Come mostrato dal diagramma in Figura \ref{fig:visitor-classi}, diagramma
+presentato in \cite{gamma1995design}, il pattern descrive una collaborazione tra
+5 diversi elementi:
 
 \begin{itemize}
 
@@ -61,7 +62,7 @@ ciascuno dei propri elementi.
 \end{itemize}
 
 Le modalità di interazione vengono quindi riassunte dal diagramma di attività
-in Figura <>:
+in Figura \ref{fig:visitor-sequenza}:
 
 \begin{enumerate}
 
@@ -78,11 +79,16 @@ tipicamente sé stesso come oggetto parametro dell'invocazione.
 
 \end{enumerate}
 
+\image{img/visitor-sequenza}
+      {Design Pattern Visitor - Diagramma di sequenza}
+      {fig:visitor-sequenza}
+      {0.5}
+
 Dopo aver brevemente presentato il design pattern a cui la struttura del
 modulo fa riferimento, le prossime sottosezioni presentano l'API del modulo e
 alcuni dettagli del funzionamento interno.
 
-\subsubsection{\texttt{CLAST-ELEMENT-SUBFORMS}} clast-elements.lisp
+\subsubsection{\texttt{CLAST-ELEMENT-SUBFORMS}}
 
 La funzione \texttt{CLAST-ELEMENT-SUBFORMS} è una funzione generica. Questa
 funzione può essere considerata come il corrispondente della classe
@@ -103,9 +109,9 @@ questa, ordinate in accordo a quanto richiesto dal processo di visita.
 (defgeneric clast-element-subforms (form)
   (:documentation "Returns a list of 'subforms' of a given FORM.
 
-The methods of this generic form operate on the different kinds of AST
-nodes that are of class FORM.  Other Common Lisp objects have NULL
-subforms and LISTs are returned as they are.
+The methods of this generic form operate on the different kinds of
+AST nodes that are of class FORM.  Other Common Lisp objects have
+NULL subforms and LISTs are returned as they are.
 
 Arguments and Values:
 
@@ -126,7 +132,8 @@ implementazione potrebbe un certo numero di elementi, ad esempio nel caso
 dell'implementazione relativa ad una form \texttt{LET*}, o una lista vuota, ad
 esempio nel caso di un self-evalutating object come la form \texttt{9}.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Esempi di implementazione del metodo \texttt
+{CLAST-ELEMENT-SUBFORMS}]
 
 ;; Simple implementation example
 (defmethod clast-element-subforms ((ce constant-form)) ())
@@ -145,14 +152,16 @@ esempio nel caso di un self-evalutating object come la form \texttt{9}.
 A partire dalla funzione \texttt{CLAST-ELEMENT-SUBFORMS} lavora la funzione
 probabilmente più importante a livello di API dell'intero modulo, la funzione
 \texttt{WALK}. Lo scopo di questa funzione è quello di consentire ad un utente
-della libreria di operare il reale traversal della rappresentazione in forma
-di AST prodotta dal modulo di parsing ed analisi.
+della libreria di operare il reale traversal della rappresentazione in forma di
+AST prodotta dal modulo di parsing ed analisi. Da un punto di vista pratico,
+data un'istanza di \texttt{CLAST-ELEMENT}, la funzione \texttt{WALK} opera una
+visita dell'AST radicato in questa in modo ricorsivo, depth-first.
 
 Per continuare il parallelo tra struttura della libreria e il design pattern
 Visitor, precedentemente illustrato, la funzione \texttt{WALK} può essere
 vista, con una certa approssimazione, come la classe astratta
 \texttt{Visitor}, la quale può essere estesa per implementare un particolare
-processo di visita.
+processo di visita.\\
 
 % Prova a modificare la parte che segue in maniera tale che sia più coerente
 % con la parte che la precede. Prova con qualcosa come "la modalità di
@@ -167,47 +176,36 @@ specificare le operazioni che desidare vengano compiute in risposta alla
 visita di un nodo o porzione dell'AST.
 
 Le diverse funzioni che vengono fornite in input alla funzione \texttt{WALK}
-possono quindi invece essere viste come classi \texttt{ConcreteVisitor}.
-
-Da un punto di vista pratico, data un'istanza di \texttt{CLAST-ELEMENT}, la
-funzione \texttt{WALK} opera una visita dell'AST radicato in questa in modo
-ricorsivo, depth-first.
+possono quindi invece essere viste come classi \texttt{ConcreteVisitor}.\\
 
 % Chiedi al professore più informazioni rispetto allo schema map-reduce
 % utilizzato da WALK, probabilmente si può aggiungere qualcosa a partire da
 % quello.
 
-Oltre alla funzionalità di visita vera e propria esposta dalla funzione
-\texttt{WALK}, la quale rappresenta il cuore del funzinamento del modulo, il
-modulo di traversal offre diverse altre funzionalità. Tali funzionalità
-vengono costruite a partire dal meccanismo di visita appena presentato e sono
-rappresentaze dalla funzionalità di query di un AST e dal supporto
-all'interoperabilità tra la libreria e sistemi software scritti utilizzando
-linguaggi di programmazione differenti, attraverso la definizione di un
-formato testuale per la rappresentazione dei nodi di un AST.
+A partire dalla funzionalità di visita dell'AST, implementata dalla funzione
+\texttt{WALK}, il modulo esporta anche un insieme di funzioni per la ricerca di
+elementi all'interno dell'AST. Queste funzioni verranno brevemente discusse
+nella prossima sottosezione.
 
-Entrambe queste funzionalità verranno approfondite nelle prossime
-sottosezioni.
+\subsubsection{Query functions}
 
-\subsection{Interrogazione di un AST e Interoperabilità}
+\begin{lstlisting}[caption=Query functions per l'identificazione di variabili
+libere all'interno di una form Common Lisp]
 
-% \begin{lstlisting}
+(defun free-variables (form)
+  "Returns all the 'free' variables present in FORM.
 
-% (defun free-variables (form) ; Ok.  All this work to be able to write
-%                              ; this function!!!!
-%   "Returns all the 'free' variables present in FORM.
+Arguments and Values:
 
-% Arguments and Values:
+form   : a CLAST-ELEMENT.
+result : a LIST of SYMBOLS."
+  (walk form
+        :map (lambda (e)
+               (typecase e
+                 (free-variable-ref (list (form-symbol e)))))
+        ))
 
-% form   : a CLAST-ELEMENT.
-% result : a LIST of SYMBOLS."
-%   (walk form
-%         :map (lambda (e)
-%                (typecase e
-%                  (free-variable-ref (list (form-symbol e)))))
-%         ))
-
-% \end{lstlisting}
+\end{lstlisting}
 
 % as-string: form to string (clast-printing.lisp)
 
@@ -222,3 +220,14 @@ sottosezioni.
 % esempio potrebbe consentire la produzione di codice in un qualsiasi
 % linguaggio di programmazione a partire dalla ricca rappresentazione di una
 % programma LISP prodotta in output proprio da questa funzione.
+
+% Oltre alla funzionalità di visita vera e propria esposta dalla funzione
+% \texttt{WALK}, la quale rappresenta il cuore del funzinamento del modulo, il
+% modulo di traversal offre diverse altre funzionalità. Tali funzionalità
+% vengono costruite a partire dal meccanismo di visita appena presentato e sono
+% rappresentaze dalla funzionalità di query di un AST.
+
+% Entrambe queste funzionalità verranno approfondite nelle prossime
+% sottosezioni.
+
+% \subsection{Interrogazione di un AST e Interoperabilità}
