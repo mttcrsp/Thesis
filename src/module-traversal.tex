@@ -70,8 +70,8 @@ in Figura \ref{fig:visitor-sequenza}:
 \texttt{ObjectStructure} che raccoglie la conoscenza rispetto all'ordine di
 visita dei diversi elementi che compongono la propria struttura;
 
-\item il metodo opera quindi un invocazione del metodo texttt{accept} di
-ciascun elemento (texttt{ConcreteElement});
+\item il metodo opera quindi un invocazione del metodo \texttt{accept} di
+ciascun elemento (\texttt{ConcreteElement});
 
 \item secondo le modalità specifiche della classe di appartenenza, ciascuna
 elemento opera quindi un invocazione del metodo \texttt{visit}, fornendo
@@ -172,7 +172,7 @@ La funzione \texttt{WALK} è una high order function, ossia una funzione che
 prende in input o restituisce altre funzioni. Proprio questa aspetto
 rappresenta il meccanismo di estensione attraverso il quale un utente della
 libreria può adattare il processo di visita alle proprie necessità e
-specificare le operazioni che desidare vengano compiute in risposta alla
+specificare le operazioni che desidera vengano compiute in risposta alla
 visita di un nodo o porzione dell'AST.
 
 Le diverse funzioni che vengono fornite in input alla funzione \texttt{WALK}

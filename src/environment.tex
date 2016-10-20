@@ -130,7 +130,7 @@ per l’analisi necessaria alla libreria CLAST. \texttt{AUGMENT-ENVIRONMENT}
 consente di produrre un nuovo oggetto environment a partire da un input
 rappresentato da un environment opzionale, a partire dal quale si desidera che
 venga generato il nuovo oggetto, e da una o più liste di definizioni di
-variabili, funzioni, macro e dichiariazioni. La funzione produrrà quindi in
+variabili, funzioni, macro e dichiarazioni. La funzione produrrà quindi in
 output un oggetto environment che raccoglierà le informazioni contenute
 dall'environment fornito in input, nel caso in cui questo sia stato utilizzato
 un parametro di questo tipo in fase di invocazione, e le informazioni generate
@@ -143,7 +143,7 @@ informazioni ad un'instanza di environment già esistente. La funzione lavora a
 partire da un input rappresentato da un environment opzionale, presente nel
 caso in cui si desideri aggiungere informazioni ad un environment piuttosto
 che crearne uno nuovo, e da una o più liste di definizioni di variabili,
-funzioni, macro e dichiariazioni. La funzione produce quindi in output un
+funzioni, macro e dichiarazioni. La funzione produce quindi in output un
 oggetto environment che raccoglie le informazioni contenute dall'environment
 fornito in input, nel caso in cui questo sia stato utilizzato un parametro di
 questo tipo in fase di invocazione, e le informazioni generate dall'analisi
@@ -179,7 +179,7 @@ probabilmente definire una funzione analoga e, nonostante la presenza di
 del tutto banale. \cite{steele1990common} Dal punto di vista pratico, \texttt
 {PARSE-MACRO} è strutturata in maniera del tutto analoga ad una
 \texttt{DEFMACRO}, accetta infatti i medesimi parametri nel medesimo ordine, a
-livello di output invece ritorna una lambda- expression che prende in input
+livello di output invece ritorna una lambda-expression che prende in input
 due valori, una form ed un environment, e che potrà essere utilizzata per
 aggiungere informazioni ad un ambiente fornito in input alla funzione
 lambda.\\
@@ -191,7 +191,7 @@ un programma Lisp, di un programma Lisp che fa utilizzo di una form del tipo
 dell’environment che contiene questa. Dal punto di vista pratico,
 \texttt{ENCLOSE} è una funzione che lavora a partire da un input,
 rappresentato da una coppia lambda-expression ed environment, e ritorna un
-oggetto di tipo funzione equivalente a quello che si otterebbe valutando la
+oggetto di tipo funzione equivalente a quello che si otterrebbe valutando la
 form \texttt{`(function ,lambda-expression)} nell'environment sintattico
 fornito in input. Affinchè la valutazione possa avere successo è necessario
 che la form faccia riferimento solamente a simboli definiti all'interno
