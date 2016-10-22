@@ -474,37 +474,3 @@ termini di tempo, operando in modo manuale, o addirittura impossibili
 utilizzando un approcci più tradizionali come quelli basati su espressioni
 regolari a causa della presenza di costrutti ambigui nella, sempre in
 evoluzione, grammatica del linguaggio JavaScript.\\
-
-% Sempre per quanto riguarda, librerie per l’interazione con ASTs nel contesto
-% di un linguaggio di programmazione, il linguaggio di programmazione Python
-% espone un modulo specifico per la generazione, visita e manipolazione di AST
-% all’interno delle librerie standard
-% <https://docs.python.org/2/library/ast.html>. Librerie equivalenti sono
-% tipicamente disponibili per la maggior parte dei linguaggi di programmazione
-% più diffusi. CITA COME ESEMPI C C++ OBJECTIVE-C <http://clang.llvm.org>
-% JAVASCRIPT<http://esprima.org> RUBY <https://rubygems.org/gems/ast/> \\
-
-% Il linguaggio di programmazione PHP ha di recente (Luglio 2014) introdotto
-% nel processo di compilazione ed esecuzione un passo prevede la trasformazione
-% del codice di un programma, in particolare della fase di parsing, in un
-% Abstract Syntax Tree. All’interno di una RFC, vengono discussi i vantaggi che
-% questa modifica porta al linguaggio complessivo. Tra i diversi vantaggi
-% citati dalla RFC, in particolare, emergono tre diversi aspetti:
-%  • da un punto di vista dell’ingegneria del software, l’introduzione di una
-%  fase di trasformazione in AST, rende l’implementazione della fase produzione
-%  di opcode disaccoppiata dalla fase di parsing precedente a questa. Questo
-%  consente grandi vantaggi dal punto di vista della manutenibilità del codice
-%  di implementazione e qualità di questo, eliminando diversi casi limite.
-%  • Dal punto di del linguaggio di programmazione, questa modifica ha
-%  eliminato diverse limitazioni rispetto alle potenzialità sintattiche del
-%  linguaggio di programmazione. Un esempio di miglioramento di questo tipo è
-%  rappresentato dal costrutto yield fornito dal linguaggio, il quale, a causa
-%  di limiti implementativi, necessitava dell’utilizzo di parentesi, ridondanti
-%  dal punto di vista espressivo, quando utilizzato come espressione. Oltre ad
-%  eliminare limitazioni come nell’esempio appena presentato, l’introduzione di
-%  una fase di trasformazione sotto forma di AST ha reso possibile
-%  l’introduzione di sintassi completamente nuovi al linguaggio di
-%  programmazione, come ad esempio un costrutto dedicato alla destrutturazione
-%  di array, comune a diversi linguaggi, e un costrutto dedicato per la
-%  generazione semplificata di liste. La modifica proposta dalla RFC è stata
-%  approvata in maniera unanime dal comitato degli sviluppatori del linguaggio.
