@@ -87,12 +87,60 @@ PROGETTO DI TESI
 %%% SECTION: MOTIVATIONS
 \include{src/motivations}
 
+\begingroup
+\let\clearpage\relax
+
 \chapter{Teoria}
 
-UN SECONDO CAPITOLO PRESENTA L'AMBITO DI RICERCA NEL QUALE SI COLLOCA LA TESI,
-QUELLO DELLA SOURCE CODE ANALYSIS, E FORNISCE UN'INTRODUZIONE AI CONCETTI TEORICI
-FONDAMENTALI CHE VERRANNO UTILIZZATI NEL RESTO DELLA TESI, GLI ABSTRACT SYNTAX
-TREES
+Lo scopo di questo capitolo è quello di introdurre il lettore all'ambito di
+ricerca all'interno del quale questa tesi si colloca, e quindi in particolare
+all'ambito della Source Code Analysis, e ai concetti fondamentali a partire dai
+quali si articola il progetto soggetto del lavoro di tesi.\\
+
+La Source Code Analysis studia il processo di estrazione di un informazioni
+riguardo un programma a partire dal codice sorgente di questo, un'attibità di
+particolare importanza all'interno del più ampio campo dell'ingegneria del
+software.
+
+In particolare, la libreria CLAST, soggetto di questa tesi, si pone come
+obiettivo quello di abilitare la creazione di strumenti per la Source Code
+Analysis nel contesto rappresentato dal linguaggio di programmazione Common
+Lisp.
+
+All'interno della Sezione \ref{source-code-analysis}, vengono quindi presentate
+l'architettura tipica di uno strumento di Source Code Analysis e le principali
+strategie per la creazione di strumenti di questo tipo, indicando e discutendo
+come la libreria CLAST si inserisca all'interno di questa architettura e come
+possa semplificare la progettazione e costruzione di nuovi strumenti.\\
+
+Le sezioni successive, come precedentemente indicato, affrontano invece i più
+importanti fondamenti a partire dai quali la libreria CLAST opera e che
+risultano particolarmente significativi per la comprensione della progettazione
+e realizzazione della libreria, aspetti che verranno approfonditi nel Capitolo
+\ref{library}.
+
+Tra questi concetti vengono quindi presenti quello di abstract syntax tree e
+quelli di macro e ambiente Common Lisp.\\
+
+La Sezione \ref{abstract-syntax-tree} illustra il concetto di abstract syntax
+tree in quanto rappresenta la struttura dati fondamentale a partire dalla quale
+la libreria svolge il proprio lavoro di modellazione di un programma Common
+Lisp. Essendo in oltre gli abstract syntax tree l'output dell'azione della
+libreria, vengono presentate le principali applicazioni di strutture dati di
+questo tipo, sia nella letteratura e nel mondo della ricerca sia nel mondo
+dell'industria. Questo allo scopo di presentare al lettore i potenziali
+strumenti che possono essere costruiti a partire dalla libreria.
+
+La Sezione \ref{macro} presenta quindi il concetto di macro Common Lisp in
+quanto questo rappresenta l'aspetto più interessante e peculiare del linguaggio
+di programmazione target dell'analisi svolta dalla libreria e soprattutto in
+quanto particolarmente significativo dal punto di vista di un'analisi che opera
+a livello di codice sorgente come quella operata da CLAST.
+
+Infine, la Sezione \ref{environments} introduce il concetto di ambiente Common
+Lisp, strumento che, sia dal punto di vista della progettazione che dal punto di
+vista implementativo, rappresenta la principale dipendenza della libreria CLAST,
+in quanto fondamento a partire dal quale questa è in grado di agire.
 
 %%% SECTION: SOURCE CODE ANALYSIS
 \include{src/source-code-analysis}
@@ -102,6 +150,8 @@ TREES
 \include{src/macro}
 %%% SECTION: ENVIRONMENTS
 \include{src/environment}
+
+\endgroup
 
 \chapter{Libreria}
 \label{library}
