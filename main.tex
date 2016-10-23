@@ -142,13 +142,9 @@ Lisp, strumento che, sia dal punto di vista della progettazione che dal punto di
 vista implementativo, rappresenta la principale dipendenza della libreria CLAST,
 in quanto fondamento a partire dal quale questa è in grado di agire.
 
-%%% SECTION: SOURCE CODE ANALYSIS
 \include{src/source-code-analysis}
-%%% SECTION: ABSTRACT SYNTAX TREE
 \include{src/abstract-syntax-tree}
-%%% SECTION: MACROS
 \include{src/macro}
-%%% SECTION: ENVIRONMENTS
 \include{src/environment}
 
 \endgroup
@@ -159,13 +155,6 @@ in quanto fondamento a partire dal quale questa è in grado di agire.
 \include{src/module-representation}
 \include{src/module-parsing}
 \include{src/module-traversal}
-
-% \subsubsection{LOOP parsing}
-% APPROFONDIMENTO SUL PARSING DI LOOP. DOVREBBE ESSERE UN ESEMPIO PARTICOLARMENTE
-% INTERESSANTE PERCHÉ SI TRATTA DI UNA MACRO CHE PERÒ NON VIENE ANALIZZATA A
-% LIVELLO DI MACROESPANSIONE MA PIUTTOSTO A LIVELLO DI CODICE SORGENTE. IN PIÙ È
-% ANCHE UN OTTIMO ESEMPIO DI COME IL PARSING VENGA OPERATO IN MODO RICORSIVO E DI
-% COME VENGA UTILIZZATA L'API RELATIVA AGLI ENVIRONMENT.
 
 \chapter{Applicazioni}
 \label{applications}
