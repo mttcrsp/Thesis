@@ -1,140 +1,220 @@
-\section{Environments}
+\section{Ambienti}
 
-Un \textit{environment} Common Lisp è definito come un oggetto che raccoglie
-un insieme di binding, e più generalmente informazioni riguardo a variabili,
-funzioni, simboli e altri elementi utilizzati da un programma Lisp. Le
-informazioni contenute in un environment possono essere utili a diversi scopi
-tra cui espansione di macro e, più in generale, valutazione e compilazione di
-form. L’operatore macroexpand, ad esempio, prende in input un parametro
-opzionale che rappresenta l’environment all’interno del quale una macro verrà
-e spansa.\footnote{http://franz.com/support/documentation/current/doc/environments.htm}\\
+Questa sezione descrive un'altro elemento fondamentale alla comprensione del
+funzionamento della libreria. Gli ambienti Common Lisp rappresentano infatti
+il principale meccanismo per ottenere accesso alle informazioni generate da un
+sistema Common Lisp durante il processo di valutazione di una form. Questo
+risulta un elemento di fondamentale importanza per la libreria CLAST che si pone
+come obiettivo quello di raccogliere ed esporre ad un utente il maggior numero
+di informazioni possibili rispetto ad un programma, in quanto semplifica la
+memorizzazione e l'introspezione rispetto alle informazioni di un dato programma
+Lisp, cercando di fornire un'interfaccia il quanto più possibile uniforme tra le
+diverse implemementazioni del linguaggio.\\
 
-La definizione riportata dal paragrafo precedente fa riferimento alla
-documentazione di una delle più note ed impiegate implementazioni dello
-standard Common Lisp. Si è scelto di riportare questa particolare definizione
-in quanto risulta essere sufficientemente generica ed articolata da riassumere
-e approssimare in modo ragionevole il funzionamento generale degli
-environments a prescindere dalla particolare implementazione. Purtroppo, non è
-possibile citare una definizione standard di environment, in quanto la
-standard Common Lisp non tratta in alcun modo questa tematica. In seguito
-vengono spiegate le motivazioni di questa lacuna.\\
+Formalmente la definizione di ambiente viene fornita a partire dalla definizione
+di binding. Un binding viene definito dallo standard ANSI Common Lisp come
+un'associazione tra un nome e ciò che questo denota. Il linguaggio consente la
+definizione di binding all'interno di un ambiente a partire da un particolare
+insieme di operatori specifici per operazioni di questo tipo, come ad esempio
+\texttt{DEFMACRO} o \texttt{DEFPARAMETER}.
 
-L’ANSI X3J13 è il comitato tecnico, nato nel 1986, responsabile per la
-definizione dello standard ANSI Common Lisp. La formalizzazione operata del
-comitato si è basata in gran parte sul contenuto del libro “Common Lisp: the
-Language” di G.L. Steele \cite{steele1984common}, spesso abbreviato nella
-comunità Lisp con la sigla \textit{CLtL1}. Prima che cominciassero i lavori
-del comitato, il libro, pubblicato nel 1984, ha infatti per anni rappresentato
-uno standard \textit{de facto} per le diverse implementazioni del linguaggio.
-Ad oggi, la più recente ri-edizione del libro \cite{steele1990common}, datata
-1990, rappresenta uno dei riferimenti di maggiore importanza per la comunità,
-tanto che la versione definitiva dello standard, pubblicata nel 1994,
-attribuisce tanta importanza al libro da suggerire agli implementatori
+A partire da questa definizione di binding, un ambiente viene definito,
+sempre dallo standard ANSI, come \enquote{\textit{a set of bindings and other
+information used during evaluation (e.g., to associate meanings with names)}}.
+
+Un ambiente raccoglie un insieme di binding all'interno di diversi namespace,
+in maniera tale da consentire il l'utilizzo simultaneo di uno stesso nome per
+identificare una funzione, una variabile, una macro o altro. Tuttavia, affichè
+non si generino ambiguità, il linguaggio consente l'utilizzo di un dato nome
+solamente una volta all'interno di un dato namespace.\\
+
+Vengono inoltre specificate diverse specializzazioni del concetto di ambiente,
+in particolare di: ambiente globale, ambiente dinamico e ambiente lessicale.
+
+L'ambiente globale, \textit{global environment}, è quella parte di un ambiente
+che contiene binding che hanno scope e extent indefinito. Tra i diversi
+elementi, l'ambiente globale contiene anche i binding relativi a variabili
+dinamiche e costanti, binding relativi a funzione, macro e operatori speciali
+oltre che informazioni relative alle proclamazioni che occorrono all'interno di
+un programma.
+
+Un ambiente dinamico, \textit{dynamic environment}, rappresenta invece quella
+parte di ambiente che contiene binding il cui momento di validità si limita alla
+durata dell'esecuzione della form all'interno della quale questi sono stati
+definiti. Tra gli altri elementi, un ambiente dinamico contiene i binding
+relativi a variabili dinamiche, informazioni rispetto ai punti di ritorno
+dall'esecuzione definiti utilizzando \texttt{UNWIND-PROTEXT}, oltre che
+informazioni relative agli handler e restart attivi durante un determinato
+momento del processo di valutazione.
+
+Un ambiente lessicale per la valutazione di un particolare frammento di
+programma è invece definito come quella parte dell'ambiente che contiene le
+definizioni che hanno scope lessicale nel contesto delle form contenute dal
+frammento. Tra i diversi elementi registrati da un ambiente lessicale si trovano
+binding relativi a variabili lessicali, binding relativi a funzioni e macro,
+binding relativi a tag \texttt{GO} e informazioni relative alle dichiarazioni
+valide rispetto a variabili, funzioni, macro e altro contenute dall'ambiente.\\
+
+Le informazioni contenute in un ambiente vengono utilizzate a diversi
+scopi anche nel contesto del sistema Common Lisp stesso, tra cui per la ricerca
+della funzione espansione associata ad un particolare macro, per
+l'identificazione delle dichiarazioni relative ad una variabile, durante il
+processo di ottimizzazione del codice e, più in generale, durante tutto il
+processo di valutazione e compilazione di form. Anche dal punto di vista
+dell'API offerta dalla libreria standard del linguaggio, l’operatore
+\texttt{MACROEXPAND}, ad esempio, prende in input un parametro opzionale che
+rappresenta l’ambiente all’interno del quale una macro verrà
+espansa.\footnote{http://franz.com/support/documentation/current/doc/environments.htm}\\
+
+Dal punto di vista pratico, un ambiente viene ovviamente rappresentato,
+all'interno del linguaggio, mediante uno specifico oggetto. Tuttavia, lo
+standard ANSI Common Lisp delegate a ciascuna implementazione il compito di
+definire la struttura e le caratteristiche di questo.
+
+L'unico aspetto formalizzato dallo standard riguarda il fatto che il valore
+\texttt{NIL} possa essere utilizzato, ovunque sia possibile specifica un oggetto
+ambiente allo scopo di denotare l'ambiente lessicale vuoto.\\
+
+Questo particolare rende particolarmente difficile l'interazione tra un
+programma e oggetti di tipo ambiente. Ciò risulta particolarmente critico nel
+contesto della libreria CLAST, e più in generale nel contesto di qualsiasi
+sistema per l'analisi di codice sorgente Common Lisp, in quanto questa richiede
+un utilizzo particolarmente centrale di oggetti di questo tipo, allo scopo di
+tenere traccia delle informazioni relative al contesto di definizione di una
+data form.
+
+\subsection{Standardizzazione ed ambienti}
+
+Come affermato nel corso della precedente Sottosezione, lo standard ANSI Common
+Lisp non definisce in alcun modo le modalità di rappresentazione ed interazione
+con oggetti di tipo ambiente. Tuttavia, diverse implementazioni forniscono un
+interfaccia, relativamente comune, che consente la creazione e la manipolazione
+di ambienti Common Lisp. Nei prossimi paragrafi si presentano il processo e le
+ragioni che hanno portato alla definizione di questa API, strumento a partire
+dal quale la libreria CLAST compie gran parte delle proprie analisi e che, per
+questa ragione, rappresenta una importante dipendenza del progetto.\\
+
+L’ANSI X3J13 fu il comitato tecnico, nato nel 1986, responsabile per la
+definizione dello standard ANSI Common Lisp, pubblicato nel 1994. Gran parte del
+lavoro di formalizzazione svolto dal comitato negli anni, si è basata sul
+contenuto del libro \enquote{\textit{Common Lisp: the Language}} di G.L. Steele
+\cite{steele1984common}, spesso abbreviato nella letteratura con la sigla
+\textit{CLtL1}. Prima che cominciassero i lavori del comitato infatti, il libro,
+pubblicato nel 1984, ha infatti per anni rappresentato uno standard \textit
+{de facto} per le diverse implementazioni del linguaggio. Ad oggi, la più recente
+ri-edizione del libro \cite{steele1990common}, datata 1990, rappresenta ancora
+uno dei riferimenti di maggiore importanza per la comunità, tanto che anche lo
+lo standard definitivo suggerisce agli implementatori del linguaggio
 l’utilizzo dei simboli \texttt{:ctlt1} e \texttt{:ctlt2} per consentire
 l’interoperabilità tra implementazioni ANSI Common Lisp e altri dialetti che
-fanno invece maggiore riferimento alle diverse edizioni del libro.
+fanno invece maggiore riferimento alle diverse edizioni del libro.\\
 
-Rispetto alla seconda edizione del libro, lo standard definitivo riporta delle
-significative variazioni, sia in termini additivi e che sottrattivi. Data la
-rilevanza che il libro ha all’interno della comunità Common Lisp, la gran
-parte delle implementazioni del linguaggio più diffuse supportano l’API
-descritta dal libro. Tuttavia, la mancanza di una formalizzazione all’interno
-dello standard ha portato all’introduzione di variazioni e peculiarità tipiche
-di ciascuna implementazione, variazioni che complicano un lavoro che voglia
-mantenere una portabilità da implementazione a implementazione e che verranno
-approfondite nelle Sezioni a seguire.\\
+Rispetto alla seconda edizione del libro, il documento di standardizzazione
+definitivo riporta delle significative variazioni, sia in termini additivi e che
+sottrattivi. Data la rilevanza che il libro ha all’interno della comunità Common
+Lisp, la gran parte delle implementazioni del linguaggio più diffuse supportano
+l’API descritta dal libro. Tuttavia, la mancanza di una formalizzazione
+all’interno dello standard ha portato all’introduzione di variazioni e
+peculiarità tipiche di ciascuna implementazione, variazioni che complicano un
+lavoro che voglia mantenere una portabilità da implementazione a implementazione
+e che verranno approfondite nelle Sezioni a seguire.\\
 
-Tra gli elementi non approvati dallo standard ANSI per l’aggiunta al
-linguaggio ma presenti all’interno di \textit{CLtL2}, si trova proprio la
-definizione di environment Common Lisp e la proposta di un'API per
-l’interazione con questo tipo di oggetto, uno degli elementi più importanti
-per la creazione della libreria CLAST. Nei prossimi paragrafi viene presentato
-il concetto di environment in Common Lisp a partire da quanto descritto da
-CLtL2 e dalla documentazione disponibile in accompagnamento alle diverse
-implementazioni del linguaggio.\\
+Tra gli elementi non approvati dallo standard ANSI per l’aggiunta al linguaggio
+ma presenti all’interno di \textit{CLtL2} e per questa ragione supportati dalle
+principali implementazioni del Common Lisp, si trova proprio la definizione di
+oggetti ambiente Common Lisp e la proposta di un'API specifica per l’interazione
+con  oggetti di questo tipo, uno degli elementi più importanti per la creazione
+della libreria CLAST.\\
 
-ESSENDO CHE OGNI TANTO SI DICE CHE LO STANDARD NON FA ALCUN RIFERIMENTO AGLI
-ENVIRONMENT, IN ALTRI CONTESTI PERÒ SE NE PARLA E SI DICE CHE UN UTENTE NON
-DEVE ESSERE IN GRADO DI ACCEDERE DIRETTAMENTE.
+Le funzioni che compongono questa API sono quindi l'unico strumento, comune alle
+principali implementazioni, a partire dal quale è possibile creare a manipolare
+ambienti Common Lisp e quindi a partire dal quale la libreria CLAST è in grado
+di svolgere il proprio lavoro di analisi di un programma. Per questa ragione,
+nella prossima sezione, se ne presenta un approfondimento.
 
-\subsection{Environments API}
+\subsection{Environment API}
 
-Uno degli aspetti formalizzati dallo standard ANSI Common Lisp rispetto agli
-environment specifica che un utente del linguaggio non debba essere in grado
-in alcun modo di accedere o modificare direttamente un oggetto environment.
+Uno degli aspetti comuni alle diverse implementazione dello standard ANSI Common
+Lisp è rappresentato dal fatto che un utente tipicamente non è in grado di
+accedere o compiere modifiche direttamente ad un oggetto ambiente in alcun modo.
 Per questa ragione, molte implementazioni utilizzano degli oggetti immutabili
-come meccanismo di rappresentazione di un environment. Questo aspetto risulta
+come meccanismo di rappresentazione di un ambiente. Questo aspetto risulta
 perfettamente in linea con l’API descritta da CLtL2, la quale descrive un
-insieme di funzioni che consentono l’accesso ai contenuti memorizzati
-dall’environment e una funzione per l’aggiunta controllata di informazioni a
-questo.
+insieme di funzioni che consentono l’accesso ai contenuti memorizzati da un
+oggetto di tipo ambiente e funzioni pure per l’aggiunta controllata di
+informazioni a questo.\\
 
-Le funzioni che compongono l’API appena citata sono sette, in particolare,
-CLtL2 descrive come insieme minimo di funzioni quattro funzioni che consentono
-l’interazione con oggetti environment: tre funzioni che consentono l’accesso
-alle informazioni presenti all’interno di un oggetto environment, \texttt
-{VARIABLE-INFORMATION}, \texttt{FUNCTION-INFORMATION} e \texttt
-{DECLARATION-INFORMATION}, e un costruttore \texttt{AUGMENT-ENVIRONMENT}. Le
-altre tre funzioni che compongono l’interfaccia suggerita dal libro sono
-chiamate \texttt {PARSE-MACRO}, \texttt{ENCLOSE} e \texttt{DEFINE-
-DECLARATION}. In seguito viene presentata un breve descrizione relativa al
-funzionamento di ciascuna delle funzioni indicate, in maniera tale da
-consentire al lettore di meglio comprendere il supporto tipicamente offerto
-dal linguaggio alla creazione delle libreria soggetto di questa tesi.\\
+Le funzioni che compongono la citata API, alla quale nel seguito di questa tesi
+si farà riferimento con il nome \enquote{\textit{Environments API}}, sono sette.
+In particolare, CLtL2 descrive un insieme minimo di funzioni quattro funzioni
+che consentono l’interazione con oggetti environment: tre funzioni che
+consentono l’accesso alle informazioni presenti all’interno di un oggetto
+environment, \texttt {VARIABLE-INFORMATION}, \texttt{FUNCTION-INFORMATION} e
+\texttt {DECLARATION-INFORMATION}, e un costruttore \texttt
+{AUGMENT-ENVIRONMENT}. Le altre tre funzioni che compongono l’interfaccia
+suggerita dal libro sono chiamate \texttt {PARSE-MACRO}, \texttt{ENCLOSE} e
+\texttt{DEFINE- DECLARATION}. In seguito viene presentata un breve descrizione
+relativa al funzionamento di ciascuna delle funzioni indicate, in maniera tale
+da consentire al lettore di meglio comprendere il supporto che tipicamente viene
+offerto da ciascuna implementazione del linguaggio per la creazione di in grado
+di compiere un analisi di programmi Common Lisp, come libreria soggetto di
+questa tesi.\\
 
 Le funzioni \texttt{VARIABLE-INFORMATION}, \texttt{FUNCTION-INFORMATION} e
-\texttt{DECLARATION-INFORMATION} forniscono l’accesso alle informazioni
-relative alle dichiarazioni attualmente presenti all’interno di un
-environment, memorizzate all’interno dell’oggetto che rappresenta questo
-attraverso l’utilizzo della funzione \texttt{AUGMENT-ENVIRONMENT}, o anche
-automaticamente aggiunte dall’interprete o dal compilatore del linguaggio.
-Ciascuna di queste funzioni può essere eseguita fornendo in input un parametro
-environment opzionale. Nel caso in cui questo non non venga specificato
-infatti, la funzione utilizzerà semplicemente l’environment lessicale vuoto
-come valore di default. In seguito viene presentato il funzionamento di
-ciascuna di queste funzioni ad un livello di dettaglio maggiore.
+\texttt{DECLARATION-INFORMATION} forniscono accesso alle informazioni relative
+alle dichiarazioni attualmente presenti all’interno di un environment,
+memorizzate all’interno dell’oggetto che rappresenta questo attraverso
+l’utilizzo della funzione \texttt{AUGMENT-ENVIRONMENT}, o automaticamente
+aggiunte da interprete e compilatore del linguaggio. Ciascuna di queste funzioni
+può essere eseguita fornendo in input un parametro environment opzionale. Nel
+caso in cui questo non non venga specificato infatti, la funzione utilizzerà
+semplicemente l’environment lessicale vuoto come valore di default, convenzione
+precedemente citata e suggerita dalla standard ANSI. In seguito viene presentato
+il funzionamento di ciascuna di queste funzioni ad un livello di dettaglio
+maggiore.
 
 \subsubsection{Funzioni di base}
 
-\texttt{VARIABLE-INFORMATION} ritorna le informazioni riguardanti
+La funzione \texttt{VARIABLE-INFORMATION} ritorna le informazioni riguardanti
 l’interpretazione del simbolo fornito in input come simbolo associato ad una
-variabile presente all’interno dell'environment lessicale in input. Queste
-informazioni sono rappresentate da un valore che indica il tipo della
-definizione, o del binding, presente per la variabile all’interno
-dell’environment (speciale, lessicale, costante, \dots), un valore che indica
-se sia stato trovato o meno un binding per la variabile ed un valore che
-riporta informazioni aggiuntive rispetto alla variabile in analisi, come ad
-esempio il tipo e se questa sia stata dichiarata utilizzando \texttt
-{DYNAMIC-EXTENT} o \texttt{IGNORE}.\\
+variabile, ossia le informazioni associate al binding quello specifico simbolo
+come nome, operando una ricerca all’interno dell'ambiente lessicale fornite in
+input. Queste informazioni sono rappresentate da un valore che indica il tipo
+binding, presente per la variabile all’interno dell’ambiente (speciale,
+lessicale, costante, \dots), un valore che indica se sia stato effettivamente
+trovato o meno un binding relativo al simbolo ed un valore che riporta
+informazioni aggiuntive rispetto alla variabile in analisi, come ad esempio il
+tipo e se questa sia stata dichiarata utilizzando \texttt {DYNAMIC-EXTENT} o
+\texttt{IGNORE}.\\
 
-\texttt{FUNCTION-INFORMATION} ritorna informazioni relative
-all’interpretazione della simbolo fornito in input come nome di funzione, nel
-caso in cui questo appaia come funzione all’interno dell’environment in input.
-Anche questa funzione ritorna tre valori: un primo valore utilizzato per
-indicare il tipo di definizione o binding presente per la funzione all’interno
-dell’environment (funzione, macro, form speciale o assente, un secondo valore
-che specifica se la funzione sia locale o globale ed un terzo valore che
-specifica informazioni aggiuntive rispetto alla funzione, identificate da Lisp
-all’interno dell’ambiente, come ad esempio se questa sia dichiarata
-utilizzando \texttt {DYNAMIC-EXTENT}, se sia stato richiesto l’inling o meno
-della funzione e il tipo di questa.\\
+La funzione \texttt{FUNCTION-INFORMATION} ritorna informazioni relative
+all’interpretazione del simbolo fornito in input come nome di funzione, nel caso
+in cui questo appaia nel contesto di un binding relativo ad una funzione
+all’interno dell’ambiente in input. Anche questa funzione ritorna tre valori: un
+primo valore utilizzato per indicare il tipo di definizione o binding presente
+relativamente simbolo all’interno dell’ambiente (funzione, macro, form speciale
+o assente), un secondo valore che specifica se la funzione sia locale o globale
+ed un terzo valore che specifica informazioni aggiuntive rispetto alla funzione,
+identificate dal sistema Common Lisp nell’ambiente, come ad esempio se questa
+sia dichiarata utilizzando \texttt{DYNAMIC-EXTENT}, se sia stato richiesto
+l’inling o meno della funzione e il tipo di questa.\\
 
-\texttt{DECLARATION-INFORMATION} ritorna le informazioni relative ad una
-dichiarazione che utilizza come nome il simbolo fornito in input presenti
-all’interno del environment in input. Questa funzione consente di analizzare
-tutte le definizioni relative ad elementi diversi da variabili e funzioni che
-possono essere presenti all’interno di un environment.\\
+La funzione \texttt{DECLARATION-INFORMATION} ritorna le informazioni
+eventualmente associate alle dichiarazioni che utilizzano come nome il simbolo
+fornito in input presenti all’interno del ambiente in input. Questa funzione
+consente di analizzare tutte le definizioni relative ad elementi diversi da
+variabili e funzioni che possono essere presenti all’interno di un ambiente.\\
 
-La funzione \texttt{AUGMENT-ENVIRONMENT} rappresenta lo strumento fondamentale
-per l’analisi necessaria alla libreria CLAST. \texttt{AUGMENT-ENVIRONMENT}
-consente di produrre un nuovo oggetto environment a partire da un input
-rappresentato da un environment opzionale, a partire dal quale si desidera che
-venga generato il nuovo oggetto, e da una o più liste di definizioni di
-variabili, funzioni, macro e dichiarazioni. La funzione produrrà quindi in
-output un oggetto environment che raccoglierà le informazioni contenute
-dall'environment fornito in input, nel caso in cui questo sia stato utilizzato
-un parametro di questo tipo in fase di invocazione, e le informazioni generate
-della nuove dichiarazioni specificate.\\
+La funzione \texttt{AUGMENT-ENVIRONMENT} rappresenta lo strumento probabilmente
+più importante per l’analisi operata dalla libreria CLAST.
+\texttt{AUGMENT-ENVIRONMENT} consente di produrre un nuovo oggetto ambiente a
+partire da un input. Input  rappresentato da un oggetto ambiente opzionale, a
+partire dal quale si desidera che venga generato il nuovo oggetto, e da una o
+più liste di definizioni di variabili, funzioni, macro e dichiarazioni. La
+funzione produrrà quindi in output un oggetto ambiente che raccoglierà le
+informazioni contenute dall'oggetto fornito in input, nel caso in cui questo sia
+stato utilizzato un parametro di questo tipo in fase di invocazione, e le
+informazioni generate della nuove dichiarazioni specificate.\\
 
 La funzione \texttt{AUGMENT-ENVIRONMENT} rappresenta lo strumento fondamentale
 per l’analisi necessaria alla libreria CLAST. \texttt{AUGMENT-ENVIRONMENT}
@@ -152,47 +232,44 @@ delle dichiarazioni specificate.\\
 \subsubsection{Macro accessorie}
 
 A differenza delle funzioni appena presentate, che hanno come obiettivo quello
-di consentire ad un utente l'interazione con un oggetto environment, in questo
-paragrafo vengono presentate delle macro che hanno il particolare obiettivo di
-fornire un'implementazione di alcune delle funzionalità fondamentali per la
-creazione di programmi in grado di analizzare programmi Lisp e per
-l'estensione dell'API offerta dalle funzioni descritte dal paragrafo
-precedente.\\
+di consentire ad un utente l'interazione con un oggetto ambiente, in questo
+paragrafo vengono presentate una serie di macro, descritte dall'Environments
+API. Macro che hanno il particolare obiettivo di fornire un'implementazione di
+alcune delle funzionalità fondamentali per la creazione di programmi in grado di
+analizzare programmi Common Lisp e per l'estensione dell'interfaccia composta
+dalle funzioni descritte nel corso della precedente Sottosezione.\\
 
 \texttt{DEFINE-DECLARATION} é una macro che consente di estendere e introdurre
-un supporto a nuove tipologie di dichiarazione per la memorizzazione
-attraverso \texttt {AUGMENT-ENVIRONMENT}; operazione che viene compiuta ad
-esempio dall’implementazione Allegro Common Lisp, la quale introduce due nuove
-ulteriori definizioni \texttt{BLOCK} e \texttt{TAG}. In generale, questa
-funzione risulta utile soprattutto internamente agli implementatori del
-linguaggio, o a quegli utenti che desiderano estendere il linguaggio con nuovi
-costrutti.\\
+un supporto a nuove tipologie di dichiarazione per la memorizzazione attraverso
+l'utilizzo della funzione \texttt{AUGMENT-ENVIRONMENT}; operazione che viene
+compiuta ad esempio dall’implementazione Allegro Common Lisp, la quale introduce
+due nuove ulteriori definizioni relativamente a \texttt{BLOCK} e \texttt{TAG}.
+In generale, questa funzione risulta utile soprattutto agli implementatori del
+linguaggio stesso, o a quegli utenti che desiderano estendere il linguaggio
+attraverso l'introduzione nuovi costrutti.\\
 
-La funzione \texttt{PARSE-MACRO} consente di destrutturare i parametri di una
-macro, un compito molto spesso necessario e generalmente realizzabile a
+La funzione \texttt{PARSE-MACRO} consente di destrutturare la lista di parametri
+di una macro, un compito molto spesso necessario e generalmente realizzabile a
 partire dalla macro \texttt{DESTRUCTURING-BIND}, la quale consente utilizzare
 gli elementi di una lista per inizializzare un insieme di variabili. L’autore
-indica come ragione per cui si è scelto di aggiungere questa funzione il fatto
-che qualsiasi programma desideri analizzare del codice Lisp dovrà molto
-probabilmente definire una funzione analoga e, nonostante la presenza di
-\texttt{DESTRUCTURING-BIND}, l’implementazione di questa funzionalità non è
-del tutto banale. \cite{steele1990common} Dal punto di vista pratico, \texttt
-{PARSE-MACRO} è strutturata in maniera del tutto analoga ad una
-\texttt{DEFMACRO}, accetta infatti i medesimi parametri nel medesimo ordine, a
-livello di output invece ritorna una lambda-expression che prende in input
-due valori, una form ed un environment, e che potrà essere utilizzata per
-aggiungere informazioni ad un ambiente fornito in input alla funzione
-lambda.\\
+G.L. Steele indica come ragione per cui si è scelto di aggiungere questa macro
+il fatto che qualsiasi programma desideri analizzare del codice Lisp dovrà molto
+probabilmente definire una funzione analoga e, nonostante la presenza di \texttt
+{DESTRUCTURING-BIND}, l’implementazione di questa funzionalità non è del tutto
+banale. \cite{steele1990common} Dal punto di vista pratico, \texttt {PARSE-
+MACRO} è strutturata in maniera del tutto analoga ad una \texttt{DEFMACRO},
+accetta infatti i medesimi parametri nel medesimo ordine. A livello di output
+invece ritorna una lambda-expression che prende in input due valori, una form ed
+un oggetto ambiente, e che potrà essere utilizzata per l'aggiunta di
+informazioni ad un ambiente fornito in input alla funzione lambda.\\
 
 Infine, la funzione \texttt{ENCLOSE} consente di espandere funzioni definite
-all’interno di un lexical environment e consente quindi l’analisi, da parte di
-un programma Lisp, di un programma Lisp che fa utilizzo di una form del tipo
+all’interno di un ambiente lessicale e consente quindi l’analisi, da parte di un
+programma Common Lisp, di un programma che fa utilizzo di una form del tipo
 \texttt{(eval-when (:compile-toplevel) …)} attraverso l’esecuzione all’interno
-dell’environment che contiene questa. Dal punto di vista pratico,
-\texttt{ENCLOSE} è una funzione che lavora a partire da un input,
-rappresentato da una coppia lambda-expression ed environment, e ritorna un
-oggetto di tipo funzione equivalente a quello che si otterrebbe valutando la
-form \texttt{`(function ,lambda-expression)} nell'environment sintattico
-fornito in input. Affinchè la valutazione possa avere successo è necessario
-che la form faccia riferimento solamente a simboli definiti all'interno
-dell'environment fornito in input assieme ad essa.
+dell’ambiente che contiene questa. Dal punto di vista pratico, \texttt{ENCLOSE}
+è una funzione che lavora a partire da un input, rappresentato da una coppia
+formata da una lambda-expression e da un oggetto ambiente, e ritorna un oggetto
+di tipo funzione, equivalente a quello che si otterrebbe valutando la form
+\texttt{`(function ,lambda-expression)} nell'ambiente sintattico fornito in
+input.
