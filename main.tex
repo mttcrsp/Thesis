@@ -202,10 +202,47 @@ in grado di accedere ai servizi offerti da questa.
 \chapter{Applicazioni}
 \label{applications}
 
+La riscrittura del form Lisp è tradizionalmente considerata un'operazione
+particolarmente semplice, soprattutto grazie al ricco costrutto macro offerto
+dal linguaggio di programmazione stesso.
+
+Tuttavia, proprio a causa della della presenza all'interno del linguaggio di
+dello stesso costrutto macro, una funzionalità di supporto alla
+meta-programmazione particolarmente potente e particolare, descritta nel corso
+della Sezione \ref{macro}, la manipolazione del codice sorgente vero e proprio
+di un programma risulta invece essere particolarmente complessa.
+
+Il costrutto macro introduce infatti diversi livelli di astrazione anche a
+livello di codice sorgente, aspetto caratteristico del linguaggio Common Lisp, e
+che porta quindi a diverse difficoltà particolarmente significative nella
+definizione di modalità di analisi e gestione del codice sorgente.\\
+
+% Avere a disposizione informazioni rispetto all'AST risulta particolarmente
+% abilitante nel contesto del CL.
+
+La libreria CLAST risolve questo problema fornendo uno strumento che consente la
+rappresentazione e l'analisi del codice sorgente di un programma Common Lisp, in
+forma di abstract syntax tree.
+
+In questo capitolo vengono quindi presentate alcune delle potenziali
+applicazioni di questo strumento, illustrando le possibilità che questo
+introduce a livello di strumenti per la source code analysis, che possono ora
+essere costruiti a partire da questo, e anche nel contesto del linguaggio di
+programmazione stesso.
+
+% rende possibile la definizione di alcune classi di estensioni del linguaggio
+% stesso, come ad esempio il supporto al pattern matching e alla valutazione
+% lazy, un compito molto più semplice, come verrà approfondito in seguito in
+% questo capitolo.
+
+% Inoltre, come largamente anticipato nelle prime sezioni della tesi, l'avere a
+% disposizione uno strumento come CLAST, in grado di operare il parsing di un
+% frammento di codice e produrre una rappresentazione di questo risolve due
+% terzi del problema di costruire uno strumento di source code analysis.
+
 \include{src/free-variable-analysis}
 \include{src/pattern-mathing}
-
-\section{Type Checking}
+\include{src/lazy-evaluation}
 
 \chapter{Conclusione}
 \section{Sviluppi Futuri}

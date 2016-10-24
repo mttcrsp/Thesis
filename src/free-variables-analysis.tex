@@ -1,6 +1,32 @@
 \section{Free Variables Analysis}
 \label{free-variables-analysis}
 
+Free variable analysis è uno degli aspetti che viene molto semplificato dalla
+possibilità di avere a disposizione una libreria per la generazione di AST. In
+particolare basta una funzione molto semplice costruita a partire dalla già
+citata funzione WALK.
+
+% (nella sezione dedicata al processo di valutazione si è indicato come si possa
+% arrivare ad avere una variabile libera / il modulo di rappresentazione riporta
+% qunidi una classe che modella una variabile libera / il modulo di parsing e
+% analisi è in grado di identificare la presenza di una variabile libera senza
+% problemi procedendo in maniera del tutto analoga a quanto opera il processo di
+% valutazione / a partire dal modulo di traversal, e in particolare dalla funzione
+% WALK risulta banale definire una funzione che identifica tutte le variabili
+% libere all'interno di una data form e di uno specifico frammento di codice /
+% codice di della definizione di funzione di ricerca all'interno dell'AST per la
+% ricerca delle variabili libere)
+
+% (come mostrato per l'identificazione di reference a variabili libere risulta
+% particolarmente semplice ricercare un qualsiasi tipo di form all'interno di un
+% data altra form / questo risulta particolarmente utile nel contesto della
+% creazione di strumenti di source code analysis come ad esempio strumenti per il
+% linting / definisci cos'è un linter / indica che questo consente di identificare
+% l'utilizzo di variabili libere ossia potenzialmente di prevenire errori a
+% runtime / un altra cosa consente di fare in modo estremamente semplice è un
+% verificare l'utilizzo di determinati convenzioni nello stile di definizione di
+% nomi di variabili o di funzione)
+
 \begin{lstlisting}[caption=Query functions per l'identificazione di variabili
 libere all'interno di una form Common Lisp]
 
