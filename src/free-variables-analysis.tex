@@ -1,31 +1,67 @@
 \section{Free Variables Analysis}
 \label{free-variables-analysis}
 
-Free variable analysis è uno degli aspetti che viene molto semplificato dalla
-possibilità di avere a disposizione una libreria per la generazione di AST. In
-particolare basta una funzione molto semplice costruita a partire dalla già
-citata funzione WALK.
+Formalmente, una variabile libera è una notazione che specifica una posizione
+all'interno di un'espressione in cui una sostituzione potrebbe avere luogo.
+L'idea è che collegata al concetto di placeholder, un simbolo che verrà
+rimpiazzato in seguito da un certo valore, o di carattere wildcard, ossia un
+simbolo che rappresenta un qualsiasi simbolo, aspetto che verrà approfondito
+maggiormente nella prossima sezioni di questo capitolo, relativamente al
+concetto di pattern matching.
 
-% (nella sezione dedicata al processo di valutazione si è indicato come si possa
-% arrivare ad avere una variabile libera / il modulo di rappresentazione riporta
-% qunidi una classe che modella una variabile libera / il modulo di parsing e
-% analisi è in grado di identificare la presenza di una variabile libera senza
-% problemi procedendo in maniera del tutto analoga a quanto opera il processo di
-% valutazione / a partire dal modulo di traversal, e in particolare dalla funzione
-% WALK risulta banale definire una funzione che identifica tutte le variabili
-% libere all'interno di una data form e di uno specifico frammento di codice /
-% codice di della definizione di funzione di ricerca all'interno dell'AST per la
-% ricerca delle variabili libere)
+In particolare, nel contesto della programmazione e dei linguaggi di
+programmazione, il termine variabile libera viene utilizzato per riferirsi a
+variabili che vengono utilizzate all'interno di una funzione senza che queste
+siano definite all'interno di questa o specificate come parametro. In questo
+contesto, il termine è quindi molto spesso sinonimo di variabile non locale.
 
-% (come mostrato per l'identificazione di reference a variabili libere risulta
-% particolarmente semplice ricercare un qualsiasi tipo di form all'interno di un
-% data altra form / questo risulta particolarmente utile nel contesto della
-% creazione di strumenti di source code analysis come ad esempio strumenti per il
-% linting / definisci cos'è un linter / indica che questo consente di identificare
-% l'utilizzo di variabili libere ossia potenzialmente di prevenire errori a
-% runtime / un altra cosa consente di fare in modo estremamente semplice è un
-% verificare l'utilizzo di determinati convenzioni nello stile di definizione di
-% nomi di variabili o di funzione)
+Per contrasto, una variabile occupata è una variabile che è precedemente stata
+libera ma è attualmente è assocaita ad uno specifico valore o insieme di
+valori.\\
+
+Dal punto di vista logico, il valore utilizzato come nome di una particolare
+variabile non risulta di particolare importanza. Tuttavia, il riutilizzo di uno
+stesso nome di variabile occupata potrebbe risultare contraddittorio o, più
+generalmente, generare confusione. Per questa ragione, nel momento in cui una
+variabile libera viene occupata, il nome associato a questa vine ritirato dallo
+spazio dei nomi validi per l'associazione ad una qualsiasi variabile.
+
+\subsection{CLAST e Free Variables Analysis}
+
+La libreria CLAST è in grado di agire come strumento per la free variables
+analysis. In particolare, nel precedente capitolo, si è mostrato come la
+libreria sia in grado di rintracciare e modellare la presenza di variabili
+libere all'interno di un dato programma Common Lisp.\\
+
+In particolare, la libreria modella l'occorrere di un utilizzo di una variabile
+libera all'interno di una data form utilizzando la classe \texttt
+{FREE-VARIABLE-REF}. Una ...\\
+
+FREE-VARIABLE-REF -> VARIABLE-REF -> SYMBOL-REF (SYMBOL LOCAL) -> FORM (SOURCE TOP TYPE) -> CLAST-ELEMENT
+
+Dal punto di vista del processo di valutazione, si ha un occorrenza di una
+variabile libera nel caso in cui, una volta che il sistema Common Lisp incontra
+una symbol form e che questo identifica la symbol form come l'utilizzo di una
+variabile, una ricerca all'interno dell'ambiente lessicale attivo non produce
+alcun risultato relativamente al simbolo.
+
+Come illustrato nel corso della Sottosezione \ref{parsing}, la libreria CLAST
+esegue le attività di parsing e analisi in modo del tutto coerente al processo
+di valutazione e, in particolare, anche relativamente ai passaggi appena
+descritti.
+
+AGGIUNGI FLOWCHART DEL PROCESSO DI IDENTIFICAZIONE DI UNA VARIABILE LIBERA
+
+Nel corso della Sezione \ref{traversal} si è infine affermato che la funzione
+\texttt{WALK} offerta dal modulo di traversal, consente l'esecuzione del
+traversal, secondo lo schema map-reduce, della rappresentazione di un programma,
+dando quindi la possibili di definire, in maniera particolarmente semplice,
+operazioni di ricerca all'interno dell'AST.\\
+
+Combinando quanto appena riportato è quindi possibile procedere alla definizione
+di un'operazioni di ricerca all'interno dell'AST, in particolare alla
+definizione di un funzione che consenta l'identificazione di tutti i diversi usi
+di variabili libere all'interno di un programma Common Lisp.
 
 \begin{lstlisting}[caption=Query functions per l'identificazione di variabili
 libere all'interno di una form Common Lisp]
@@ -44,3 +80,142 @@ result : a LIST of SYMBOLS."
         ))
 
 \end{lstlisting}
+
+AGGIUNGI UNA SPIEGAZIONE DEL FUNZIONAMENTO DI FREE-VARIABLES
+
+La possibilità offerta da questa funzione, di identificare ogni reference a
+variabili libere all'interno di una data form, rende
+
+La Free variable analysis è quindi una delle tipologie di analisi che viene
+significativamente semplificato dalla possibilità di avere a disposizione una
+libreria per la generazione di AST come CLAST.
+
+PARLA DA QUALCHE PARTE DEL FATTO CHE LA POSSIBILITÀ DI FARE FREE VARIABLE
+ANALYSIS CONSENTE DI DEFINIRE STRUMENTI DI ANALISI STATICA IN GRADO DI PREVENIRE
+ERRORI A RUNTIME, IN PARTICOLARE ERRORI DI TIPO UNBOUND VARIABLE.
+
+Come mostrato nel corso di questa Sezione, relativamente all'identificazione di
+reference a variabili livere risulta particolarmente immediata la definizione di
+form di un qualsiasi tipo, e quindi dell'utilizzo di un qualsiasi costrutto con
+determinate modalità da parte del programma in analysis, un aspetto che risulta
+particolarmente utile nel contesto della creazione di un qualsiasi strumento per
+la source code analysis.
+
+Esempi di strumenti source code analysis abilitati dalla presenza funzionalità
+appena citata sono rappresentati da linter per il linguaggio di programmazione
+Common Lisp.
+
+\subsection{Linting}
+
+Un linter è uno strumento che ha come scopo quello di segnalare ad uno
+sviluppatore potenziali errori ed inconsistenze all'interno del codice sorgente
+di un programma. Questa categoria di strumenti prende il proprio nome un
+particolare strumento specifico per il linguaggio C, chiamato Lint, e
+disponibile all'interno del sistema operativo Unix.
+
+Solitamente, viene definito strumento di linting generalmente un qualsiasi
+programma che svolge un'attività di analisi statica del codice sorgente di un
+programma ricerando potenziali error nell'utilizzo dei costrutti offerti dal
+linguaggio di programmazione o anche alla ricerca di frammenti di codice non
+aderente alle particolare linee guida stilistiche utilizzate dal team di
+sviluppo.
+
+Esempi di potenziali errori sono rappresentati dall'utilizzo di variabili
+libere, descritto dai paragrafi precedenti, divisioni per zero, utilizzo di
+condizioni costanti e potenziali overflow aritmetici. A differenza delle
+ottimizzazioni e delle segnalazioni di errori che vengono tipicamente operate da
+un compilatore, strumenti di linting si riferiscono molto spesso ad utilizzi del
+linguaggio che sono consentiti da un compilatore e dalla sintassi del linguaggio
+ma spesso sono indice di imprecisioni da parte di uno sviluppatore e, in alcuni
+casi, anche di errori che fanno riferimento ad un livello superiore rispetto ad
+un compilatore, andando a segnalare potenziali problemi di portabilità di un
+programma nel passaggio dall'utilizzo di un compilatore ad un altro.
+
+% @book{johnson1977lint,
+%   title={Lint, a C program checker},
+%   author={Johnson, Stephen C},
+%   year={1977},
+%   publisher={Citeseer}
+% }
+
+%%% LINT C
+
+La verifica compiuta da un linter è quindi tipicamente più stringente rispetto a
+quella operata da un compilatore e consente l'identificazione rendere evidente
+l'utilizzo all'interno del codice sorgente di un programma di costrutti che
+portano ad uno spreco di risorse, sono tipicamente maggiormente sorgente di
+errori rispetto a costrutti equivalenti.
+
+È importante sottolineare il fatto ch molti errori che risulta impossibile
+identificare a livello di compilazione risultano impossibili da identificare
+anche a livello di linting. Problemi di questo tipo sono rappresentati
+da tutti quei problemi che richiedono l'utilizzo di tecniche di analisi
+dinamica. Questo rappresenta il limite più significativo delle analisi che è
+possibili svolgere a partire dalla libreria CLAST e in particolare a partire da
+qualsiasi strumento per la source code analysis. Non risulta infatti possibile
+identificare tutti quegli errori che possono essere identificati solamente in
+seguito all'esecuzione del codice.
+
+Esempi di problemi di questo tipo sono rappresentati dalla terminazione o meno
+di un programma, ossia l'halting problem, o dall'esecuzione di una chiamata o
+meno ad una funzione. L'approccio utilizzato da strumenti di linting è quello
+accettare un compromesso e cerca di segnalare errori rispetto alla cui presenza
+si ha più confidenza. Ad esempio, un linter a cui viene richiesto di verificare
+l'assenza di chiamate ad una particolare funzione potrebbe lavorare assumendo
+che in assenza di occorrenze di una chiamata alla funzione questa non possa
+essere mai chiamata, mentre nel aso in cui sia presente almeno un'occorrenza che
+questa possa essere effettivamente invocata. Si tratta di un approccio
+ragionevole ma che produce una quantità significativa di falsi positivi. Per
+questa ragione i linter sono tipicamente strumenti con un alto grado di
+configurabilità.
+
+% LINTING IN SCALA
+%
+% To check for possible bugs, ine
+% cient code, and coding style problems it combines simple pattern matching used
+% in many similar static analysis tools for other programming languages with
+% abstract inter- pretation on some builtin types like integers and strings.
+% Taking advantage of the Scala compiler plugin interface it relies on the Scala
+% compiler (a) to parse the source code and (b) to provide the abstract syntax
+% tree with all needed information.
+%
+% As the Scala compiler can be extended with compiler plugins, Linter has been
+% implemented as a compiler plugin rather than as a standalone application.
+%
+% @inproceedings{DBLP:conf/sac/PotocnikCS14,
+%   author    = {Matic Potocnik and
+%                Uros Cibej and
+%                Bostjan Slivnik},
+%   title     = {Linter: a tool for finding bugs and potential problems in scala code},
+%   booktitle = {Symposium on Applied Computing, {SAC} 2014, Gyeongju, Republic of
+%                Korea - March 24 - 28, 2014},
+%   pages     = {1615--1616},
+%   year      = {2014},
+%   crossref  = {DBLP:conf/sac/2014},
+%   url       = {http://doi.acm.org/10.1145/2554850.2555129},
+%   doi       = {10.1145/2554850.2555129},
+%   timestamp = {Sun, 20 Jul 2014 11:32:29 +0200},
+%   biburl    = {http://dblp.uni-trier.de/rec/bib/conf/sac/PotocnikCS14},
+%   bibsource = {dblp computer science bibliography, http://dblp.org}
+% }
+% @proceedings{DBLP:conf/sac/2014,
+%   editor    = {Yookun Cho and
+%                Sung Y. Shin and
+%                Sang{-}Wook Kim and
+%                Chih{-}Cheng Hung and
+%                Jiman Hong},
+%   title     = {Symposium on Applied Computing, {SAC} 2014, Gyeongju, Republic of
+%                Korea - March 24 - 28, 2014},
+%   publisher = {{ACM}},
+%   year      = {2014},
+%   url       = {http://dl.acm.org/citation.cfm?id=2554850},
+%   isbn      = {978-1-4503-2469-4},
+%   timestamp = {Sun, 20 Jul 2014 11:32:29 +0200},
+%   biburl    = {http://dblp.uni-trier.de/rec/bib/conf/sac/2014},
+%   bibsource = {dblp computer science bibliography, http://dblp.org}
+% }
+
+Essendo al momento non disponbile alcuno strumento il linting di codice Common
+Lisp, CLAST rappresenta infrastruttura particolarmente abilitante da questo
+punto di vista, in quanto, come mostrato in apertura di questa sezione consente
+di costruire in maniera molto semplice strumenti di questo tipo.
