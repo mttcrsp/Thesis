@@ -1,10 +1,13 @@
 \documentclass{book}
 
-%% Imports
+\title{CLAST}
+\author{Matteo Crespi 748274}
+\date{Agosto 2016}
+
+% IMPORT
 
 \usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
-
 \usepackage{csquotes}
 \usepackage{graphicx}
 \usepackage{listings}
@@ -13,17 +16,7 @@
 \usepackage{float}
 \usepackage{url}
 
-\usepackage[
-  backend=biber,
-  sorting=ynt,
-  style=ieee-alphabetic,
-  defernumbers=true
-]{biblatex}
-\addbibresource{bib/papers.bib}
-\addbibresource{bib/books.bib}
-\addbibresource{bib/websites.bib}
-
-%% Definitions
+% COMMAND
 
 \newcommand{\image}[4]{
   \begin{figure}[H]
@@ -35,6 +28,8 @@
   \end{figure}
 }
 
+% LISTING
+
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 
 \lstset{
@@ -43,28 +38,31 @@
   captionpos=b,
 }
 
-\title{CLAST}
-\author{Matteo Crespi 748274}
-\date{Agosto 2016}
-
-%% Options
+% FORMATTING
 
 \setstretch{1.3}
-
 \setlength{\oddsidemargin}{36.1pt}
 \setlength{\evensidemargin}{0pt}
 \setlength{\marginparwidth}{40pt}
-
 \marginparsep 10pt
-
 \topmargin 0pt \headsep .5in
 \textheight 8.1in \textwidth 6in
-
 % \brokenpenalty=10000
-
 \linespread{1.3}
 
-%% Content
+% BIBLIOGRAPHY
+
+\usepackage[
+  backend=biber,
+  sorting=ynt,
+  style=ieee-alphabetic,
+  defernumbers=true
+]{biblatex}
+\addbibresource{bib/papers.bib}
+\addbibresource{bib/books.bib}
+\addbibresource{bib/websites.bib}
+
+% DOCUMENT
 
 \begin{document}
 
@@ -84,7 +82,6 @@
 AGGIUNGI INTRODUZIONE CHE PARLA DEL CONTENUTO DELLA TESI E DEGLI OBIETTIVI DEL
 PROGETTO DI TESI
 
-%%% SECTION: MOTIVATIONS
 \include{src/motivations}
 
 \begingroup
@@ -149,18 +146,65 @@ in quanto fondamento a partire dal quale questa è in grado di agire.
 
 \endgroup
 
+\begingroup
+\let\clearpage\relax
+
 \chapter{Libreria}
 \label{library}
+
+Lo scopo di questo capitolo è presentare al lettore di tesi il funzionamento e
+l'interfaccia della libreria CLAST, mostrando quindi sia l'architettura interna
+della libreria sia le funzionalità offerte da queste agli utenti.
+
+Internamente la libreria è organizzata in moduli, in particolare, all'interno di
+tre diversi moduli chiamati rispettivamente: un modulo di rappresentazione, un
+modulo di parsing e analisi ed un modulo di traversal.\\
+
+Il modulo di rappresentazione è responsabile per la definizione delle strutture
+necessarie alla modellazione di un programma Common Lisp. Si tratta quindi del
+modulo fondamentale a partire la libreria è in grado di realizzare una
+rappresentazione in forma di AST del programma in input attraverso l'azione del
+modulo di parsing e analisi. La progettazione e la struttura interna del modulo
+vengono illustrate e discusse all'interno della Sezione \ref{representation}.\\
+
+All'interno della Sezione \ref{parsing} viene invece presentato il modulo di
+parsing ed analisi. Questo modulo rappresenta il cuore del funzionamento della
+libreria in quanto realizza la funzionalità vera e propria di generazione
+dell'AST di un programma scritto utilizzando il linguaggio Common Lisp a partire
+dalle strutture di rappresentazione offerte dal modulo di rappresentazione prima
+citato.
+
+Lo scopo di questo modulo è quindi quello di svolgere le attività di parsing del
+codice sorgente del programma in input, in maniera tale da organizzare i diversi
+elementi di questo all'interno di una struttura ad albero, e di svolgere
+parallelamente un'attività di analisi del funzionamento di questo, mirata ad
+arricchire con maggiori informazioni i nodi che compongono la struttura ad
+albero producendo quindi la rappresentazione più ricca possibile del programma
+in input. Nel corso della Sezione vengono quindi presentate le principali
+componenti del modulo e l'interazione tra queste attraverso un esempio.\\
+
+L'ultima sezione di questo Capitolo presenta invece il modulo di traversal
+offerto dalla libreria, il quale raccoglie le diverse funzionalità costruite a
+partire a partire dalla rappresentazione prodotta in output dal modulo di
+parsing ed analisi. La responsabilità del modulo è quindi quella di consentire
+agli utenti l'ispezione e l'esecuzione di elaborazioni dell'AST, prodotto a
+partire dalle strutture denifinite dal modulo di rappresentazione, di un
+programma Common Lisp. Questo modulo costituisce quindi la principale
+interfaccia attraverso la quale un sistema costruito a partire dalla libreria è
+in grado di accedere ai servizi offerti da questa.
 
 \include{src/module-representation}
 \include{src/module-parsing}
 \include{src/module-traversal}
+
+\endgroup
 
 \chapter{Applicazioni}
 \label{applications}
 
 \include{src/free-variable-analysis}
 \include{src/pattern-mathing}
+
 \section{Type Checking}
 
 \chapter{Conclusione}
