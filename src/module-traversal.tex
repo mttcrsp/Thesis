@@ -10,8 +10,8 @@ un analizzatore costruito a partire da questa.
 
 \subsection{Funzionalità traversal}
 
-In questa Sottosezione viene fornita al lettore una presentazione ad alto livello
-del funzionamento interno del modulo, per poi proseguire presentando le
+In questa Sottosezione viene fornita al lettore una presentazione ad alto
+livello del funzionamento interno del modulo, per poi proseguire presentando le
 diverse funzionalità che vengono offerte dal modulo di traversal agli utenti
 della libreria.\\
 
@@ -21,12 +21,13 @@ presentato il funzionamento di base del design pattern e come questo sia stato
 esteso per adattarsi allo specifico contesto in analisi.\\
 
 Si è scelto di sfruttare il design pattern Visitor principalmente per come
-questo consenta di ottenere una separazione tra una dato insieme di operazioni
-e gli oggetti su cui queste operazioni vengono operate. Separazione che,
-all'interno della libreria CLAST, consente di isolare all'interno di un modulo
-specifico per il traversal dell'AST tutte le operazioni relative alla visita
-dei nodi e isolare all'interno di un modulo differente, come presentato in
-precedenza, tutte le strutture e gli oggetti che rappresentano i nodi.
+questo consente di ottenere una separazione tra una dato insieme di operazioni e
+gli oggetti a partire dai quali queste operazioni vengono eseguite. Separazione
+che, all'interno della libreria CLAST, consente di isolare all'interno di un
+modulo specifico per il traversal dell'AST tutte le operazioni relative alla
+visita dei nodi e isolare all'interno di un modulo differente, come presentato
+nella Sezione \ref{representation}, tutte le strutture e gli oggetti che per la
+rappresentazione dell'AST stesso.
 
 \image{img/visitor-classes}
       {Design Pattern Visitor - Diagramma delle classi}
@@ -41,19 +42,19 @@ presentato in \cite{gamma1995design}, il pattern descrive una collaborazione tra
 
 \begin{itemize}
 
-\item \texttt{Visitor} dichiara un'operazione di visita per ciascuna classe
-che sarà toccata dal processo di visita, ossia ciascun
-\texttt{ConcreteElement} che compone la \texttt{ObjectStructure}.
+\item \texttt{Visitor} dichiara un'operazione di visita per ciascuna classe che
+sarà toccata dal processo di visita, ossia ciascun \texttt{ConcreteElement} che
+compone la \texttt{ObjectStructure}.
 
 \item \texttt{ConcreteVisitor} implementa ciascuna operazione dichiarata dal
-\texttt{Visitor}. Ciascuna operazione implementa la specifico frammento della
-logica di visita associata alla specifica classe soggetto dell'operazione.
+\texttt{Visitor}. Ciascuna operazione realizza lo specifico frammento della
+logica di visita associata alla particolare classe soggetto dell'operazione.
 
-\item \texttt{Element} definisce un'operazione accetta che presente in input un
-oggetto di tipo \texttt{Visitor}.
+\item \texttt{Element} definisce un'operazione \texttt{accept} che riceve in
+input un oggetto di tipo \texttt{Visitor}.
 
-\item \texttt{ConcreteElement} implementa l'operazione definita da
-\texttt{Element}.
+\item \texttt{ConcreteElement} implementa l'operazione definita da \texttt
+{Element}.
 
 \item \texttt{ObjectStructure} incapsula la logica di enumerazione dei propri
 elementi, fornendo ad un visitor un'interfaccia semplificata per la visita di
@@ -71,11 +72,11 @@ in Figura \ref{fig:visitor-sequence}:
 visita dei diversi elementi che compongono la propria struttura;
 
 \item il metodo opera quindi un invocazione del metodo \texttt{accept} di
-ciascun elemento (\texttt{ConcreteElement});
+ciascun elemento di tipo (\texttt{ConcreteElement});
 
 \item secondo le modalità specifiche della classe di appartenenza, ciascuna
 elemento opera quindi un invocazione del metodo \texttt{visit}, fornendo
-tipicamente sé stesso come oggetto parametro dell'invocazione.
+tipicamente sé stesso come parametro dell'invocazione.
 
 \end{enumerate}
 
@@ -99,7 +100,7 @@ processo di visita e guidare il processo di visita all'interno di una dato
 elemento; scopo che, nel contesto della libreria CLAST, si traduce
 nell'identificazione della struttura interna di ciascuna form e nella guida
 del processo di visita attraverso ciascuna form. La funzione opera quindi un
-mapping tra una form e le sue sottoform, dal punto di vista pratico, data una
+mapping tra una form e le sue sottoform. Dal punto di vista pratico, data una
 form, produce in output una lista contenente le diverse sottoform contenute in
 questa, ordinate in accordo a quanto richiesto dal processo di visita.
 
@@ -121,16 +122,16 @@ result : a list of 'subforms' (or NIL).
 
 \end{lstlisting}
 
-La funzione generica viene quindi specializzata da uno specifico metodo per
-ciascun \texttt{CLAST-ELEMENT}, ossia per ciascun potenziale form LISP e nodo
-dell'AST. Dal punto di vista teorico quindi, ciasuna metodo può essere visto
-come l'estensione di ciascun \texttt{ConcreteElement} per la definizione del
-metodo \texttt{accept}.\\
+La funzione generica \texttt{CLAST-ELEMENT-SUBFORMS} viene quindi specializzata
+da uno specifico metodo per ciascun \texttt{CLAST-ELEMENT}, ossia per ciascuna
+potenziale form Common Lisp nodo dell'AST. Dal punto di vista teorico, questo
+significa che ciascun metodo può essere visto come l'estensione di ciascun
+\texttt{ConcreteElement} per la definizione del metodo \texttt{accept}.\\
 
 Chiaramente, essendo il metodo comune a tutte le diverse form, una data
-implementazione potrebbe un certo numero di elementi, ad esempio nel caso
-dell'implementazione relativa ad una form \texttt{LET*}, o una lista vuota, ad
-esempio nel caso di un self-evalutating object come la form \texttt{9}.
+implementazione potrebbe ritornare un certo numero di elementi, ad esempio nel
+caso dell'implementazione relativa ad una form \texttt{LET*}, o una lista vuota,
+ad esempio nel caso di un self-evalutating object come la form \texttt{9}.
 
 \begin{lstlisting}[caption=Esempi di implementazione del metodo \texttt
 {CLAST-ELEMENT-SUBFORMS}]
@@ -150,12 +151,13 @@ esempio nel caso di un self-evalutating object come la form \texttt{9}.
 \subsubsection{WALK}
 
 A partire dalla funzione \texttt{CLAST-ELEMENT-SUBFORMS} lavora la funzione
-probabilmente più importante a livello di API dell'intero modulo, la funzione
-\texttt{WALK}. Lo scopo di questa funzione è quello di consentire ad un utente
-della libreria di operare il reale traversal della rappresentazione in forma di
-AST prodotta dal modulo di parsing ed analisi. Da un punto di vista pratico,
-data un'istanza di \texttt{CLAST-ELEMENT}, la funzione \texttt{WALK} opera una
-visita dell'AST radicato in questa in modo ricorsivo, depth-first.
+probabilmente più importante a livello di API offerta dell'intero modulo, la
+funzione \texttt{WALK}. Lo scopo di questa funzione è quello di consentire ad un
+utente della libreria di operare il reale traversal della rappresentazione in
+forma di AST prodotta dal modulo di parsing ed analisi. Da un punto di vista
+pratico, data un'istanza di \texttt{CLAST-ELEMENT}, la funzione \texttt{WALK}
+opera una visita dell'AST radicato in questa in modo ricorsivo, ossia
+depth-first.
 
 Per continuare il parallelo tra struttura della libreria e il design pattern
 Visitor, precedentemente illustrato, la funzione \texttt{WALK} può essere
@@ -168,66 +170,95 @@ processo di visita.\\
 % estensione offerta dalla libreria è rappresentata dal meccanismo delle high
 % order functions..."
 
-La funzione \texttt{WALK} è una high order function, ossia una funzione che
-prende in input o restituisce altre funzioni. Proprio questa aspetto
+La funzione \texttt{WALK} è una funzione di ordine superiore, ossia una funzione
+che prende in input o restituisce altre funzioni. Proprio questa aspetto
 rappresenta il meccanismo di estensione attraverso il quale un utente della
-libreria può adattare il processo di visita alle proprie necessità e
-specificare le operazioni che desidera vengano compiute in risposta alla
-visita di un nodo o porzione dell'AST.
+libreria può adattare il processo di visita alle proprie necessità e specificare
+le operazioni che desidera vengano compiute in risposta alla visita di un nodo o
+porzione dell'AST.
 
 Le diverse funzioni che vengono fornite in input alla funzione \texttt{WALK}
 possono quindi invece essere viste come classi \texttt{ConcreteVisitor}.\\
 
-% Chiedi al professore più informazioni rispetto allo schema map-reduce
-% utilizzato da WALK, probabilmente si può aggiungere qualcosa a partire da
-% quello.
+\begin{lstlisting}[
+  caption=Definizione della funzione WALK,
+  label={lst:walk}
+]
 
-A partire dalla funzionalità di visita dell'AST, implementata dalla funzione
-\texttt{WALK}, il modulo esporta anche un insieme di funzioni per la ricerca di
-elementi all'interno dell'AST. Queste funzioni verranno brevemente discusse
-nella prossima Sottosezione.
+(defgeneric walk (clast-element &rest keys
+                                &key
+                                key ; #'identity
+                                result-type
+                                map-fun
+                                reduce-fun
+                                initial-value
+                                environment
+                                op-first
+                                &allow-other-keys)
+  (:documentation "The 'visiting' engine used to traverse a form.
 
-\subsubsection{Query functions}
+The WALK generic function methods recursively traverse the tree
+corresponding to a form (i.e., CLAST-ELEMENT) using a map/reduce
+scheme.
 
-\begin{lstlisting}[caption=Query functions per l'identificazione di variabili
-libere all'interno di una form Common Lisp]
-
-(defun free-variables (form)
-  "Returns all the 'free' variables present in FORM.
-
-Arguments and Values:
-
-form   : a CLAST-ELEMENT.
-result : a LIST of SYMBOLS."
-  (walk form
-        :map (lambda (e)
-               (typecase e
-                 (free-variable-ref (list (form-symbol e)))))
-        ))
+The function MAP-FUN is applied to each (sub)form and their respective
+subforms are WALKed over.  WALK uses MAP-SUBFORMS internally,
+therefore it generates sequences (of type RESULT-TYPE) as output. Once
+the traversing of subforms is completed the function REDUCE-FUN is
+applied, via REDUCE to the resulting sequence.
+")
+  )
 
 \end{lstlisting}
 
-% as-string: form to string (clast-printing.lisp)
+Come il listato \ref{lst:walk} mostra, la funzione prende in input in
+particolare due funzioni, una funzione chiamata \texttt{MAP-FUN} e una funzione
+chiamata \texttt{REDUCE-FUN}. Come il nome stesso di questi due parametri le
+funzioni vengon invocate seguendo lo schema di esecuzione map-reduce. Questo
+significa che durante il processo di visita, la funzione \texttt{WALK}
+applicherà il la funzione \texttt{MAP-FUN} a ciascun nodo dell'AST incontrato, e
+utilizzerà la funzione \texttt{REDUCE-FUN} a partire dalla lista di valori
+ritornati dall'applicazione di \texttt{MAP-FUN} per ottenere il risultato finale
+della computazione.
 
-% AS-STRING è una funzione che prende in input un'istanza di CLAST-ELEMENT e
-% una rappresentazione testuale dei dati relativi a questa. Oltre a
-% rappresentare una funzione particolarmente utile in fase di debugging e
-% costruzione della libreria, questa funzione risulta particolarmente
-% importante in quanto, essendo in grado di produrre un rappresentazione
-% testuale, consente l'analisi di programmi Common LISP anche da parte di
-% sistemi scritti utilizzando un linguaggio di programmazione differente, come
-% ad esempio sistemi di source code translation, fornendo un elemento che ad
-% esempio potrebbe consentire la produzione di codice in un qualsiasi
-% linguaggio di programmazione a partire dalla ricca rappresentazione di una
-% programma LISP prodotta in output proprio da questa funzione.
+L'utilizzo di questo schema di funzionamento risulta particolarmente per
+l'implementazione di funzioni che operano un'interrogazione dell'AST allo scopo
+di identificare particolari tipologie di nodi. Operazioni di interrogazione che
+risultano particolarmente utili a strumenti per la source code analysis, come
+verrà illustrato nel capitolo \ref{applications}.\\
 
-% Oltre alla funzionalità di visita vera e propria esposta dalla funzione
-% \texttt{WALK}, la quale rappresenta il cuore del funzinamento del modulo, il
-% modulo di traversal offre diverse altre funzionalità. Tali funzionalità
-% vengono costruite a partire dal meccanismo di visita appena presentato e sono
-% rappresentaze dalla funzionalità di query di un AST.
+Oltre alla funzionalità di visita vera e propria esposta dalla funzione
+\texttt{WALK}, la quale rappresenta il cuore del funzinamento del modulo, il
+modulo di traversal offre diverse altre funzionalità. Ciascuna di queste
+funzionalità viene costruita proprio a partire dall'interfaccia esposta dalla
+funzione \texttt{WALK}. Nella prossima Sottosezione viene presentato un esempio
+di funzionalità di questo tipo.
 
-% Entrambe queste funzionalità verranno approfondite nelle prossime
-% sottosezioni.
+\subsubsection{AS-STRING}
 
-% \subsection{Interrogazione di un AST e Interoperabilità}
+\texttt{AS-STRING} è un'altra delle funzioni più importanti offerte dal modulo.
+La funzione funzione prende in input un'istanza di \texttt{CLAST-ELEMENT} e una
+rappresentazione testuale dei dati relativi a questa. Può quindi risultare come
+una funzione analoga a metodi come \texttt{toString} Java e \texttt{description}
+Objective-C. La particolarità di questa funzione generica è costituita dal fatto
+che ciascuno dei suoi metodi agisce in modo ricorsivo, restituendo una
+rappresentazione completamente componibile, strutturata e leggibile da un
+sistema automatico, dell'AST radicato nel nodo specificato come input.\\
+
+Oltre a rappresentare una funzione particolarmente utile in fase di debugging e
+costruzione della libreria, questa funzione risulta particolarmente importante
+in quanto, producendo un rappresentazione testuale, consente l'analisi dell'AST
+programmi Common Lisp, e più in generale della rappresentazione di un programma offerta dalla libreria, anche da parte di sistemi scritti utilizzando un
+linguaggio di programmazione differente.
+
+Esempi di sistemi che vengono abilitati dalla presenza di questo metodo sono per
+compilatori source-to-source, ossia sistemi per la traduzioni di codice sorgente
+da un linguaggio di programmazione ad un altro, fornendo un elemento che ad
+esempio potrebbe consentire la produzione di codice in un qualsiasi linguaggio
+di programmazione a partire dalla ricca rappresentazione di una programma Common
+Lisp prodotta in output dal modulo di parsing e analisi della libreria. Un altra
+classi di sistemi la cui creazione viene abilitata dalla presenza della
+funzionalità offerta dai metodi \texttt{AS-STRING} è rappresentata strumenti per
+il linting di codice Common Lisp, tipicamente integrati all'interno di editor di
+testo in molti casi scritti utilizzando linguaggio di programmazione diversi dal
+Common Lisp.

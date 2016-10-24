@@ -158,7 +158,25 @@ in quanto fondamento a partire dal quale questa è in grado di agire.
 
 \chapter{Applicazioni}
 \label{applications}
-\section{Free Variables Analysis}
+
+% \section{Free Variables Analysis}
+% \begin{lstlisting}[caption=Query functions per l'identificazione di variabili
+% libere all'interno di una form Common Lisp]
+
+% (defun free-variables (form)
+%   "Returns all the 'free' variables present in FORM.
+
+% Arguments and Values:
+
+% form   : a CLAST-ELEMENT.
+% result : a LIST of SYMBOLS."
+%   (walk form
+%         :map (lambda (e)
+%                (typecase e
+%                  (free-variable-ref (list (form-symbol e)))))
+%         ))
+
+% \end{lstlisting}
 
 %%% SECTION: PATTERN MATCHING
 \include{src/pattern-mathing}
