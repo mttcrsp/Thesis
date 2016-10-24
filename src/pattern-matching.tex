@@ -1,4 +1,5 @@
 \section{Pattern Matching}
+\label{pattern-matching}
 
 % - A partire dalle informazioni rispetto all'AST e in particolare dal fatto che
 % si è particolarmente semplificato il problema della free variable analysis,
@@ -13,17 +14,17 @@
 
 Formalmente, il pattern matching viene definito come un meccanismo che consente
 di identificare e scomporre le componenti di un dato pattern a partire dal
-confronto con i valori presenti all’interno di una data struttura dati. Nel
-caso in cui siano presenti variabili all’interno del pattern specificato, il
+confronto con i valori presenti all’interno di una data struttura dati. Nel caso
+in cui siano presenti variabili all’interno del pattern specificato, il
 meccanismo prevede che queste vengano inizializzate al valore corrispondente
 specificato all’interno della struttura dati.\\
 
 Il pattern matching è considerato come uno strumento di fondamentale importanza
 nel contesto dei linguaggi di programmazione funzionali. Proprio per questa
-ragione, nell’ambito dei linguaggi di programmazione, è proprio questa classe
-di linguaggi quella in cui si è vista la maggiore diffusione e adozione di
-questo meccanismo. Da un punto di vista storico, i primi linguaggi funzionali
-ad introdurre un supporto al pattern matching sono stati il linguaggio SASL, un
+ragione, nell’ambito dei linguaggi di programmazione, è proprio questa classe di
+linguaggi quella in cui si è vista la maggiore diffusione e adozione di questo
+meccanismo. Da un punto di vista storico, i primi linguaggi funzionali ad
+introdurre un supporto al pattern matching sono stati il linguaggio SASL, un
 linguaggio funzionale puro definito nel 1972 da D. Turner
 \cite{DBLP:journals/spe/Turner79}, e il linguaggio Hope
 \cite{DBLP:conf/lfp/BurstallMS80}, sviluppato nel 1980 da un gruppo di
@@ -31,7 +32,7 @@ ricercatori presso l'università di Edimburgo. Il primo utilizzo nel contesto di
 un linguaggio di programmazione più diffuso risale però all’utilizzo nel
 contesto del linguaggio di programmazione ML nel 1973, prima all’interno del
 dialetto Standard-ML (SML) \cite{milner1997definition} e poi con il dialetto
-Lazy-ML (LML) \cite{DBLP:conf/lfp/Augustsson84}.
+Lazy-ML (LML) \cite{DBLP:conf/lfp/Augustsson84}.\\
 
 Nel corso degli anni, il pattern matching è divenuto un elemento comune
 all'interno di molti linguaggi di programmazione. Nel linguaggio Haskell
@@ -42,47 +43,49 @@ fondamentale, e più appropriato, per la gestione dei tipi di dato algebrici che
 contraddistinguono Haskell. Per concludere questo riferimento storico, è
 importante sottolineare che anche linguaggi molto recenti, come Rust
 \cite{rust2016}, Elixir \cite{laurent2014introducing} ed Elm \cite{elm2016},
-hanno scelto di introdurre un supporto al pattern matching.
+hanno scelto di introdurre un supporto al pattern matching.\\
 
 Per meglio illustrare la definizione di fornita nel paragrafo precedente, in
-seguito viene presentato un esempio di costrutto, realmente presente
-all'interno di un linguaggio di programmazione, che introduce all'interno del
-linguaggio un supporto al pattern matching. In particolare, l'esempio di
-implementazione proposto e descritto in seguito fa riferimento al linguaggio
-LML, precedentemente citato, e in particolare al costrutto \texttt{CASE}
-offerto da questo. Si è scelto di presentare questo particolare esempio di
-implementazione dei principi del pattern matching in quanto particolarmente
-rappresentativo dei principi generali alla base questo.
+seguito viene presentato un esempio di costrutto, realmente presente all'interno
+di un linguaggio di programmazione, che introduce all'interno del linguaggio un
+supporto al pattern matching. In particolare, l'esempio di implementazione
+proposto e descritto in seguito fa riferimento al linguaggio LML,
+precedentemente citato, e in particolare al costrutto \texttt{CASE} offerto da
+questo. Si è scelto di presentare questo particolare esempio di implementazione
+dei principi del pattern matching in quanto particolarmente rappresentativo dei
+principi generali alla base questo.
 
 Il costrutto \texttt{CASE} consente ad un utente del linguaggio ML di esaminare
 il valore di un elemento ed eseguire codice in modo condizionale a partire da
 questa valutazione.
 
 \begin{lstlisting}[caption=Il costrutto \texttt{CASE} presente in LML
-  rappresenta un esempio di supporto al pattern matching.]
+rappresenta un esempio di supporto al pattern matching.]
+
 case e in
     p1 : e1
 ||  p2 : e2
 ...
 ||  pn : en
 end
+
 \end{lstlisting}
 
 Nell'esempio i $p_i$ rappresentano i pattern che dovranno essere verificati
 all’esecuzione del costrutto, $e$ rappresenta un’espressione, detta
 \textit{discriminante}, ossia un valore o insieme di valori a partire dai quali
-devono essere verificati i pattern $p_i$ per identificare la presenza di
-un match, infine ciascun $e_i$ rappresenta l'espressione che deve essere
-ritornata nel caso in cui il pattern $p_i$ venga individuato come match.
+devono essere verificati i pattern $p_i$ per identificare la presenza di un
+match, infine ciascun $e_i$ rappresenta l'espressione che deve essere ritornata
+nel caso in cui il pattern $p_i$ venga individuato come match.
 
-Un pattern è rappresentato da un insieme di dimensione arbitraria ed
-eterogeneo, in cui ciascun elemento può essere classificato o come una costante
-o come una variabile. Un pattern composto da una sola variabile o costante
-viene detto \textit{semplice}.
+Un pattern è rappresentato da un insieme di dimensione arbitraria ed eterogeneo,
+in cui ciascun elemento può essere classificato o come una costante o come una
+variabile. Un pattern composto da una sola variabile o costante viene detto
+\textit{semplice}.
 
 Gli elementi che compongono un'espressione, come anche i pattern che vanno ad
-essere verificati a partire da questa, possono essere organizzati all’interno
-di una lista o di un albero, costruito a partire da liste innestate.
+essere verificati a partire da questa, possono essere organizzati all’interno di
+una lista o di un albero, costruito a partire da liste innestate.
 
 Nel caso invece di valori costanti, il matching operato tra valore specificato
 dal pattern e valore corrispondente presente all'interno della struttura dati è
@@ -95,8 +98,8 @@ come anche molti altri linguaggi, è quella di riservare il nome di variabile
 \texttt{\_} per indicare una variabile al cui valore non si è interessati. Nel
 caso di utilizzo di un \texttt{\_} all’interno di un pattern, si effettuerà
 sempre un matching incondizionato, ma il valore associato a questo match verrà
-semplicemente scartato invece che essere utilizzato per l’inizializzazione
-della variabile.
+semplicemente scartato invece che essere utilizzato per l’inizializzazione della
+variabile.
 
 Il valore prodotto quindi dalla valutazione di un'istanza del costrutto
 \texttt{CASE} è quello prodotto dalla valutazione dell’espressione $e_i$
@@ -107,21 +110,25 @@ Durante la valutazione di un'istanza del costrutto \texttt{CASE}, valgono le
 seguenti proprietà:
 
 \begin{itemize}
-\item i diversi pattern vengono verificati a partire dall’ordine di
-  definizione, ossia dall’alto verso il basso, così come anche le diverse
-  componenti interne a ciascun pattern, ossia da sinistra verso destra;
-\item nel caso in cui i pattern non siano sufficienti a coprire l’intero
-  insieme di variabilità dell’espressione discriminante, il compilatore
-  aggiunge un ulteriore pattern in grado di matchare un qualsiasi valore e
-  associa a questo un’espressione che porterà alla generazione di un errore a
-  runtime;
+
+\item i diversi pattern vengono verificati a partire dall’ordine di definizione,
+ossia dall’alto verso il basso, così come anche le diverse componenti interne a
+ciascun pattern, ossia da sinistra verso destra;
+
+\item nel caso in cui i pattern non siano sufficienti a coprire l’intero insieme
+di variabilità dell’espressione discriminante, il compilatore aggiunge un
+ulteriore pattern in grado di matchare un qualsiasi valore e associa a questo
+un’espressione che porterà alla generazione di un errore a runtime;
+
 \item l’espressione discriminante $e$ viene valutata solamente quanto basta per
-  poter identificare il primo pattern con il quale si ha un match;
-\item é ammesso che i pattern si sovrappongano tra di loro, ma non è ammesso
-  che un pattern si sovrapponga completamente ad uno dei pattern successivi ad
-  esso. Questo perché il pattern successivo non potrebbe mai essere matchato e
-  il linguaggio considera questo come un errore di programmazione da parte
-  dell'utente.\\
+poter identificare il primo pattern con il quale si ha un match;
+
+\item é ammesso che i pattern si sovrappongano tra di loro, ma non è ammesso che
+un pattern si sovrapponga completamente ad uno dei pattern successivi ad esso.
+Questo perché il pattern successivo non potrebbe mai essere matchato e il
+linguaggio considera questo come un errore di programmazione da parte
+dell'utente.
+
 \end{itemize}
 
 La scelta del linguaggio ML di definire un ordinamento totale tra i diversi
@@ -134,12 +141,12 @@ definizione un altro meccanismo per la risoluzione dei conflitti nel caso in
 siano presenti più pattern per il quale si ha un match con l’espressione
 discriminante. Tuttavia la definizione di un meccanismo generale per risolvere
 questo genere di problemi non risulta particolarmente intuitiva e lavorerebbe
-necessariamente per singoli casi, richiedendo inoltre tipicamente la
-definizione di una funzione di distanza che consenta di identificare il match
-più specifico rispetto all’espressione discriminante in grado di agire a
-prescindere dal tipo di espressione e pattern in analisi. Molte implementazioni
-ritengono che questo processo agguinga un overhead significativo e
-difficilmente giustificabile alla programmazione.\\
+necessariamente per singoli casi, richiedendo inoltre tipicamente la definizione
+di una funzione di distanza che consenta di identificare il match più specifico
+rispetto all’espressione discriminante in grado di agire a prescindere dal tipo
+di espressione e pattern in analisi. Molte implementazioni ritengono che questo
+processo agguinga un overhead significativo e difficilmente giustificabile alla
+programmazione.\\
 
 È importante sottolineare che, nonostante gran parte delle implementazioni di
 strumenti per il supporto al pattern matching all’interno di diversi linguaggi
@@ -150,8 +157,8 @@ necessariamente lo stesso funzionamento e/o processo di esecuzione.
 Tuttavia, come accennato in precedenza, i principi del funzionamento del
 costrutto \texttt{CASE} appena riportato possono essere rintracciati in maniera
 del tutto analoga anche nel contesto di implementazioni dei principi alla base
-del pattern matching che utilizzano linguaggi di programmazione diversi e che
-si pongono obiettivo completamente diversi.
+del pattern matching che utilizzano linguaggi di programmazione diversi e che si
+pongono obiettivo completamente diversi.
 
 Ad esempio, nel linguaggio Haskell, sviluppato da un gruppo di sviluppatori tra
 cui L. Augustsson, coautore di LML e della definizione del costrutto
@@ -160,50 +167,55 @@ una funzione, elemento centrale al funzionamento del linguaggio, lavora in modo
 molto simile a quanto appena riportato.
 
 \begin{lstlisting}[caption=Esempio di definizione di una funzione semplificata
-  per il calcolo del fattoriale utilizzando il linguaggio Haskell.]
+per il calcolo del fattoriale utilizzando il linguaggio Haskell.]
+
 factorial 0 = 1
 factorial n = n * factorial(n-1)
+
 \end{lstlisting}
 
 Il precedente esempio definisce una prima versione della funzione factorial, il
 cui input ammesso è il valore intero 0, e che ritorna il valore intero 1. La
 seconda definizione specifica invece come input il nome di una variabile, la
 quale andrà ad essere matchata in modo incondizionato e quindi a rappresentare
-un qualsiasi parametro fornito in input alla funzione, e ritorna il risultato
-di una computazione ricorsiva costruita partire dal valore del parametro in
-input.
+un qualsiasi parametro fornito in input alla funzione, e ritorna il risultato di
+una computazione ricorsiva costruita partire dal valore del parametro in input.
 
 All’invocazione della funzione factorial vengono applicate delle regole del
 tutto analoghe a quelle definite in precedenza:
 
 \begin{itemize}
+
 \item le diverse definizioni della funzione vengono valutare in ordine di
-  definizione come anche i parametri specificati da ciascuna di queste, nel
-  caso in si abbia un match tra i parametri specificati dall'invocazione e
-  quelli specificati dalla definizione in analisi, il codice associato a quella
-  particolare definizione viene eseguito.
+definizione come anche i parametri specificati da ciascuna di queste, nel caso
+in si abbia un match tra i parametri specificati dall'invocazione e quelli
+specificati dalla definizione in analisi, il codice associato a quella
+particolare definizione viene eseguito.
+
 \item nel caso non sia presente una definizione una della funzione in grado di
-  matchare i parametri di invocazione, il runtime del linguaggio produrrà un
-  errore nel quale indicherà che i pattern associati alla funzione f non sono
-  sufficienti per poter valutare la chiamata (\texttt{Non-exhaustive patterns
-  in function 'factorial'});
+matchare i parametri di invocazione, il runtime del linguaggio produrrà un
+errore nel quale indicherà che i pattern associati alla funzione f non sono
+sufficienti per poter valutare la chiamata (\texttt{Non-exhaustive patterns in
+function 'factorial'});
+
 \item i parametri di input vengono valutati solamente quanto basta per poter
-  identificare la prima definizione della funzione con la quale si ha un match.
+identificare la prima definizione della funzione con la quale si ha un match.
+
 \end{itemize}
 
-Nel contesto del linguaggio Haskell, il pattern matching viene quindi
-utilizzato anche come meccanismo alla base del dispatching delle chiamate ad
-una funzione. Un’aspetto di questa implementazione che è significativo
-sottolineare è rappresentato dal fatto che, a differenza dei più tradizionali
-meccanismi per il dispatching di chiamate a funzione utilizzati da linguaggi di
-programmazione più comuni, come ad esempio il linguaggio Java, il dispatching
-delle chiamate viene effettuato andando a verificare l’effettivo valore dei
-parametri specificati dall’invocazione, e non solamente il tipo di questi.\\
+Nel contesto del linguaggio Haskell, il pattern matching viene quindi utilizzato
+anche come meccanismo alla base del dispatching delle chiamate ad una funzione.
+Un’aspetto di questa implementazione che è significativo sottolineare è
+rappresentato dal fatto che, a differenza dei più tradizionali meccanismi per il
+dispatching di chiamate a funzione utilizzati da linguaggi di programmazione più
+comuni, come ad esempio il linguaggio Java, il dispatching delle chiamate viene
+effettuato andando a verificare l’effettivo valore dei parametri specificati
+dall’invocazione, e non solamente il tipo di questi.\\
 
 Il fatto che il pattern matching possa essere utilizzato come strumento che
-consente di introdurre aspetti come l’esecuzione condizionata e dynamic
-dispatch all’interno di un linguaggio di programmazione può fornire un’idea
-della potenza espressivo del meccanismo
+consente di introdurre aspetti come l’esecuzione condizionata e dynamic dispatch
+all’interno di un linguaggio di programmazione può fornire un’idea della potenza
+espressivo del meccanismo
 
 Dopo aver presentato nei precedenti paragrafi una definizione di pattern
 matching, i principi alla base di questo e alcuni esempi di utilizzo di questo
@@ -230,22 +242,21 @@ fase di compilazione, prevenendo il potenziale generarsi di errori a runtime.\\
 
 Il vantaggio più significativo che la disponibilità di un supporto al pattern
 matching porta all’interno di un linguaggio di programmazione è però
-rappresentato dal fatto che questo consente di trasferire lavoro dall’utente
-del linguaggio al compilatore. Lavori, come ad esempio la validazione di
-asserzioni e precondizioni e la gestione del branching, che risultano
-particolarmente soggetti ad errori di programmazione, e per i quali un
-compilatore è tipicamente in grado di produrre con maggior successo un codice
-corretto. Oltre alla correttezza, un ulteriore aspetto che un utilizzo più
-intensivo del compilatore porta ad ottenere è relativo alle prestazioni di un
-programma: avendo a disposizione maggiori informazioni rispetto al
-funzionamento e ad i meccanismi di rappresentazione interni del linguaggio di
-programmazione, un compilatore è tipicamente in grado di produrre codice più
-efficiente rispetto a quello che potrebbe essere prodotto da un utente del
-linguaggio.\\
+rappresentato dal fatto che questo consente di trasferire lavoro dall’utente del
+linguaggio al compilatore. Lavori, come ad esempio la validazione di asserzioni
+e precondizioni e la gestione del branching, che risultano particolarmente
+soggetti ad errori di programmazione, e per i quali un compilatore è tipicamente
+in grado di produrre con maggior successo un codice corretto. Oltre alla
+correttezza, un ulteriore aspetto che un utilizzo più intensivo del compilatore
+porta ad ottenere è relativo alle prestazioni di un programma: avendo a
+disposizione maggiori informazioni rispetto al funzionamento e ad i meccanismi
+di rappresentazione interni del linguaggio di programmazione, un compilatore è
+tipicamente in grado di produrre codice più efficiente rispetto a quello che
+potrebbe essere prodotto da un utente del linguaggio.\\
 
-Common Lisp non fornisce un supporto diretto al pattern matching.
-Tuttavia il concetto di pattern matching può essere rintracciato in diversi
-aspetti del linguaggio.
+Common Lisp non fornisce un supporto diretto al pattern matching. Tuttavia il
+concetto di pattern matching può essere rintracciato in diversi aspetti del
+linguaggio.
 
 Ad esempio, il costrutto \texttt{DESTRUCTURING-BIND} è una macro fornita
 nativamente dal linguaggio per la destrutturazione di liste, anche
@@ -258,21 +269,24 @@ arbitrariamente innestate, all’interno delle loro componenti elementari.
   (values a b c))             ; prints 1 2 3
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Signature della macro \texttt{DESTRUCTURING-BIND}.]
+\begin{lstlisting}[caption=Sintassi della macro \texttt{DESTRUCTURING-BIND}.]
+
 destructuring-bind lambda-list expression declaration* form*
 => result*
+
 \end{lstlisting}
 
-\texttt{DESTRUCTURING-BIND} rappresenta una forma elementare di pattern
-matching in cui viene ammesso un singolo pattern, il quale può
-solamente essere composto da variabili, e che essendo unico dovrà
-necessariamente matchare correttamente l’espressione in input affinché non si
-generino errori. Oltre alle limitazioni appena presentate, il costrutto non
-ammette l'utilizzo di costanti e wildcard. \footnote{In sostanza il costrutto
-non opera un reale matching degli elementi di una struttura, ma solamente una
-scomposizione di questi all'interno dell'insieme di variabili specificato.}
+\texttt{DESTRUCTURING-BIND} rappresenta una forma elementare di pattern matching
+in cui viene ammesso un singolo pattern, il quale può solamente essere composto
+da variabili, e che essendo unico dovrà necessariamente matchare correttamente
+l’espressione in input affinché non si generino errori. Oltre alle limitazioni
+appena presentate, il costrutto non ammette l'utilizzo di costanti e wildcard.
+\footnote{In sostanza il costrutto non opera un reale matching degli elementi di
+una struttura, ma solamente una scomposizione di questi all'interno dell'insieme
+di variabili specificato.}
 
 Tuttavia, nonostante l'assenza di un supporto nativo al pattern matching, la
 forte estensibilità che contraddistingue Common Lisp rende possibile
 l'introduzione di un costrutto per il pattern matching in maniera naturale.
-Come verrà approfondito all'interno delle prossime Sezioni.
+
+
