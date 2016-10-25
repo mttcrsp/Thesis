@@ -1,19 +1,40 @@
-\section{Pattern Matching}
+\section{Supporto al Pattern Matching}
 \label{pattern-matching}
 
-% - A partire dalle informazioni rispetto all'AST e in particolare dal fatto che
-% si è particolarmente semplificato il problema della free variable analysis,
-% l'aggiunta di un supporto al pattern matching e alla compilazione del pattern
-% matching per il linguaggio Common Lisp risulta particolarmente semplificata.
-% - Cosa è il pattern matching
-% - Il professore ha fatto un discorso immenso sul fatto che la compilazione del
-% pattern matching, come descritto dal paper semplice, porta all'introduzione di
-% un grande insieme di variabili libere.
-% - Questo può essere risolto dalla libreria che è in grado di identificare la
-% presenza di variabili libere e ottimizzare la compilazione del pattern matching.
+All'interno di questa sezione viene presentata una delle principali applicazione
+della libreria CLAST, l'utilizzo delle potenzialità di source code analysis
+offerte da questa allo scopo di introdurre un supporto al pattern matching
+all'interno del linguaggio Common Lisp stesso.
+
+Nel corso di questa sezione viene quindi dapprima introdotto il concetto di
+pattern matching e il funzionamento di questo meccanismo, comune a diversi
+linguaggi di programmazione funzionali, come ad esempio il linguaggio ML e il
+linguaggio Haskell.
+
+Viene poi mostrato un esempio di implementazione di questo costrutto nel
+contesto di un linguaggio di programmazione, rappresentato in particolare dal
+costrutto \texttt{CASE} del linguaggio LML.\\
+
+Come anticipato, il linguaggio Common Lisp non offre un supporto nativo al
+pattern matching, anche se i concetti alla base del funzionamento di questo
+meccanismo possono essere rintracciati in diversi aspetti del linguaggio.
+
+Viene quindi mostrato, come sia possibile operare un'estensione del linguaggio
+allo scopo di introdurre un supporto al pattern matching a partire dal lavoro di
+L. Augustsson, co-autore del linguaggio LML ed esponente di spicco della
+comunità Haskell, non che autore di uno dei primi e più noti per lo stesso
+linguaggio di programmazione.\\
+
+Viene quindi presentato il problema dell'inefficienza introdotta da
+un'implementazione diretta dei principi descritti da Augustsson in \cite{} e si
+mostra come la libreria CLAST consenta di risolvere questi problemi, abilitando
+l'estensione del linguaggio Common Lisp in maniera tale da introdurre un
+supporto al pattern matching.
+
+\subsection{Pattern Matching}
 
 Formalmente, il pattern matching viene definito come un meccanismo che consente
-di identificare e scomporre le componenti di un dato pattern a partire dal
+di identificare e scomporre le componenti di un certo pattern a partire dal
 confronto con i valori presenti all’interno di una data struttura dati. Nel caso
 in cui siano presenti variabili all’interno del pattern specificato, il
 meccanismo prevede che queste vengano inizializzate al valore corrispondente
@@ -36,31 +57,34 @@ Lazy-ML (LML) \cite{DBLP:conf/lfp/Augustsson84}.\\
 
 Nel corso degli anni, il pattern matching è divenuto un elemento comune
 all'interno di molti linguaggi di programmazione. Nel linguaggio Haskell
-\cite{DBLP:conf/hopl/HudakHJW07}, un linguaggio anch'esso funzionale puro nato
-nel 1990, il pattern matching svolge addirittura un ruolo centrale per il
-funzionamento complessivo del linguaggio, rappresentando lo strumento
-fondamentale, e più appropriato, per la gestione dei tipi di dato algebrici che
-contraddistinguono Haskell. Per concludere questo riferimento storico, è
-importante sottolineare che anche linguaggi molto recenti, come Rust
-\cite{rust2016}, Elixir \cite{laurent2014introducing} ed Elm \cite{elm2016},
-hanno scelto di introdurre un supporto al pattern matching.\\
+\cite{DBLP:conf/hopl/HudakHJW07}, un linguaggio anch'esso di tipo funzionale e
+puro nato, nel 1990. Nel contesto dell'Haskell il pattern matching svolge
+addirittura un ruolo centrale per il funzionamento complessivo del linguaggio,
+rappresentando lo strumento fondamentale, e più appropriato, per la gestione dei
+tipi di dato algebrici che lo contraddistinguono. Per concludere questo
+riferimento storico, è importante sottolineare che anche linguaggi molto
+recenti, come ad Rust \cite{rust2016}, Elixir \cite{laurent2014introducing} ed
+Elm \cite{elm2016}, hanno scelto di introdurre un supporto al pattern
+matching.\\
 
-Per meglio illustrare la definizione di fornita nel paragrafo precedente, in
+Per meglio illustrare la definizione fornita nel paragrafo precedente, in
 seguito viene presentato un esempio di costrutto, realmente presente all'interno
-di un linguaggio di programmazione, che introduce all'interno del linguaggio un
-supporto al pattern matching. In particolare, l'esempio di implementazione
-proposto e descritto in seguito fa riferimento al linguaggio LML,
-precedentemente citato, e in particolare al costrutto \texttt{CASE} offerto da
-questo. Si è scelto di presentare questo particolare esempio di implementazione
-dei principi del pattern matching in quanto particolarmente rappresentativo dei
-principi generali alla base questo.
+di un linguaggio di programmazione, che implementa un supporto al meccanismo di
+pattern matching all'interno di un reale linguaggio di programmazione. In
+particolare, l'esempio di implementazione proposto in seguito fa riferimento al
+linguaggio LML e al costrutto \texttt{CASE} definito da questo. Si è scelto di
+presentare questo particolare esempio di implementazione dei principi del
+pattern matching in quanto particolarmente rappresentativo dei principi generali
+alla base del meccanismo.
 
 Il costrutto \texttt{CASE} consente ad un utente del linguaggio ML di esaminare
 il valore di un elemento ed eseguire codice in modo condizionale a partire da
 questa valutazione.
 
-\begin{lstlisting}[caption=Il costrutto \texttt{CASE} presente in LML
-rappresenta un esempio di supporto al pattern matching.]
+\begin{lstlisting}[
+  caption=Esempio di utilizzo del costrutto \texttt{CASE} LML,
+  label={lst:case}
+]
 
 case e in
     p1 : e1
@@ -71,35 +95,37 @@ end
 
 \end{lstlisting}
 
-Nell'esempio i $p_i$ rappresentano i pattern che dovranno essere verificati
-all’esecuzione del costrutto, $e$ rappresenta un’espressione, detta
-\textit{discriminante}, ossia un valore o insieme di valori a partire dai quali
-devono essere verificati i pattern $p_i$ per identificare la presenza di un
-match, infine ciascun $e_i$ rappresenta l'espressione che deve essere ritornata
-nel caso in cui il pattern $p_i$ venga individuato come match.
+Nel listato \ref{lst:case}, i $p_i$ rappresentano i pattern che devono essere
+verificati durante l'esecuzione, $e$ rappresenta un’espressione, detta
+discriminante, ossia un valore o insieme di valori a partire dai quali deveno
+essere verificati i pattern $p_i$ per identificare la presenza di un match.
+Infine, ciascun $e_i$ rappresenta l'espressione che deve essere ritornata nel
+caso in cui il pattern $p_i$ venga individuato come match rispetto al
+discriminante.
 
 Un pattern è rappresentato da un insieme di dimensione arbitraria ed eterogeneo,
 in cui ciascun elemento può essere classificato o come una costante o come una
 variabile. Un pattern composto da una sola variabile o costante viene detto
-\textit{semplice}.
+semplice.
 
 Gli elementi che compongono un'espressione, come anche i pattern che vanno ad
 essere verificati a partire da questa, possono essere organizzati all’interno di
-una lista o di un albero, costruito a partire da liste innestate.
+una lista o di un albero, costruito a partire da liste innestate.\\
 
 Nel caso invece di valori costanti, il matching operato tra valore specificato
-dal pattern e valore corrispondente presente all'interno della struttura dati è
+dal pattern e corrispondente valore presente all'interno della struttura dati è
 di tipo esatto. Nel caso in cui un pattern $p_i$ riporti una variabile al suo
 interno, questa viene matchata in modo incondizionato, e il valore
 corrispondente a questa all’interno dell’espressione e viene utilizzato per
 effettuare l’inizializzazione di questa nel contesto della valutazione
-dell'espressione $e_i$. Una convenzione che le diverse varianti di ML adottano,
-come anche molti altri linguaggi, è quella di riservare il nome di variabile
-\texttt{\_} per indicare una variabile al cui valore non si è interessati. Nel
-caso di utilizzo di un \texttt{\_} all’interno di un pattern, si effettuerà
-sempre un matching incondizionato, ma il valore associato a questo match verrà
-semplicemente scartato invece che essere utilizzato per l’inizializzazione della
-variabile.
+dell'espressione $e_i$.
+
+Una convenzione che le diverse varianti di ML adottano, come anche molti altri
+linguaggi, è quella di riservare il nome di variabile \texttt{\_} per indicare
+una variabile al cui valore non si è interessati. Nel caso di utilizzo di un
+\texttt{\_} all’interno di un pattern, si effettuerà sempre un matching
+incondizionato, ma il valore associato a questo match verrà semplicemente
+scartato invece che essere utilizzato per l’inizializzazione della variabile.
 
 Il valore prodotto quindi dalla valutazione di un'istanza del costrutto
 \texttt{CASE} è quello prodotto dalla valutazione dell’espressione $e_i$
@@ -125,8 +151,8 @@ poter identificare il primo pattern con il quale si ha un match;
 
 \item é ammesso che i pattern si sovrappongano tra di loro, ma non è ammesso che
 un pattern si sovrapponga completamente ad uno dei pattern successivi ad esso.
-Questo perché il pattern successivo non potrebbe mai essere matchato e il
-linguaggio considera questo come un errore di programmazione da parte
+Questo perché altrimenti il pattern successivo non potrebbe mai essere matchato
+e il linguaggio considera questo come un errore di programmazione da parte
 dell'utente.
 
 \end{itemize}
@@ -135,9 +161,10 @@ La scelta del linguaggio ML di definire un ordinamento totale tra i diversi
 pattern, utilizzando l’ordine di definizione è una scelta arbitraria ma
 condivisa da molte altre implementazioni del pattern matching e che consente di
 identificare univocamente l'espressione che dovrà essere ritornata nel caso in
-cui più pattern vadano a matchare l'espressione discriminante. Una verifica
-compiuta in assenza di un ordinamento totale richiederebbe infatti la
-definizione un altro meccanismo per la risoluzione dei conflitti nel caso in
+cui più pattern vadano a matchare l'espressione discriminante.
+
+Una verifica compiuta in assenza di un ordinamento totale richiederebbe infatti
+la definizione un altro meccanismo per la risoluzione dei conflitti nel caso in
 siano presenti più pattern per il quale si ha un match con l’espressione
 discriminante. Tuttavia la definizione di un meccanismo generale per risolvere
 questo genere di problemi non risulta particolarmente intuitiva e lavorerebbe
@@ -145,8 +172,10 @@ necessariamente per singoli casi, richiedendo inoltre tipicamente la definizione
 di una funzione di distanza che consenta di identificare il match più specifico
 rispetto all’espressione discriminante in grado di agire a prescindere dal tipo
 di espressione e pattern in analisi. Molte implementazioni ritengono che questo
-processo agguinga un overhead significativo e difficilmente giustificabile alla
-programmazione.\\
+processo aggiunga un overhead alla programmazione significativo e difficilmente
+giustificabile.
+
+\subsubsection{Pattern matching come strumento}
 
 È importante sottolineare che, nonostante gran parte delle implementazioni di
 strumenti per il supporto al pattern matching all’interno di diversi linguaggi
@@ -166,15 +195,15 @@ cui L. Augustsson, coautore di LML e della definizione del costrutto
 una funzione, elemento centrale al funzionamento del linguaggio, lavora in modo
 molto simile a quanto appena riportato.
 
-\begin{lstlisting}[caption=Esempio di definizione di una funzione semplificata
-per il calcolo del fattoriale utilizzando il linguaggio Haskell.]
+\begin{lstlisting}[caption=Esempio di definizione di una funzione Haskell naive
+per il calcolo del fattoriale]
 
 factorial 0 = 1
 factorial n = n * factorial(n-1)
 
 \end{lstlisting}
 
-Il precedente esempio definisce una prima versione della funzione factorial, il
+Il precedente esempio definisce una prima versione della funzione fattoriale, il
 cui input ammesso è il valore intero 0, e che ritorna il valore intero 1. La
 seconda definizione specifica invece come input il nome di una variabile, la
 quale andrà ad essere matchata in modo incondizionato e quindi a rappresentare
@@ -224,21 +253,24 @@ linguaggio di programmazione può ottenere introducendo un supporto al pattern
 matching e come il linguaggio Common Lisp si relazioni con il pattern
 matching.\\
 
+\subsubsection{Vantaggi legati al Pattern Matching}
+
 Alcuni dei vantaggi che l'introduzione di un supporto al pattern matching porta
 all’interno di un linguaggio di programmazione sono legati in prima battuta al
 fatto che questo consente, in maniera semplificata, l’utilizzo di un paradigma
-di programmazione dichiarativo piuttosto che imperativo. Questo consente di
-evidenziare in modo chiaro l’intento di un frammento di codice utilizzando una
-forma leggibile. L’utilizzo di un approccio come quello descritto in precedenza
-per la definizione di una funzione rende immediatamente visibili quali siano le
-precondizioni e le supposizioni rispetto ai parametri di input ad una funzione;
-un compito per il quale un approccio imperativo necessiterebbe di una struttura
-apposita per la formulazione di asserzioni rispetto ai parametri in input, che
-infatti molto spesso viene aggiunta a linguaggi di questo tipo. Strumento che,
-quello delle asserzioni, comunque non è in grado di fornire le garanzie che è
-in grado di fornire un approccio dichiarativo, in cui la validità delle
-precondizioni, o asserzioni, rispetto ai parametri può essere garantita già in
-fase di compilazione, prevenendo il potenziale generarsi di errori a runtime.\\
+di programmazione dichiarativo piuttosto che imperativo. Questo permette di
+evidenziare in modo chiaro l’intento di un frammento di codice, utilizzando una
+forma particolarmente leggibile. L’utilizzo di un approccio come quello
+descritto in precedenza per la definizione di una funzione rende immediatamente
+visibili quali siano le precondizioni e le supposizioni rispetto ai parametri di
+input ad una funzione; un compito per il quale un approccio imperativo
+necessiterebbe di una struttura apposita per la formulazione di asserzioni
+rispetto ai parametri in input, che infatti molto spesso viene aggiunta a
+linguaggi di questo tipo. Strumento che, quello delle asserzioni, comunque non è
+in grado di fornire le garanzie che è in grado di fornire un approccio
+dichiarativo, in cui la validità delle precondizioni, o asserzioni, rispetto ai
+parametri può essere garantita già in fase di compilazione, prevenendo il
+potenziale generarsi di errori a runtime.\\
 
 Il vantaggio più significativo che la disponibilità di un supporto al pattern
 matching porta all’interno di un linguaggio di programmazione è però
@@ -246,7 +278,7 @@ rappresentato dal fatto che questo consente di trasferire lavoro dall’utente d
 linguaggio al compilatore. Lavori, come ad esempio la validazione di asserzioni
 e precondizioni e la gestione del branching, che risultano particolarmente
 soggetti ad errori di programmazione, e per i quali un compilatore è tipicamente
-in grado di produrre con maggior successo un codice corretto. Oltre alla
+in grado di produrre codice corretto con miglior tasso di successo. Oltre alla
 correttezza, un ulteriore aspetto che un utilizzo più intensivo del compilatore
 porta ad ottenere è relativo alle prestazioni di un programma: avendo a
 disposizione maggiori informazioni rispetto al funzionamento e ad i meccanismi
@@ -254,22 +286,30 @@ di rappresentazione interni del linguaggio di programmazione, un compilatore è
 tipicamente in grado di produrre codice più efficiente rispetto a quello che
 potrebbe essere prodotto da un utente del linguaggio.\\
 
-Common Lisp non fornisce un supporto diretto al pattern matching. Tuttavia il
-concetto di pattern matching può essere rintracciato in diversi aspetti del
-linguaggio.
+\subsection{Common Lisp e Pattern Matching}
+
+Il linguaggio Common Lisp non fornisce un supporto diretto al pattern matching.
+Tuttavia il concetto di pattern matching può essere rintracciato in diversi
+aspetti del linguaggio.
 
 Ad esempio, il costrutto \texttt{DESTRUCTURING-BIND} è una macro fornita
 nativamente dal linguaggio per la destrutturazione di liste, anche
 arbitrariamente innestate, all’interno delle loro componenti elementari.
 
-\begin{lstlisting}[caption=Esempio utilizzo della macro
-  \texttt{DESTRUCTURING-BIND}.]
-(destructuring-bind (a (b) c)
-    (list 1 (list 2) 3)
-  (values a b c))             ; prints 1 2 3
+\begin{lstlisting}[
+  caption=Esempio utilizzo della macro \texttt{DESTRUCTURING-BIND},
+  label={lst:destructuring-bind}]
+
+CL-USER> (destructuring-bind (a (b) c)
+       (list 1 (list 2) 3)
+     (values a b c))
+1
+2
+3
+
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Sintassi della macro \texttt{DESTRUCTURING-BIND}.]
+\begin{lstlisting}[caption=Sintassi della macro \texttt{DESTRUCTURING-BIND}]
 
 destructuring-bind lambda-list expression declaration* form*
 => result*
@@ -283,10 +323,259 @@ l’espressione in input affinché non si generino errori. Oltre alle limitazion
 appena presentate, il costrutto non ammette l'utilizzo di costanti e wildcard.
 \footnote{In sostanza il costrutto non opera un reale matching degli elementi di
 una struttura, ma solamente una scomposizione di questi all'interno dell'insieme
-di variabili specificato.}
+di variabili specificato. Come mostrato dal Listato \ref
+{lst:destructuring-bind}, il risultato risulta in diversi casi molto simile.}
+
+Un altro aspetto del linguaggio in cui è possibile rintracciare principi del
+pattern matching è rappresentato dal meccanismo di dispatching dei metodi,
+presentato nella Sezione \ref{generic-functions}, in cui il corretto metodo, o
+insieme di metodi, che dovrà essere eseguito in risposta ad una particolare
+invocazione di una funzione generica viene identificato dal sistema Common Lisp
+utilizzando un meccanismo di matching molto simile al pattern matching.\\
 
 Tuttavia, nonostante l'assenza di un supporto nativo al pattern matching, la
-forte estensibilità che contraddistingue Common Lisp rende possibile
-l'introduzione di un costrutto per il pattern matching in maniera naturale.
+forte estensibilità che contraddistingue Common Lisp, dovuta soprattutto alla
+presenza del costrutto macro descritto nel corso della Sezione \ref{macro},
+rende possibile l'introduzione di un costrutto per il pattern matching in
+maniera nativa.
 
+In particolare, nel corso del progetto di tesi, si è studiato come questo
+potesse essere possibile soprattutto a partire dal lavoro presentato da L.
+Augustsson in \cite{}. All'interno di questo documento, l'autore descrive
+infatti un costrutto per il pattern matching, in particolare il costrutto
+\texttt{CASE}, discusso in precedenza, possa essere compilato. Mentre gli
+aspetti di generazione di codice macchina non risultano di particolare interesse
+nel contesto di questa tesi, l'aspetto più significativo del documento è
+rappresento dal procedimento che l'autore descrive per la traduzione del codice
+di pattern matching all'interno di un insieme di funzioni mutuamente ricorsive.
 
+Questo processo di traduzione risulta di grande interesse in quanto, essendo un
+procedimento puramente funzionale, risulta particolarmente adatto come
+meccanismo utilizzabile per l'introduzione di un supporto al pattern matching
+all'interno del linguaggio Common Lisp; al contrario di differenti approcci alla
+compilazione del pattern matching, come ad esempio quello descritto da Margeret
+in \cite{}, che risultano significamente più complessi a livello di
+implementazione utilizzando il linguaggio Common Lisp.
+
+Una descrizione approfondita del funzionamento dell'algoritmo presentato in
+\cite{} esula dagli obiettivi di questa tesi. Si rimanda infatti al documento
+stesso per i dettagli relativi all'implementazione di questo. Tuttavia,
+l'intuizione alla base dell'algoritmo è la seguente: il pattern matching può
+sempre essere riscritto come una più semplice sequenza di operazioni di
+verifica, if statements, rispetto al tipo o all'identità di una data variabile.
+
+In particolare, questa operazione di riscrittura avviene in due passi distinti.
+
+\begin{enumerate}
+
+\item Tutti i pattern che utilizzo lo stesso costruttore a livello più alto
+possono essere raccolti in un unico pattern, rimpiazzato i diversi sotto-
+pattern con delle variabili.
+
+\item Vengono definiti nuove case expression che analizzano i sotto-pattern,
+espressioni che, procedendo in modo ricorsivo, verranno trattate in maniera
+analoga durante la prossima iterazione dell'algoritmo.
+
+\end{enumerate}
+
+Come affermato nel paragrafo precedente, l'algoritmo procede ad una riscrittura
+ricorsiva del frammento di codice contenente una case expression. Mentre i passi
+appena descritti rappresentano il passo ricorsivo dell'algoritmo, il caso base
+di questo è rappresentato dal caso in cui ciascun pattern presente nel frammento
+di codice è rappresentato da un pattern semplice; pattern che può quindi essere
+riscritto come un semplice if statement.
+
+Il Listato \ref{lst:compiling-pattern-matching} mostra l'azione dell'algoritmo a
+partire da un esempio.
+
+\begin{lstlisting}[
+  caption=Esempio di funzionamento dell'algoritmo per la compilazione del pattern matching di L. Augustsson,
+  label={lst:compiling-pattern-matching}
+]
+
+case e in
+    [x;true] : x
+||  [false] : true
+||  z : false
+end
+
+case e in
+    cons(x, cons(true, nil)) : x
+||  cons(false, nil) : true
+||  z : false
+end
+
+case e in
+    cons(x, v2) :
+        case x in
+            false :
+                case v2 in
+                    nil : true
+                ||  _ : default
+                end
+        ||  v3 : case v2 in
+                     cons(true, nil) : x
+                 ||  _ : default
+                 end
+        end
+||  z : false
+end
+
+case e in
+    cons(x, v2) :
+        case x in
+            false :
+                case v2 in
+                    nil : true
+                ||  _ : default
+                end
+        ||  v3 : case v2 in
+                     cons(v4, v5) :
+                         case v4 in
+                             true :
+                                 case v5 in
+                                     nil : x
+                                 ||  _ : default
+                                 end
+                         ||  _ : default
+                         end
+                 ||  _ : default
+                 end
+        end
+||  z : false
+end
+\end{lstlisting}
+
+La riscrittura del codice prodotta in input dall'algoritmo può quindi essere
+operata in maniera del tutto analoga utilizzando il linguaggio Common Lisp,
+utilizzando i costrutti nativi \texttt{CASE}, molto simile al costrutto
+\texttt{switch} diffuso nei linguaggio di programmazione tradizionali,
+\texttt{LET}, costrutto utilizzato per la definizione di variabili locali. Il
+Listato \ref{lst:cl-pm-compiled} mostra come il risultato del processo di
+riscrittura appena descritto.
+
+% (case e
+%   ((eql 'cons (type-of e))
+%    (let ((x (car e))
+%    (v2 (cdr v2)))
+%      (ecase x
+%        (false
+%   (case v2
+%     (nil t)
+%     (otherwise (error "Unmatched expression"))))
+%        (otherwise
+%   (let ((v3 x))
+%     (case v2
+%       ((eql 'cons (type-of v2))
+%        (let ((v4 (car v2))
+%        (v5 (cdr v2)))
+%          (case v4
+%      (true
+%       (case v5
+%         (nil x)
+%         (otherwise (error "Unmatched expression"))))
+%      (otherwise (error "Unmatched expression")))))
+%       (otherwise (error "Unmatched expression"))))))))
+%   (otherwise nil))
+
+\begin{lstlisting}[
+  caption=Esempio di implementazione Common Lisp,
+  label={lst:cl-pm-compiled}
+]
+
+(match e
+  ((cons x t) x)
+  (nil t)
+  (z nil))
+
+(case e
+  ((eql 'cons (type-of e))
+   (let ((x (car e))
+   (v2 (cdr v2)))
+     (case x
+       (false
+  (let ((ev2 t))
+    (case v2
+      (nil t)
+      (ev2 (error "Unmatched expression")))))
+       (otherwise
+  (let ((v3 x)
+        (ev3 t))
+    (case v2
+      ((eql 'cons (type-of v2))
+       (let ((v4 (car v2))
+       (v5 (cdr v2))
+       (ev4 t))
+         (case v4
+     (true
+      (let ((ev5 t))
+        (case v5
+          (nil x)
+          (ev5 (error "Unmatched expression")))))
+     (t (error "Unmatched expression")))))
+      (ev3 (error "Unmatched expression"))))))))
+  (otherwise nil))
+
+\end{lstlisting}
+
+Si possono quindi compiere diverse osservazioni rispetto al funzionamento
+dell'algoritmo. Una prima osservazione è che la quantità di codice generata da
+questo è molto maggiore rispetto alla quantità di codice originale. Questo
+tuttavia risulta poco significativo, in quanto si trattarebbe di codice generato
+in maniera automatica in fase di compilazione attraverso l'utilizzo del
+costrutto macro, e che quindi risulterebbe sostanzialmente invisibile ad un
+utente del linguaggio.\\
+
+Una seconda osservazione è invece relativa all'efficienza dell'algoritmo. Si può
+infatti osservare che l'algoritmo porta alla generazione di un grande numero di
+variabili, un aspetto che incide sia dal punto di vista dei tempi di
+compilazione sia dal punto di vista dell'efficienza a runtime di un programma
+che utilizza questo meccanismo. Si evidenzia inoltre che molte di queste
+variabili non vengono poi utilizzate effettivamente dal programma ma risultano
+essere variabili libere e che per tanto potrebbero essere eliminate dal
+programma.\\
+
+Teoricamente, la fase di ottimizzazione di svolta da un compilatore dovrebbe
+essere in grado di compiere un'operazione di rimozione di queste variabili. Cosa
+che consentirebbe di ottenere codice di pattern matching con la stessa
+efficienza che caratterizza gli altri costrutti offerti dal linguaggio.
+
+Sfortunatamente i compilatori per il linguaggio Common Lisp, come anche la gran
+parte dei compilatori per linguaggi analoghi, non sono tipicamente in grado di
+compiere questo tipo di ottimizzazione.\\
+
+Tuttavia, grazie alla presenza del costrutto macro non è però richiesto che sia
+il compilatore stesso a compiere questo passo di ottimizzazione. Un programma
+Common Lisp stesso è infatti in grado, a partire dal meccanismo rappresentato
+dalle macro, di operare una riscrittura del proprio codice sorgente e quindi,
+potenzialmente, anche di operare una riscrittura in cui si compie
+un'eliminazione delle variabili precedentemente descritte.\\
+
+Questo, fino a prima della costruzione della libreria CLAST risultava
+impossibile, non era infatti disponibile alcun componente che consentisse
+l'analisi di codice sorgente scritto in Common Lisp, e risultava quindi
+impossibile costruire uno strumento che consentisse l'identificazione di
+particolari elementi all'interno di questo, come ad esempio le variabili
+precedentemente citate.
+
+La libreria CLAST, che come mostrato nel corso della precedente sezione di
+questo capitolo consente di compiere free variables analysis nel contesto del
+linguaggio Common Lisp, e consente quindi la costruzione di una soluzione al
+problema appena discusso. Attraverso l'utilizzo della libreria risulta infatti
+possibile compiere una ricerca che consenta di identificare le variabili libere
+all'interno del codice generato da un'applicazione dell'algoritmo. I risultati
+potranno quindi essere utilizzati per compiere una trasformazione \textit
+{source-to-source} attraverso la quale queste variabili vengono eliminate,
+consentendo quindi la generazione di codice maggiormente efficiente e rendendo
+possibile l'introduzione di un meccanismo di pattern matching nel contesto del
+linguaggio per estensione di questo.\\
+
+AGGIUNGI UN IMMAGINE IN CUI MOSTRI: CODICE COMMON LISP -> RISCRITTURA ALGORITMO
+AUGUSTSSON -> RIMOZIONE VARIABILI CLAST -> CODICE COMMON LISP
+
+È inoltre importante sottolineare che la definizione di un supporto al pattern
+matching attraverso il procedimento appena descritto risulta del tutto portabile
+rispetto alle diverse implementazioni del linguaggio. Aspetto che non si
+otterrebe agendo a livello dell'ottimizzazione operata dal compilatore e che
+risulta particolarmente significativo nel contesto della frammentata comunità
+Common Lisp.
