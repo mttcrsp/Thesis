@@ -284,7 +284,12 @@ come ad esempio il linguaggio Haskell ed il linguaggio LML.
 (some code)
 \end{lstlisting}
 
-\printbibliography[nottype=misc,title={Bibliografia}]
+\defbibfilter{papers}{
+  type=article or
+  type=inproceedings
+}
+\printbibliography[filter=papers,title={Articoli Citati}]
+\printbibliography[type=book,title={Bibliografia}]
 \printbibliography[type=misc,title={Sitografia}]
 
 \end{document}
