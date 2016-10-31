@@ -132,8 +132,9 @@ consentano di influenzare il processo di valutazione in maniera tale da ottenere
 un comportamento lazy.
 
 Esempi di linguaggi di programmazione che adottano un modello lazy come default
-sono rappresentati dal linguaggio Haskell, dal linguaggio Miranda e dalla
-variante del linguaggio ML chiamata LML.
+sono rappresentati dal linguaggio Haskell \cite{DBLP:conf/hopl/HudakHJW07}, dal
+linguaggio Miranda \cite{DBLP:journals/eatcs/Turner87} e dalla variante del
+linguaggio ML chiamata LML \cite{DBLP:conf/lfp/Augustsson84}.
 
 Altri linguaggi invece utilizzano un modello di valutazione strict come default
 ma consentono all'utente di specificare che un particolare frammento di codice
@@ -382,7 +383,7 @@ Questo porta ad un problema analogo a quanto presentato dal Listato
 consente l’utilizzo di un modello di valutazione lazy nasconde la semantica vera
 e propria del programma e introduce un pesante overhead all'attività di
 sviluppo, come viene mostrato dall'esempio riportato nel Listato
-\ref{lst:messy-lazy- call}.
+\ref{lst:messy-lazy-call}.
 
 \begin{lstlisting}[
   caption=Confronto tra definizione di funzione con chiamate strict e con chiamate lazy,
