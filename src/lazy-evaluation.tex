@@ -391,10 +391,10 @@ sviluppo, come viene mostrato dall'esempio riportato nel Listato
 ]
 
 (defun mean-confidence-interval (data confidence)
-  (let* ((initial-array  (fill-array data 1))
-   (count          (length a))
-   (mean           (mean a))
-   (standard-error (standard-error initial-array))
+  (let* ((array  (fill-array data 1))
+   (count          (length data))
+   (mean           (mean data))
+   (standard-error (standard-error array))
    (percent-point  (percent-point (/ (1+ confidence) 2.0)
           (- count 1)))
    (h              (* standard-error percent-point)))
