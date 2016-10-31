@@ -90,55 +90,60 @@ PROGETTO DI TESI
 
 \chapter{Teoria}
 
-Lo scopo di questo capitolo è quello di introdurre il lettore all'ambito di
-ricerca all'interno del quale questa tesi si colloca, e quindi in particolare
-all'ambito della Source Code Analysis, e ai concetti fondamentali a partire dai
+Lo scopo di questo capitolo è quello di introdurre il lettore all’ambito di
+ricerca all’interno del quale questa tesi si colloca, e quindi in particolare
+all’ambito della source code analysis, e ai concetti fondamentali a partire dai
 quali si articola il progetto soggetto del lavoro di tesi.\\
 
-La Source Code Analysis studia il processo di estrazione di un informazioni
-riguardo un programma a partire dal codice sorgente di questo, un'attibità di
-particolare importanza all'interno del più ampio campo dell'ingegneria del
-software.
+La \texttt{Source Code Analysis} studia il processo di estrazione di un
+informazioni riguardo un programma a partire dal codice sorgente di questo,
+un’attività di particolare importanza all'interno del più ampio campo
+dell'ingegneria del software.
 
 In particolare, la libreria CLAST, soggetto di questa tesi, si pone come
-obiettivo quello di abilitare la creazione di strumenti per la Source Code
-Analysis nel contesto rappresentato dal linguaggio di programmazione Common
+obiettivo quello di abilitare la creazione di strumenti per la source code
+analysis nel contesto rappresentato dal linguaggio di programmazione Common
 Lisp.
 
 All'interno della Sezione \ref{source-code-analysis}, vengono quindi presentate
-l'architettura tipica di uno strumento di Source Code Analysis e le principali
+l'architettura tipica di uno strumento di source code analysis e le principali
 strategie per la creazione di strumenti di questo tipo, indicando e discutendo
 come la libreria CLAST si inserisca all'interno di questa architettura e come
 possa semplificare la progettazione e costruzione di nuovi strumenti.\\
 
-Le sezioni successive, come precedentemente indicato, affrontano invece i più
-importanti fondamenti a partire dai quali la libreria CLAST opera e che
+Le sezioni successive, come precedentemente indicato, affrontano invece i
+concetti fondamentali a partire dai quali la libreria CLAST opera e che
 risultano particolarmente significativi per la comprensione della progettazione
-e realizzazione della libreria, aspetti che verranno approfonditi nel Capitolo
-\ref{library}.
+e realizzazione della libreria, aspetti che verranno approfonditi nel corso del
+Capitolo \ref{library}.
 
-Tra questi concetti vengono quindi presenti quello di abstract syntax tree e
-quelli di macro e ambiente Common Lisp.\\
+Tra questi concetti vengono quindi presenti quello di
+\textit{abstract syntax tree} e quelli di \textit{macro} e \textit{ambiente}
+Common Lisp.\\
 
-La Sezione \ref{abstract-syntax-tree} illustra il concetto di abstract syntax
-tree in quanto rappresenta la struttura dati fondamentale a partire dalla quale
-la libreria svolge il proprio lavoro di modellazione di un programma Common
-Lisp. Essendo in oltre gli abstract syntax tree l'output dell'azione della
+La Sezione \ref{abstract-syntax-tree} illustra quindi il concetto di abstract
+syntax tree, in quanto rappresenta la struttura dati fondamentale a partire
+dalla quale la libreria svolge il proprio lavoro di modellazione di un programma
+Common Lisp. Essendo inoltre gli abstract syntax tree l'output dell'azione della
 libreria, vengono presentate le principali applicazioni di strutture dati di
 questo tipo, sia nella letteratura e nel mondo della ricerca sia nel mondo
-dell'industria. Questo allo scopo di presentare al lettore i potenziali
-strumenti che possono essere costruiti a partire dalla libreria.
+dell'industria. Questo allo scopo di presentare al lettore le possibilità che la
+presenza di una libreria come CLAST introduce dal punto di vista della
+possibilità di creare nuovi strumenti per la source code analysis.
 
-La Sezione \ref{macro} presenta quindi il concetto di macro Common Lisp in
-quanto questo rappresenta l'aspetto più interessante e peculiare del linguaggio
-di programmazione target dell'analisi svolta dalla libreria e soprattutto in
-quanto particolarmente significativo dal punto di vista di un'analisi che opera
-a livello di codice sorgente come quella operata da CLAST.
+La Sezione \ref{macro} presenta il concetto di macro Common Lisp. Le macro x
+rappresentano infatti l'aspetto più caratteristico del linguaggio di
+programmazione Common Lisp, ossia il target dell'analisi svolta dalla libreria.
+Risultano inoltre un aspetto del linguaggio particolarmente significativo dal
+punto di vista dell'analisi a livello di codice sorgente operata dalla libreria
+e il principale strumento a partire dal quale lavorano le applicazioni della
+libreria che verranno presentate nel Capitolo \ref{applications}.
 
 Infine, la Sezione \ref{environments} introduce il concetto di ambiente Common
 Lisp, strumento che, sia dal punto di vista della progettazione che dal punto di
 vista implementativo, rappresenta la principale dipendenza della libreria CLAST,
-in quanto fondamento a partire dal quale questa è in grado di agire.
+in quanto fondamento a partire dal quale questa è in grado di agire, operando
+un'analisi del codice fornitole in input.
 
 \include{src/source-code-analysis}
 \include{src/abstract-syntax-tree}
@@ -181,10 +186,10 @@ elementi di questo all'interno di una struttura ad albero, e di svolgere
 parallelamente un'attività di analisi del funzionamento di questo, mirata ad
 arricchire con maggiori informazioni i nodi che compongono la struttura ad
 albero producendo quindi la rappresentazione più ricca possibile del programma
-in input. Nel corso della Sezione vengono quindi presentate le principali
+in input. Nel corso della sezione vengono quindi presentate le principali
 componenti del modulo e l'interazione tra queste attraverso un esempio.\\
 
-L'ultima Sezione di questo Capitolo presenta invece il modulo di traversal
+L'ultima sezione di questo capitolo presenta invece il modulo di traversal
 offerto dalla libreria, il quale raccoglie le diverse funzionalità costruite a
 partire a partire dalla rappresentazione prodotta in output dal modulo di
 parsing ed analisi. La responsabilità del modulo è quindi quella di consentire
@@ -249,7 +254,7 @@ programma.
 
 Oltre a consentire l'identificazione in maniera semplice dell'utilizzo di
 variabili libere all'interno di un programma, la libreria CLAST consente
-l'identificazione dell'utilizzo di un qualsiasi costrutto. La Sezione prosegue
+l'identificazione dell'utilizzo di un qualsiasi costrutto. La sezione prosegue
 quindi discutendo come questa funzionalità possa essere utilizza allo scopo di
 costruire strumenti per il linting di codice Common Lisp, una particolare
 categoria di strumenti di supporto alla programmazione basato sull'analisi
