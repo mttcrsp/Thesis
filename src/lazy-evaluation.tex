@@ -7,35 +7,46 @@ PRESENTA CONTENUTO DELLE SOTTOSEZIONI
 
 \subsection{Lazy Evaluation}
 
-MOSTRA L'ESEMPIO DAL SITO DI CLAZY IL FATTO CHE I PARAMETRI FORNITI IN INPUT AD UNA CHIAMATA A FUNZIONE VENGONO VALUTATI IMMEDIATAMENTE, NONOSTANTE QUESTO NON SIA REALMENTE NECESSARIO.
+Ciascun linguaggio di programmazione, funzionale o meno, può essere classificato o come linguaggio strict o come linguaggio lazy, in base alla modalità di valutazione che adotta.
 
-LA DISPONIBILITÀ DI UN'INFRASTRUTTURA PER L'ISPEZIONE DI CODICE SORGENTE RENDE POSSIBILE LA DEFINIZIONE DI UNA SOLUZIONE CHE CONSENTE L'AGGIUNTA DI UN SUPPORTO ALLA VALUTAZIONE LAZY AL LINGUAGGIO COMMON LISP.
+La fase di passaggio dei parametri ad una funzione rappresenta il momento in cui le differenze tra questi due modelli di valutazione risultano più evidenti:
 
-==============
 
-La grande maggioranza dei linguaggi di programmazione funzionali può essere classificata come strict o come lazy, in base alla modalità di valutazione adottata. La differenza tra queste due modalità di valutazione risulta più evidente nel contesto della vlutazione dei parametri forniti in input ad una funzione.
+\begin{itemize}
 
-ESEMPIO CLAZY
+\item in un linguaggio che adotta un modello di valutazione strict, i parametri di una funzione vengono valutati subito prima dell'esecuzione del corpo di questa e tipicamente già in fase di invocazione.
 
-In un linguaggio che adotta un modello di valutazione strict, i parametri di una funzione vengono valutati subito prima dell'esecuzione del corpo di una funzione e tipicamente già in fase di invocazione. In un linguaggio che adotta un modello di valutazione lazy, i parametri vengono valutati on-demand; vengono inzialiamente passati come espressioni non valutate e vengono valutati solametne nel quando la computazione necessità del risultato della loro valutazione per poter proseguire. Se la computazione non dovesse mai avere necessità del valore effettivo prodotto dalla valutazione di un'espressione, nel contesto di un linguaggio che adotta un modello di valutazione lazy, questa espressione non verrebbe mai effettivamente valutata. Tipicamente inoltre, una volta che un dato parametro è stato valutato, il valore prodotto dalla valutazione viene memorizzato. Questo in maniera tale che, nel caso in cui il programma richieda nuovamente la sua valutazione, il sistema possa limitarsi a restituire il valore precedetemente computato piuttosto che operare la stessa computazione nuovamente. Un processo tipicamente noto con il nome di memoizzazione. \cite{mic68}
+\item In un linguaggio che adotta un modello di valutazione lazy, i parametri vengono invece valutati \textit{on-demand}.
 
-I vantaggi introdotti dalla presenza di un supporto di questo tipo sono però diversi e documentati \cite{SICP}.\\
+\end{itemize}
 
-In seguito, vengono presentati alcuni esempi di vantaggi introdotti dalla disponbiilità di un supporto alla lazy evalutation all'interno di un linguaggio di programmazione.
+In un modello di valutazione lazy, i parametri vengono quindi inizialiamente passati al corpo della funzione come espressioni non valutate e vengono valutati solamente nel momento in cui la computazione necessita realmente del risultato della loro valutazione per poter proseguire. Questo significa anche, se la computazione non dovesse mai avere necessità del valore prodotto dalla valutazione di una data un'espressione, questa espressione non verrebbe mai effettivamente valutata.
 
-L'esempio tradizionale di vantaggio introdotto da questo supporto, e che meglio consente di comprendere il funzionamento del modello di valutazione, è rappresentato dalla possibilità di rappresentate sequenze particolarmente lunghe e potenzialmente infinite di valori oppure strutture circolari.
+Linguaggi di programmazione funzionali puri che adottano questo secondo modello di valutazione molto spesso combinano a questo l'utilizzo di tecniche di memoizzazione \cite{mic68}. Nel contesto di un linguaggio di questo tipo, una volta che un dato parametro viene valutato, il valore prodotto dalla valutazione viene memorizzato. Questo in maniera tale che, nel caso in cui il programma richieda nuovamente la sua valutazione, il sistema possa limitarsi a restituire il valore precedetemente memorizzato piuttosto che operare la stessa computazione nuovamente. Si tratta di un'ottimizzazione che in molti casi può portare ad ottimi risultati, ma che non può essere applicata in modo sicuro solamente all'interno di un linguaggio puro.
 
-ESPANDI LA SPIEGAZIONE DEL VANTAGGIO DI SEQUENZE INFINITE CON UN ESEMPIO
+Per meglio illustrare la differenza tra i modelli di valutazione appena presentati, il Listato \ref{lst:si} mostra un frammento di codice il cui comportamento varia in modo significativo nel passaggio dall'utilizzo di un modello all'altro.
 
-ALTRI VANTAGGI
+\begin{lstlisting}[
+  caption=Codice di esempio,
+  label={lst:si}
+]
 
-Lo svantaggio fondamentale del modello di valutazione lazy è rappresentato dal fatto che, a differenza di quanto avviene nel contesto del modello di valutazione strict, risulta particolarmente complesso ragionare rispetto alla complessità algoritmica di un dato programma. Nei linguaggi che utilizzano un modello strict, ciascuna sottoespressione viene valutata nel momemnto stesso in cui questa compare a livello sintattico. Questo semplifica in maniera sostanziale il processo di ragionamento rispetto alle risorse di tempo e spazio utilizzate da un programma di questo tipo in un dato istante. Invece, nel contesto di un linguaggio che utilizza un modello di valutazione lazy, anche utenti esperti del linguaggio possono avere difficoltà nel predire quando e se una data sottoespressione verrà effettivamente valutata.
+(defun si (condicio ergo alternatio)
+  (if condition
+      ergo
+      alternatio))
 
-Come i precedenti paragrafi hanno discusso, entrambi i modelli di valutazione hanno i propri vantaggi e svantaggi. Per questa ragione, un linguaggio di programmazione ideale dovrebbe consentire ad un utente un supporto per l'utilizzo di entrambi questi modelli, senza introdurre overhead significativi dal punto di vista sintattico e della complessità di un sistema, consentendo quindi ad un utente di scegliere quale modello adottare in relazione alle necessità del sistema in sviluppo.
+\end{lstlisting}
 
-Esempi di linguaggi di programmazione che adottano un modello di valutazione di tipo strict sono rappresentati dal linguaggio Java e dal linguaggio C, esempi di linguaggi che adottano un modello di valutazione lazy sono rappresentati dal linguaggi Miranda e dal Linguaggio Haskell.
+Se si considera l'invocazione \texttt{(si t 9 (loop))} della funzione riportata come esempio dal Listato \ref{lst:si}, relativamente ad un linguaggio che adotta un modello di valutazione strict, si osserva che l'invocazione produce un loop infinito. Prima dell'esecuzione della funzione infatti, il linguaggio opera una valutazione dei parametri forniti e, in particolare, la valutazione dell'espressione \texttt{(loop)}. La valutazione di questa espressione causa quindi la non terminazione del programma. Se si considera invece la medesima invocazione all'interno di un linguaggio che adotta un modello di valutazione lazy, si osserva invece che l'esecuzione termina, producendo come output il valore \texttt{9}. Questo perchè i parametri forniti in input alla funzione non vengono valutati fino al momento in cui il valore associato a questo risulta realmente necessario all'esecuzione ed, essendo che il terzo parametro non risulta mai effettivamente necessario a questa, non sia avrà mai una valutazione del parametro \texttt{(loop)} né quindi il generarsi di un loop infinito.
 
-Il linguaggi di programmazione tradizionali, come ad esempio il linguaggio C e il linguaggio Java, adottano questo secondo modello di valutazione, così come anche il linguaggio Common Lisp, e non prevedono, a livello di linguaggio stesso, un supporto alla definizione di meccanismi che consentano di influenzare il processo di valutazione in maniera tale da ottenere un comportamento lazy. Altri linguaggi ancora utilizzano un modello di valutazione strict come default ma consentono all'utente, attraverso l'utilizzo di una sintassi speciale, di specificare che un particolare frammento di codice debba essere eseguito utilizzando secondo il modello lazy. Esempi di linguaggi appartenenti a quest'ultima categoria sono il linguaggio Scheme, con i tradizionali costrutti \texttt{delay} e \texttt{force} e OCaml, con \texttt{lazy} e \texttt{Lazy.force}.
+Il vantaggio fondamentale introdotto dalla disponbilità di un supporto alla lazy evaluation è principalmente legato a questa ottimizzazione. A sua volta, la presenza di questa ottimizzazione introduce però nuove possibilità, come ad esempio la possiblità di rappresentazione strutture dati infinite o circolari e operazioni su sequenze di valori particolarmente lunghe in maniera significativamente più efficiente rispetto a quanto si otterrebbe con un linguaggio che adotta un modello di valutazione strict.
+
+Lo svantaggio fondamentale del modello di valutazione lazy è rappresentato dal fatto che, a differenza di quanto avviene nel contesto del modello di valutazione strict, risulta particolarmente complesso ragionare rispetto alle performance di un dato programma. Nei linguaggi che utilizzano un modello strict, ciascuna sottoespressione viene valutata nel momento stesso in cui questa compare a livello sintattico. Questo semplifica in maniera sostanziale il processo di ragionamento rispetto alle risorse di tempo e spazio utilizzate da un programma di questo tipo in un dato istante. Nel contesto di un linguaggio che utilizza un modello di valutazione lazy, anche utenti esperti del linguaggio possono avere difficoltà nel predire quando e se una data sottoespressione verrà effettivamente valutata.
+
+Entrambi i modelli di valutazione hanno quindi i propri vantaggi e svantaggi. Per questa ragione, un linguaggio di programmazione ideale dovrebbe consentire ad un utente un supporto per l'utilizzo di entrambi questi modelli, senza introdurre overhead significativi dal punto di vista sintattico e della complessità di un sistema, consentendo quindi ad un utente di scegliere quale modello adottare in relazione alle necessità del sistema in sviluppo.
+
+Il linguaggi di programmazione tradizionali, come ad esempio il linguaggio C e il linguaggio Java, adottano un modello di valutazione lazy, e non prevedono, a livello di linguaggio stesso, un supporto alla definizione di meccanismi che consentano di influenzare il processo di valutazione in maniera tale da ottenere un comportamento lazy. Altri linguaggi utilizzano un modello di valutazione strict come default ma consentono all'utente di specificare che un particolare frammento di codice debba essere eseguito utilizzando secondo il modello lazy attraverso l'utilizzo di una sintassi speciale. Esempi di linguaggi appartenenti a quest'ultima categoria sono il linguaggio Scheme, con i costrutti \texttt{delay} e \texttt{force} e OCaml, con \texttt{lazy} e \texttt{Lazy.force}.
 
 Il linguaggio di programmazione Common Lisp fa parte della categoria dei linguaggi che adottano un modello di valutazione strict e non fornisce alcun costrutto che consenta l'utilizzo del modello lazy.
 
@@ -43,9 +54,9 @@ Il linguaggio di programmazione Common Lisp fa parte della categoria dei linguag
 
 Esistono diverse strategie che possono essere impiegate allo scopo di introdurre un supporto all'utilizzo di un modello di valutazione lazy nel contesto di un linguaggio di programmazione.
 
-Tra queste diverse strategie, la più nota e più adatta al contesto del linguaggio Common Lisp è quella illustrata da Abelson et al. in \cite{sicp} e parallelamente da Okasaki in \cite{okasaki} basata sul concetto di stream e sulle primitive \texttt{delay} e \texttt{force}.
+Tra queste diverse strategie, la più nota e più adatta al contesto del linguaggio Common Lisp è quella illustrata da Abelson et al. in \cite{Abelson1996} e parallelamente da Okasaki in \cite{Okasaki96}, basata sul concetto di stream e sulle primitive \texttt{delay} e \texttt{force}.
 
-La primitiva \texttt{delay} genera a partire da una data espressione una funzione che può essere invocata ottenendo come risultato il valore associato all'espressione. Lel contesto dei linguaggi funzionali, la funzione prodotta dalla primitiva \texttt{delay} viene spesso chiamata thunk. Il Listato \ref{lst:delay} mostra un'implementazione della primitiva \texttt{delay} in Common Lisp.
+La primitiva \texttt{delay} genera a partire da una data espressione una funzione che può essere invocata ottenendo come risultato il valore associato all'espressione. Nel contesto dei linguaggi funzionali, la funzione prodotta dalla primitiva \texttt{delay} viene spesso chiamata \textit{thunk}. Il Listato \ref{lst:delay} mostra un'implementazione della primitiva \texttt{delay} in Common Lisp.
 
 \begin{lstlisting}[
   caption=Implementazione della primitiva delay in Common Lisp,
@@ -67,7 +78,7 @@ La primitiva \texttt{force} consente, dato il risultato di una funzione prodotta
 
 \end{lstlisting}
 
-Il limite di un sistema all'interno del quale un modello di valutazione lazy viene implementato solamente a partire da queste due primitive è rappresentato dal fatto che questo la definizione di una qualsiasi funzione prevederà un utilizzo particolarmente intenso di questi due costrutti. Ad esempio, l'operatore discusso nel contesto della sezione precedente e presento dal Listato \ref{lst:} potrebbe essere implementato a partire combinando il meccanismo delle macro Common Lisp alle due primitive come mostrato dal Listato \ref{lst:si-delay-force}.
+Il limite di un sistema all'interno del quale un modello di valutazione lazy viene implementato solamente a partire da queste due primitive è rappresentato dal fatto che questo la definizione di una qualsiasi funzione prevederà un utilizzo particolarmente intenso di questi due costrutti. Ad esempio, l'operatore discusso dalla precedente Sottosezione e presentato dal Listato \ref{lst:si} potrebbe essere implementato combinando il meccanismo delle macro Common Lisp alle due primitive come mostrato dal Listato \ref{lst:si-delay-force}.
 
 \begin{lstlisting}[
   caption=Implementazione della primitiva force in Common Lisp,
@@ -81,25 +92,25 @@ Il limite di un sistema all'interno del quale un modello di valutazione lazy vie
 
 \end{lstlisting}
 
-Si può osservare che, nonostante la semplicità dell'esempio, l'implementazione dell'operatore risulta quasi nascosta dall'utilizzo delle due primitive. L'implementazione originale dell'operatore era infatti di 67 caratteri, la nuova implementazione ne richiede 115. Oltre a questo aspetto relativo alla leggibilità e manutenibilità del codice di implementazione, un altro aspetto particolarmente significativo è rappresentato dal costante overhead introdotto alla fase di codifica. Infatti, è importante tenere sempre presente durante lo sviluppo che si vuole ritardare l'esecuzione di ciascun elemento all'interno della funzione, un aspetto significativo soprattutto all'aumentare della complessità.
+Si può osservare che, nonostante la semplicità dell'esempio, l'implementazione dell'operatore risulta quasi nascosta dall'utilizzo delle due primitive. Mentre l'implementazione originale dell'operatore utilizzava 67 caratteri, la nuova implementazione ne richiede 115. Oltre a questo aspetto relativo alla leggibilità e manutenibilità del codice, un'altra problematica particolarmente significativa è rappresentato dal costante overhead introdotto alla fase di sviluppo del codice vero e proprio. Per un utente del linguaggio diventa infatti importante tenere sempre presente quando e dove sia necessario ritardare l'esecuzione di ciascun elemento, un aspetto significativo soprattutto all'aumentare della complessità.
 
-Un altro problema relativo a questa implementazione è rappresentato dal fatto che, avendo utilizzato il costrutto macro, il prodotto della definizione non è una funzione. Questo significa che l'operatore \texttt{SI} e qualsiasi operatore definito in maniera analoga non potrà essere utilizzato come una qualsiasi funzione e quindi utilizzato in combinazione a funzioni come \texttt{FUNCALL}, \texttt{MAP} e in generale qualsiasi higher-order function; aspetto che limita in maniera significativa l'utilità di questa definizione. Per risolvere questi due problemi è possibile introdurre un nuovo costrutto.
+Una terza problematica è invece relativa è rappresentata dal fatto che, avendo utilizzato il costrutto macro, il prodotto della definizione non è una funzione. Questo significa che l'operatore \texttt{SI} e qualsiasi operatore definito in maniera analoga non potrà essere utilizzato come una funzione e quindi utilizzato in combinazione a funzioni come \texttt{FUNCALL}, \texttt{MAP} e in generale qualsiasi funzione di ordine superiore; aspetto che limita in maniera significativa l'utilità di questa definizione. Per risolvere questi due problemi è possibile introdurre un nuovo costrutto.
 
 \subsubsection{DEFLAZY}
 
-Data una la definizione di una qualsiasi funzione è sempre possibile produrre una versione di questa del tutto equivalente che utilizza però un modello di valutazione lazy attraverso l'utilizzo di una macro. Una macro di questo tipo dovrebbe:
+Data la definizione di una qualsiasi funzione è sempre possibile produrre una versione di questa del tutto equivalente ma che utilizza un modello di valutazione lazy attraverso l'utilizzo di una macro. Una macro di questo tipo dovrebbe:
 
 \begin{enumerate}
 
-\item utilizzare la definizione di funzione fornita per definire una prima versione strict della funzione all'interno dell'ambiente;
+\item utilizzare la definizione di funzione fornita dall'utente per definire la normale versione strict della funzione all'interno dell'ambiente;
 
 \item generare un thunk per ciascuna parametro della funzione;
 
-\item generare una versione della funzione fornita che lavora secondo il modello lazy a partire dai thunk prodotti per i parametri della definizione originale e dal corpo della versione originale della funzione.
+\item generare una versione della funzione fornita che lavora secondo il modello lazy a partire dai thunk prodotti per ciascun parametro e dal corpo della versione originale della funzione.
 
 \end{enumerate}
 
-Un'implementazione della macro appena descritta viene fornita dalla libreria CLAZY \cite{} e viene riportata nel listato \ref{lst:deflazy}.
+Un'implementazione della macro appena descritta viene fornita dalla libreria CLAZY \cite{Antoniotti14} e viene riportata nel listato \ref{lst:deflazy}.
 
 \begin{lstlisting}[
   caption=Definizione della macro \texttt{DEFLAZY},
@@ -131,9 +142,11 @@ Questo primo costrutto risulta essere una soluzione ai problemi descritti in pre
 
 \begin{itemize}
 
-\item Consente di mantenere uno stile di definizione del tutto analogo a quello che si utilizzerebbe per la definizione di una funzione secondo il modello di valutazione strict, ottenendo però allo stesso tempo anche definizione della funzione sia una definizione che adotta il modello lazy.
+\item Consente di mantenere uno stile di definizione del tutto analogo a quello che si utilizzerebbe per la definizione di una funzione secondo il modello di valutazione strict.
 
-\item Produce funzioni vere e proprie e che pertanto possono essere utilizzate come parametri in qualsiasi ambito del linguaggio come una qualsiasi altra funzione.
+\item Produce funzioni vere e proprie e che pertanto possono essere utilizzate come parametri in qualsiasi ambito del linguaggio lo richieda.
+
+\item Contente di ottenere due definizione della funzione, una per ciascun modello di valutazione.
 
 \end{itemize}
 
@@ -147,11 +160,13 @@ Questo primo costrutto risulta essere una soluzione ai problemi descritti in pre
 
 \end{lstlisting}
 
-La disponbilità di entrambe queste versioni consente inoltre ad un utente di poter scegliere il modello di esecuzione più adatto a secondo dallo specifico contesto in analisi. Per gestire questo aspetto la libreria CLAZY utilizza la seguente soluzione.
+La disponbilità di entrambe le versioni di una stessa funzione consente ad un utente di poter scegliere il modello di esecuzione più adatto a seconda dallo specifico contesto in analisi.
 
-La scelta operata dalla libreria CLAZY è quindi quella utilizzare lo stesso nome, specificato in fase di definizione tramite \textt{DEFLAZY}, per identificare la versione strict della funzione. Questo consente infatti di mantenere un comportamento di default della una chiamata a funzione in linea con il resto del linguaggio di programmazione.
+La libreria affronta quindi il problema delle definizione di una funzione lazy a partire dalla soluzione appena presentata. Dal punto di vista dell'invocazione di una funzione, la scelta operata dalla libreria CLAZY è invece la seguente.
 
-Per quanto riguarda invece la versione lazy della funzione, come il listato mostra non viene invece definita all'interno dell'ambiente utente ma viene definita all'interno dell'ambiente specifico della libreria. La libreria prevede quindi che un'utente utilizzi un operatore particolare in fase di chiamata per indicare la volontà di utilizzare la versione lazy della funzione.
+Il nome specificato dall'utente in fase di definizione tramite \textt{DEFLAZY}, viene utilizzato dalla libreria per identificare la versione strict della funzione. Questo consente infatti di mantenere un comportamento di default di una chiamata a funzione del tutto analogo a quello che si avrebbe operando una normale definizione della funzione, rimanendo quindi in linea con il resto del linguaggio di programmazione.
+
+Per quanto riguarda invece la versione lazy della funzione, come mostrato dal Listato \ref{lst:deflazy}, questa non viene invece definita all'interno dell'ambiente utente ma piuttosto all'interno di un ambiente specifico alla libreria. La libreria prevede quindi che un'utente utilizzi un operatore particolare in fase di chiamata per indicare la volontà di utilizzare la versione lazy della funzione. In risposta all'utilizzo di questo operatore, la libreria estrae la versione lazy della funzione definita all'interno del proprio ambiente ed riflette la chiamata operata dall'utente su di questa.
 
 Queste due politiche di chiamata vengono presentate dal Listato \ref{lst:strict-lazy-calls}.
 
@@ -172,15 +187,15 @@ Queste due politiche di chiamata vengono presentate dal Listato \ref{lst:strict-
 
 La soluzione realizzata dalla libreria CLAZY risulta particolarmente appropriata al contesto del linguaggio Common Lisp ma risulta ancora soggetta ad un problema.
 
-Tipicamente, nel caso in cui si voglia adottare un modello di valutazione di tipo lazy, si vuole che questo venga utilizzato all'interno di un intero modulo di un sistema e non semplicemente nel contesto di un numero ristretto di chiamate a funzione.
+Tipicamente, nel caso in cui si voglia adottare un modello di valutazione di tipo lazy, si vuole che questo venga utilizzato all'interno di un intero modulo e non semplicemente nel contesto di un numero ristretto di chiamate a funzione.
 
-Infatti, combinare utilizzo di entrambi i modelli nel contesto della stessa porzione di un sistema può portare a risultati inattesi, sia in termini di performance che in termini correttezza. Questo specialmente nel contesto di un linguaggio funzionale non puro, come il Common Lisp, in cui è possibile che una funzione produca degli effetti collaterali.
+Infatti, combinare utilizzo di entrambi i modelli nel contesto della stessa porzione di un sistema può portare a risultati inattesi, sia in termini di performance che in termini correttezza. Questo specialmente nel contesto di un linguaggio funzionale non puro, come il Common Lisp, in cui è possibile che una funzione produca cambiamenti di stato di un sistema complessivo.
 
 Tipicamente quello che si desidera è quindi avere determinate parti all'interno di un sistema in cui il modello di valutazione adottato è un modello lazy, e altre parti in cui si adotta un modello di valutazione strict.
 
-Quello che si ottiene a partire dalla soluzione nel corso della precedente sezione in un contesto come quello appena descritto, in cui si hanno moduli interi di un sistema che utilizzano un modello di valutazione lazy è che il codice di questo riporterà, per ogni chiamata a funzione un'utilizzo del costrutto \texttt{LAZY:CALL}.
+In un contesto come quello appena descritto, quello che si ottiene utilizzando al soluzione descritta nel corso della precedente sezione, è che in alcuni moduli del sistema, quelli che adottano il modello di valutazione lazy, ogni chiamata a funzione sarà mediata dall'utilizzo del costrutto \texttt{LAZY:CALL}, attraverso il quale l'utente specifica ogni volta la volontà di applicare la definizione lazy di una data funzione.
 
-Questo porta ad un problema analogo a quanto presentato dal Listato \ref{lst:si-delay-force}, in cui si aveva una situazione in cui il codice che consente di utilizzare il modello di valutazione asincrono nasconde la semantica vera e propria del programma e introduce un pesante overhead all'attività di sviluppo, come viene mostrato dall'esempio riportato dal listato \ref{lst:messy-lazy:call}.
+Questo porta ad un problema analogo a quanto presentato dal Listato \ref{lst:si-delay-force}, in cui si aveva una situazione in cui il codice che consente di utilizzare il modello di valutazione asincrono nasconde la semantica vera e propria del programma e introduce un pesante overhead all'attività di sviluppo, come viene mostrato dall'esempio riportato nel Listato \ref{lst:messy-lazy:call}.
 
 \begin{lstlisting}[
   caption=Confronto tra definizione di funzione con chiamate strict e con chiamate lazy,
@@ -231,12 +246,10 @@ I passi previsti da questo processo di riscrittura automatico sarebbero i seguen
 
 \end{enumerate}
 
-Come riportato risulta necessario identificare l'elenco di tutte le chiamate a funzione all'interno di un frammento di codice, aspetto per il quale in precedenza non era disponibile alcuno strumento.
+Come riportato, risulta necessario identificare l'elenco di tutte le chiamate a funzione all'interno di un frammento di codice, aspetto per il quale in precedenza non era disponibile alcuno strumento.
 
 Come presentato nei capitoli precedenti, la libreria CLAST è in grado di compiere questa operazione di ricerca in modo particolarmente semplice ed efficiente. La libreria consente quindi la definizione del processo di riscrittura appena descritto attraverso la definizione di una macro, risolvendo il problema discusso nel corso di questa Sottosezione.
 
-Questo consente quindi ad un utente del linguaggio di programmazione Common Lisp la possibilità di adottare un modello di valutazione lazy per un certa porzione di codice in maniera particolarmente semplice e nativa rispetto al linguaggio di programmazione, come mostrato nel Listato \ref{lst:lazily}.
+Questo consente quindi ad un utente del linguaggio di programmazione Common Lisp la possibilità di adottare un modello di valutazione lazy per un certa porzione di codice, in maniera particolarmente semplice e nativa rispetto al linguaggio di programmazione, come mostrato nel Listato \ref{lst:lazily}.
 
 In questa sezione si è quindi mostrato come la libreria CLAST possa essere utilizzata come strumento per definire un estensione nativa del linguaggio Common Lisp, estensione che consenta ad un utente di scegliere e utilizzare in maniera semplice e naturale rispetto al linguaggio stesso i modelli di valutazione strict e eager per la definzione del proprio sistema.
-
-% TIPICAMENTE QUELLO CHE SI VUOLE FARE È AVERE UNA CERTA PARTE DI PROGRAMMA CHE UTILIZZA UN MODELLO / MISCHIARE I DUE MODELLI PUÒ RISULTARE PERICOLOSO, SOPRATTUTTO NEL CONTESTO DI UNA LINGUAGGIO FUNZIONALE NON PURO COME IL COMMON LISP E IN CUI QUINDI È POTENZIALMENTE POSSIBILE AVERE SIDE EFFECTS / SI AVRANNO QUINDI PARTI DI UN PROGRAMMA IN CUI SI DESIDERA CHE TUTTE LE FUNZIONI DEFINITE COME LAZY VENGANO INVOCATE CON QUESTO MODELLO DI VALUTAZIONE / QUESTO RISULTA PROBLEMATICO DAL PUNTO DI VISTA SINTATTICO IN QUANTO DIVENTA NECESSARIO RIPORTARE AD OGNI PASSO LA CHIAMATA LAZY:CALL / QUESTO INCORRE NEGLI STESSI PROBLEMI DI LEGGIBILITÀ E OVERHEAD ALLA PROGRAMMAZIONE DISCUSSI RELATIVAMENTE ALLA DEFINIZONE DI FUNZIONI UTILIZZANDO IN MANIERA DIRETTA LE PRIMITIVE DELAY E FORCE / QUELLO CHE SI VORREBBE È QUINDI FARE IN MODO CHE IL SISTEMA COMMON LISP, ALL'INTERNO DI UN DATO FRAMMENTO DI CODICE, SIA IN GRADO IN MANIERA AUTOMATICA DI UTILIZZARE LA VERSIONE LAZY DI UNA FUNZIONE, SENZA AVERE LA NECESSITÀ OGNI VOLTA DOVER SPECIFICARE LAZY:CALL / QUESTO VIENE RESO POSSIBILE DALLA LIBRERIA CLAST / È INFATTI POSSIBILE DEFINIRE UNA MACRO IN GRADO DI 1 IDENTIFICARE TUTTE LE CHIAMATE A FUNZIONE ALL'INTERNO DI UN FRAMMENTO DI CODICE 2 IDENTIFICARE QUALI DI QUESTE ABBIANO UNA VERSIONE LAZY ASSOCIATA 3 RISCRIVERE CIASCUNA DI QUESTE CHIAMATA UTILIZZANDO LAZY:CALL / QUESTO CONSENTE ALL'UTENTE DEL LINGUAGGIO COMMON LISP DI POTER UTILIZZARE SIA UN MODELLO DI VALUTAZIONE STRICT CHE UN MODELLO DI VALUTAZIONE LAZY IN MANIERA NATURALE ATTRAVERSO UNA SEMPLICE ESTENSIONE NATIVA DEL LINGUAGGIO STESSO
