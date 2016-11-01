@@ -158,46 +158,53 @@ un'analisi del codice fornitole in input.
 \chapter{Libreria}
 \label{library}
 
-Lo scopo di questo capitolo è presentare al lettore di tesi il funzionamento e
+Lo scopo di questo capitolo è quello dipresentare al lettore il funzionamento e
 l'interfaccia della libreria CLAST, mostrando quindi sia l'architettura interna
-della libreria sia le funzionalità offerte da queste agli utenti.
+della libreria sia le funzionalità offerte da questa ad un utente.
 
 Internamente la libreria è organizzata in moduli, in particolare, all'interno di
-tre diversi moduli chiamati rispettivamente: un modulo di rappresentazione, un
-modulo di parsing e analisi ed un modulo di traversal.\\
+tre diversi moduli chiamati rispettivamente: \textit{modulo di
+rappresentazione}, \textit{modulo di parsing e analisi} e \textit{modulo di
+traversal}.\\
 
 Il modulo di rappresentazione è responsabile per la definizione delle strutture
 necessarie alla modellazione di un programma Common Lisp. Si tratta quindi del
-modulo fondamentale a partire la libreria è in grado di realizzare una
-rappresentazione in forma di AST del programma in input attraverso l'azione del
-modulo di parsing e analisi. La progettazione e la struttura interna del modulo
-vengono illustrate e discusse all'interno della Sezione \ref{representation}.\\
+modulo fondamentale a partire dal quale la libreria è in grado di realizzare una
+rappresentazione in forma di AST del programma in input, a partire anche
+dall'azione del modulo di parsing e analisi. La progettazione e la struttura
+interna di questo modulo vengono illustrate e discusse all'interno della Sezione
+\ref{representation}.\\
 
 All'interno della Sezione \ref{parsing} viene invece presentato il modulo di
 parsing ed analisi. Questo modulo rappresenta il cuore del funzionamento della
 libreria in quanto realizza la funzionalità vera e propria di generazione
 dell'AST di un programma scritto utilizzando il linguaggio Common Lisp a partire
-dalle strutture di rappresentazione offerte dal modulo di rappresentazione prima
-citato.
+dalle strutture di rappresentazione offerte dal modulo di rappresentazione
+sopraccitato.
 
-Lo scopo di questo modulo è quindi quello di svolgere le attività di parsing del
+Lo scopo del modulo è quindi quello di svolgere le attività di parsing del
 codice sorgente del programma in input, in maniera tale da organizzare i diversi
-elementi di questo all'interno di una struttura ad albero, e di svolgere
-parallelamente un'attività di analisi del funzionamento di questo, mirata ad
-arricchire con maggiori informazioni i nodi che compongono la struttura ad
-albero producendo quindi la rappresentazione più ricca possibile del programma
-in input. Nel corso della sezione vengono quindi presentate le principali
-componenti del modulo e l'interazione tra queste attraverso un esempio.\\
+elementi di questo all'interno di un AST, e di svolgere parallelamente
+un'attività di analisi del funzionamento di questo, mirata ad arricchire con
+maggiori informazioni i nodi che compongono la struttura ad albero producendo
+quindi la rappresentazione più ricca possibile del programma in input. Nel corso
+della sezione vengono quindi presentate le principali componenti del modulo e
+l'interazione tra queste attraverso un esempio.\\
 
 L'ultima sezione di questo capitolo presenta invece il modulo di traversal
 offerto dalla libreria, il quale raccoglie le diverse funzionalità costruite a
 partire a partire dalla rappresentazione prodotta in output dal modulo di
-parsing ed analisi. La responsabilità del modulo è quindi quella di consentire
-agli utenti l'ispezione e l'esecuzione di elaborazioni dell'AST, prodotto a
-partire dalle strutture denifinite dal modulo di rappresentazione, di un
-programma Common Lisp. Questo modulo costituisce quindi la principale
+parsing ed analisi. La responsabilità principale del modulo è quella di
+consentire agli utenti l'ispezione e l'esecuzione di elaborazioni dell'AST,
+prodotto a partire dalle strutture denifinite dal modulo di rappresentazione, di
+un programma Common Lisp. Questo modulo costituisce quindi la principale
 interfaccia attraverso la quale un sistema costruito a partire dalla libreria è
 in grado di accedere ai servizi offerti da questa.
+
+\image{img/clast-architecture.png}
+      {Componenti della libreria CLAST}
+      {fig:clast-architecture}
+      {0.5}
 
 \include{src/module-representation}
 \include{src/module-parsing}
