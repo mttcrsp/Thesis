@@ -1,22 +1,22 @@
 \section{Modulo di rappresentazione}
 \label{representation}
 
-In questa Sezione viene approfondita la struttura e il contenuto del modulo di
+In questa sezione viene approfondita la struttura e il contenuto del modulo di
 rappresentazione presente all'interno della libreria CLAST. In particolare,
-questa Sezione discute le scelte compiute e il procedimento utilizzato per la
-definizione delle diverse classi che verranno poi utilizzate dal modulo di
-parsing ed analisi in fase di generazione dell'AST associato al programma
-target dell'azione della libreria.\\
+vengono presentate e discusse le scelte compiute e il procedimento utilizzato
+per la definizione delle diverse classi utilizzate per la rappresentazione di un
+programma Common Lisp. Classi che verranno poi utilizzate dal modulo di parsing
+ed analisi in fase di generazione dell'AST associato al programma target
+dell'azione della libreria.\\
 
-La struttura del modulo di rappresentazione ricalca molto da vicino il
-processo di valutazione del codice sorgente di un programma Common Lisp.
-Questo allo scopo di ottenere delle strutture che consentano di ottenere una
-rappresentazione molto vicina a quella utilizzata internamente da un reale
-sistema Common Lisp, ossia la più ricca possibile. Tutto questo mantenendo
-sempre il riferimento al codice sorgente vero e proprio, in maniera tale da
-ottenere sia informazioni rispetto alla semantica del programma a livello
-macchina, sia informazioni rispetto alla semantica desiderata dall’autore del
-programma.
+La struttura del modulo di rappresentazione ricalca molto da vicino il processo
+di valutazione del codice sorgente di un programma Common Lisp. Questo allo
+scopo di ottenere delle strutture che forniscano una rappresentazione molto
+vicina a quella utilizzata internamente da un reale sistema Common Lisp, ossia
+la più ricca possibile. Tutto questo mantenendo sempre il riferimento al codice
+sorgente vero e proprio, in maniera tale da ottenere sia informazioni rispetto
+alla semantica del programma a livello macchina, sia informazioni rispetto alla
+semantica desiderata dall’autore del programma.
 
 \subsection{Processo di valutazione}
 \label{CL-valutazione}
@@ -25,27 +25,26 @@ Come affermato nel precedente paragrafo, le componenti facenti parte del
 modulo di rappresentazione sono particolarmente legate al processo di
 valutazione utilizzato dal linguaggio. Per questa ragione, allo scopo di
 fornire al lettore una migliore comprensione degli elementi che verranno
-presentati nel dettaglio in seguito, in questa Sottosezione viene presentato
+presentati nel dettaglio in seguito, in questa sottosezione viene presentato
 un breve sunto del processo di valutazione e delle strutture fondamentali di
 un programma scritto utilizzando il linguaggio di programmazione Common
 Lisp.\\
 
-La struttura fondamentale alla base del processo di valutazione di un
-programma Lisp è la form. Una form viene infatti definita formalmente dallo
+La struttura fondamentale alla base del processo di valutazione di un programma
+Lisp è la form. Una \textit{form} viene infatti definita formalmente dallo
 standard ANSI Common Lisp proprio come \textit{“an object meant to be
-evaluated”}. Dal punto di vista pratico una form può essere costituita sia da
-un atomo che da una lista. Tuttavia, vengono definite delle particolari
-tipologie di form, a seconda delle modalità con le quali procede la
-valutazione operata da un sistema Common Lisp nel momento in cui queste
-vengono incontrate.
+evaluated”}. Dal punto di vista pratico una form può essere costituita sia da un
+atomo che da una lista. A partire da questo elemento particolarmente generico
+vengono poi definite delle particolari tipologie di form, a seconda delle
+modalità con le quali procede la valutazione operata da un sistema Common Lisp
+nel momento in cui queste vengono incontrate.
 
 \subsubsection{Form atomiche: self-evaluating objects}
 
 Il caso in cui una form è costituita da un atomo rappresenta il caso più
 semplice del processo di valutazione. Una volta identificato un atomo infatti,
-il sistema di valutazione deve semplicemente verificare se questo rappresenta
-un oggetto auto-valutante, \enquote{\textit{self-evaluating object}}, oppure un
-simbolo.
+il sistema di valutazione deve semplicemente verificare se questo rappresenti un
+oggetto auto-valutante, \textit{self-evaluating object}, oppure un simbolo.
 
 Nel caso di un self-evaluating object, il sistema Lisp si limita a produrre
 come risultato l’oggetto stesso, come il nome stesso di questa struttura
@@ -70,29 +69,26 @@ CL-USER > "fred smith"
 \subsubsection{Form atomiche: simboli}
 
 Nel caso in cui un atomo non sia un self-evaluating object, il sistema Lisp lo
-identifica come automaticamente come simbolo. A sua volta, un simbolo può
+identifica automaticamente come simbolo. A sua volta, un simbolo può
 rappresentare o una symbol macro, una form utilizzata in sostituzione di
 un’altra form, o una variabile.
 
-La prima operazione compiuta da un sistema Lisp aderente allo standard in
+La prima operazione compiuta da un sistema Common Lisp aderente allo standard in
 questo caso è una verifica della presenza o meno di un binding relativo ad una
 macro all’interno dell'ambiente lessicale attivo al momento della valutazione.
 Se viene effettivamente identificato un binding che utilizza il simbolo come
-nome, viene applicata la funzione associata dalla definizione di macro al fine
-di produrre una form che verrà valutata al posto del simbolo stesso, come
-descritto durante la discussione del processo di macro-espansione illustrato
-nella Sottosezione \ref{macroexpansion}.
+nome, viene applicata la funzione associata dalla definizione di macro. Questo
+al fine di produrre una form che verrà valutata al posto del simbolo stesso,
+come descritto durante la discussione del processo di macro-espansione
+illustrato nella Sottosezione \ref{macroexpansion}.
 
-Se non dovesse essere presente una definizione di macro all’interno
-dell’ambiente, il sistema Lisp assume che il simbolo rappresenti una
-variabile. Il valore della variabile associata al simbolo viene quindi
-ricercato e utilizzato per ritornato come output del processo di
-valutazione.\\
+Nel caso in cui non sia presente una definizione di macro all’interno
+dell’ambiente, il sistema Lisp assume che il simbolo rappresenti una variabile.
+Il valore della variabile associata al simbolo viene quindi ricercato e prodotto
+come output del processo di valutazione.\\
 
-\begin{lstlisting}[caption=Esempi di form di tipo symbol]
+\begin{lstlisting}[caption=Esempio di form di tipo symbol]
 
-CL-USER > *MACROEXPAND-HOOK*
-FUNCALL
 CL-USER > *STANDARD-INPUT*
 #<SWANK/GRAY::SLIME-INPUT-STREAM {1004F2D653}>
 
@@ -107,31 +103,29 @@ aderente allo standard si limita a segnalare un errore di tipo \texttt
 
 Sia il modulo di rappresentazione che il modulo di parsing, seguono questa
 stessa convenzione, il che porta ad ottenere una rappresentazione corretta del
-comportamento di un programma che, a runtime, manifesterà però un
-comportamento scorretto e un fallimento. Questo significa però che il
-risultato prodotto dal lavoro del modulo di parsing e analisi sarà una
-rappresentazione che presenterà sufficienti informazioni da consentire
-l’individuazione e la segnalazione del un comportamento potenzialmente
-scorretto; esattamente ciò che risulta più interessante per gli strumenti di
-source code analysis per i quali CLAST si pone come infrastruttura
-abilitante.\\
+comportamento di un programma che, a runtime, manifesterà un comportamento
+scorretto e un fallimento. Questo significa però che il risultato prodotto dal
+lavoro del modulo di parsing e analisi sarà una rappresentazione che presenterà
+sufficienti informazioni da consentire l’individuazione e la segnalazione del un
+comportamento potenzialmente scorretto; esattamente ciò che risulta più
+interessante per gli strumenti di source code analysis per i quali CLAST si pone
+come infrastruttura abilitante.\\
 
 \subsubsection{Form composte: function, macro, lambda e special forms}
 
-Nel caso invece in un una form non sia costituita da una variabile, ma
-piuttosto da una lista, questa prende il nome di compound form. In questo caso
-il processo di valutazione prosegue in modo significativamente più
-approfondito. Ciascuna compound form viene infatti scomposta in due
-componenti: un operatore, rappresentato dal simbolo di testa della lista o
-\texttt{CAR} della lista, e una lista di parametri, rappresentata da una nuova
-lista contenente tutti gli elementi della lista originale ad eccezione
-dell’operatore, detta \texttt{CDR}. Il sistema Lisp procede quindi all'analisi
-del simbolo operatore, ricercando eventuali associazioni tra questo ed
-elementi all’interno ambiente lessicale corrente alla valutazione e quindi
-all'interno dell'ambiente globale. In base al risultato prodotto da questa
-ricerca la compound form viene classificata all’interno di una delle seguenti
-4 categorie: \textit{special form}, \textit{macro form}, \textit
-{function form} o \textit{lambda form}.
+Nel caso invece in un una form non sia costituita da una variabile, ma piuttosto
+da una lista, questa prende il nome di compound form. In questo caso il processo
+di valutazione prosegue in modo significativamente più approfondito. Ciascuna
+compound form viene infatti scomposta in due componenti: un operatore,
+rappresentato dal simbolo di testa della lista, detto \texttt{CAR} della lista,
+e una lista di parametri, rappresentata da una nuova lista contenente tutti gli
+elementi della lista originale ad eccezione dell’operatore, detta \texttt{CDR}.
+Il sistema Lisp procede quindi all'analisi del simbolo operatore, ricercando
+eventuali associazioni tra questo ed elementi all’interno ambiente lessicale
+corrente alla valutazione e all'interno dell'ambiente globale. In base al
+risultato prodotto da questa ricerca la compound form viene classificata
+all’interno di una delle seguenti 4 categorie: \textit{special form},
+\textit{macro form}, \textit{function form} o \textit{lambda form}.
 
 \begin{lstlisting}[
   caption=Esempio di estrazione degli elementi operatore e parametri di una
@@ -146,35 +140,35 @@ CL-USER > (cdr '(+ 1 2))
 
 \end{lstlisting}
 
-A questo punto il processo di valutazione si ramifica a seconda di come la
-form sia stata classificata al passo precedente.
+Il processo di valutazione si ramifica quindi a seconda di come la form sia
+stata classificata al passo precedente.
 
 \begin{itemize}
 
 \item Nel caso in cui l’operatore venga identificato come il nome di una
-funzione, e quindi la compound form sia stata classificata come function form,
-questa viene invocata utilizzando come input la lista di parametri
-identificata al passo precedente.
+funzione e quindi la compound form sia stata classificata come function form,
+questa viene invocata utilizzando come input la lista dei parametri identificata
+al passo precedente.
 
-\item Nel caso in cui l’operatore venga identificato come nome di una macro, e
-quindi la compound form sia stata classificata come macro form la valutazione
+\item Nel caso in cui l’operatore venga identificato come nome di una macro e
+quindi la compound form sia stata classificata come macro form, la valutazione
 prosegue dando inizio al processo di valutazione delle macro illustrato nel
 corso del capitolo precedente, Sottosezione \ref{macroexpansion}.
 
 \item Nel caso in cui l’environment in cui viene eseguita la ricerca non
 contenga alcuna definizione per il simbolo operatore, la compound form viene
 identificata come lambda form. L’operatore viene quindi utilizzato come una
-funzione e la valutazione avviene in maniera analoga a quanto riportato nel
-caso di una function form.
+funzione e la valutazione avviene in maniera analoga a quanto riportato nel caso
+di una function form.
 
 \end{itemize}
 
 Il caso più particolare dal punto di vista del processo di valutazione si
-verifica quando, a partire dall’analisi dell’operatore, una compound form
-viene identificata dal sistema come una special form. Il maggior interesse per
-compound forms di tipo special form è legato al fatto che form di questo tipo
-possono utilizzare o una sintassi speciale, o regole di valutazione speciali,
-o entrambi, oltre ad essere in grado potenzialmente di compiere modifiche
+verifica quando, a partire dall’analisi dell’operatore, una compound form viene
+identificata dal sistema come una special form. Il maggior interesse per
+compound form di tipo special form è legato al fatto che form di questo tipo
+possono utilizzare o una sintassi speciale, o regole di valutazione speciali, o
+entrambi, oltre ad essere potenzialmente in grado di compiere modifiche
 dell’environment all’interno del quale vengono valutate, oltre che più
 generalmente del flusso di controllo stesso del programma.
 
@@ -182,22 +176,22 @@ Questo significa che la valutazione di una compound form di questo tipo può
 produrre nuovi environment lessicali o dinamici all’interno dei quali verranno
 valutate eventuali sotto-form innestate a questa.
 
-Ad esempio, una compound form che utilizza l’operatore \texttt{LET}, dichiara
-un nuovo environment lessicale, identico a quello di invocazione, all’interno
-del quale vengono aggiunti nuovi binding rispetto a nomi di variabile. Questo
+Ad esempio, una compound form che utilizza l’operatore \texttt{LET}, dichiara un
+nuovo environment lessicale, identico a quello di invocazione, all’interno del
+quale vengono aggiunti nuovi binding rispetto a nomi di variabile. Questo
 significa che form di tipo special form avranno un impatto particolarmente
 significativo sul funzionamento del modulo di parsing e analisi, in quanto, ad
-esempio, avendo la possibilità di utilizzare una sintassi speciale, ciascuna
-di queste potenzialmente rappresenterà una nuova regola della grammatica
-target del parser.\\
+esempio, avendo la possibilità di utilizzare una sintassi speciale, e
+rappresenterà quindi potenzialmente una nuova regola della grammatica target del
+parser.\\
 
-Questo conclude la breve panoramica del processo di valutazione di un
-programma Common Lisp e delle strutture fondamentali che caratterizzano questo
-processo offerta da questa Sottosezione. Panoramica che ha mostrato le
-modalità con il quale opera il processo di valutazione di un programma Lisp
-rispetto alle principali componenti di questo.
+Questo conclude la breve panoramica del processo di valutazione di un programma
+Common Lisp e delle strutture fondamentali che caratterizzano questo processo
+offerta da questa Sottosezione. Panoramica che ha mostrato le modalità con il
+quale opera il processo di valutazione di un programma Lisp rispetto alle
+principali componenti di questo.
 
-Nel corso della prossima Sottosezione verrano quindi approfonditi meccanismi che
+Nel corso della prossima sottosezione verrano quindi approfonditi meccanismi che
 la libreria CLAST utilizza per la rappresentazione di queste strutture al fine
 di facilitare i compiti di analisi del codice sorgente di un programma.
 
@@ -205,8 +199,8 @@ di facilitare i compiti di analisi del codice sorgente di un programma.
 
 Dopo aver brevemente presentato il processo di valutazione utilizzato da un
 sistema Common Lisp e le strutture fondamentali utilizzate da questo processo,
-questa Sottosezione presenta i meccanismi che vengono forniti e utilizzati
-dalla libreria CLAST allo scopo di rappresentare un programma Lisp.
+si presentano i meccanismi che vengono forniti e utilizzati dalla libreria CLAST
+allo scopo di rappresentare un programma Lisp.
 
 Come precedentemente riportato, i meccanismi di rappresentazione ricalcano
 molto da vicino le informazioni prodotte e raccolte da un sistema Lisp durante
@@ -220,6 +214,11 @@ strutturata all’interno di un grande insieme di classi. Classi organizzate
 all’interno di una gerarchia, sfruttando il supporto offerto dal linguaggio
 Common Lisp all’ereditarietà e in particolare all’ereditarietà multipla.
 
+\image{img/clast-representation.png}
+      {Modulo di rappresentazione - Diagramma delle classi (ridotto)}
+      {fig:clast-representation}
+      {0.5}
+
 \subsubsection{CLAST-ELEMENT e FORM}
 
 La classe fondamentale, al vertice della gerarchia delle strutture esposte da
@@ -229,13 +228,13 @@ unico tipo, in maniera tale da facilitare l’ispezione e l’analisi di oggetti
 prodotti dalla libreria. Per questa ragione la classe non dichiara alcun
 attributo e nessun metodo viene specializzato rispetto a questa.\\
 
-La prima classe concreta all’interno della gerarchia è la classe
-\texttt{FORM}. Lo scopo di questa classe è quello di rappresentare i dettagli
-fondamentali di qualsiasi elemento presente all’interno di un programma Common
-Lisp e, in particolare, fungere da nodo ossia unità fondamentale della
-rappresentazione mediante AST fornita dalla libreria.\\
+La prima classe concreta all’interno della gerarchia è la classe \texttt{FORM}.
+Lo scopo di questa classe è quello di rappresentare i dettagli fondamentali di
+qualsiasi elemento presente all’interno di un programma Common Lisp e, in
+particolare ,fungere da nodo, ossia unità fondamentale, della rappresentazione
+mediante AST fornita dalla libreria.\\
 
-Per fare questo, la classe \texttt{FORM} espone quindi tre attributi
+Per fare questo, la classe \texttt{FORM} espone quindi tre slot, attributi,
 fondamentali.
 
 \begin{itemize}
@@ -243,48 +242,48 @@ fondamentali.
 \item Un attributo \texttt{SOURCE} che riporta il codice sorgente associato al
 nodo, form, in analisi. La presenza di questo attributo ha lo scopo di
 facilitare il compito di un analizzatore che lavora a partire dalla libreria,
-interessato in particolar modo ad aspetti testuali del codice sorgente.
+interessato in particolare modo ad aspetti testuali del codice sorgente.
 
-\item Un attributo \texttt{TOP} indica l'istanza \texttt{FORM} all’interno
-della quale questa istanza è innestata. Questo attributo risulta di
-fondamentale importanza, sia per gli utenti della libreria, sia per la
-libreria stessa, in quanto è l'elemento che consente di implementare una
-navigazione all'interno del codice di un programma di rappresentare un
-programma all’interno di una struttura ad albero, un AST, come anticipato dal
-capitolo precendente. Questo consente di ottenere una rappresentazione
+\item Un attributo \texttt{TOP} indica il nodo \texttt{FORM} all’interno della
+quale questa istanza è innestata. Questo attributo risulta di fondamentale
+importanza, sia per gli utenti della libreria, sia per la libreria stessa, in
+quanto è l'elemento che consente di rappresentare un programma all’interno di
+una struttura ad albero, un AST, come anticipato dal Capitolo
+\ref{abstract-syntax-tree}, e di implementare una navigazione all'interno di
+questa struttura. Questo consente di ottenere una rappresentazione
 universalmente nota e per la quale le operazioni di traversal risultano
 particolarmente semplici.
 
 \item Un attributo \texttt{TYPE} riporta invece il tipo dichiarato, o
 potenzialmente inferito, del nodo o form in analisi. Questo allo scopo di
-facilitare il lavoro di strumenti come type checkers, che cerchino di
-aggiungere una tipizzazione statica ad un linguaggio di programmazione
-dinamico come il Common Lisp.
+facilitare il lavoro di strumenti come type checkers, che cerchino di aggiungere
+una tipizzazione statica ad un linguaggio di programmazione dinamico come il
+Common Lisp.
 
 \end{itemize}
 
-\subsubsection{Mixins}
+\subsubsection{Mixin}
 
 Come precedentemente affermato, il modulo fa utilizzo del supporto
-all'ereditarietà multiple offerto dal linguaggio. In particolare, questo il
-meccanismo dell'ereditarietà multipla viene sfruttato allo scopo di definire
-un insieme di classi in grado di agire da mixin.\\
+all'ereditarietà multiplo offerto dal linguaggio. In particolare, questo il
+meccanismo viene sfruttato allo scopo di definire un insieme di classi in grado
+di agire da mixin.\\
 
-Un mixin o trait viene definito come una classe che definisce un insieme i
-metodi e/o attributi allo scopo di facilitare il riuso di questi da parte di
-altre classi, senza però forzare la definizione una relazione di ereditarietà
-diretta tra di essa e la classe che opera il riuso. Lo scopo di soluzioni di
-questo tipo, implementate da diversi linguaggio di programmazione con modalità
-e nomi differenti, è quindi fondamentalmente quello di facilitare il riuso di
-codice evitando allo stesso tempo i problemi legati alle ambiguità che possono
-essere causate dall’impiego dell’ereditarietà multipla, legate ad esempio a
-problemi come il Diamond Problem\cite{martin1997}.\\
+Un \textit{mixin} o \textit{trait} viene definito come una classe che definisce
+un insieme i metodi e/o attributi allo scopo di facilitare il riuso di questi da
+parte di altre classi, senza però forzare la definizione di una relazione di
+ereditarietà diretta tra questa e le classi che operano il riuso. Lo scopo di
+soluzioni di questo tipo, implementate da diversi linguaggi di programmazione
+con modalità e nomi differenti, è quindi fondamentalmente quello di facilitare
+il riuso di codice, evitando allo stesso tempo i problemi legati alle ambiguità
+che possono essere causate dall’impiego dell’ereditarietà multipla, legate ad
+esempio al Diamond Problem\cite{martin1997}.\\
 
 A differenza di quanto avviene nel contesto di altri linguaggi di
 programmazione, come ad esempio il linguaggio Scala, un linguaggio che
-specifica un costrutto dedicato esclusivamente alla definizione di mixins, in
+specifica un costrutto dedicato esclusivamente alla definizione di mixin, in
 Common Lisp un mixin viene definito attraverso una semplice definizione di
-classe in maniera del tutto analoga a quanto avverrebbe per la definizione di
+classe, in maniera del tutto analoga a quanto avverrebbe per la definizione di
 una classe tradizionale.\\
 
 Alla base della libreria vengono quindi definite altre due classi, oltre alla
@@ -296,17 +295,17 @@ chiamata \texttt {EXPANSION-COMPONENT}.
 
 Il costrutto \texttt{PROGN} è il costrutto fondamentale alla definizione di
 codice imperativo in Common Lisp: valuta l’insieme di form fornite in input in
-sequenza e ritorna il risultato dell’ultima di queste, scartando il risultato
-di tutte le precedenti. Lo scopo della classe \texttt{IMPLICIT-PROGN} è quello
-di raccogliere gli attributi ed i metodi necessari all’analisi di compound
-form che contengono una form di tipo \texttt{PROGN} implicita. Essendo
-l’utilizzo costrutto \texttt{PROGN} presente in modo implicito alla base del
-funzionamento di diversi altri costrutti, come ad esempio \texttt{DEFUN} e
-\texttt{DEFMACRO}, si è scelto di isolare le responsabilità e le strutture
-fondamentali al parsing e all’analisi di form di questo tipo all’interno di
-questo mixin, allo scopo di facilitare il riuso all’interno delle funzioni e
-delle strutture dedicate al parsing dei diversi costrutti che utilizzano un
-\texttt{IMPLICIT-PROGN}.
+sequenza e ritorna il risultato prodotto dalla valutazione dell’ultima di
+queste, scartando il risultato di tutte le precedenti. Lo scopo della classe
+\texttt{IMPLICIT-PROGN} è quello di raccogliere attributi e metodi necessari
+all’analisi di compound form che contengono una form di tipo \texttt{PROGN}
+implicita. Essendo infatti l’utilizzo del costrutto \texttt{PROGN} presente in
+modo implicito alla base del funzionamento di diversi altri costrutti, come ad
+esempio \texttt{DEFUN} e \texttt{DEFMACRO}, si è scelto di isolare le
+responsabilità e le strutture fondamentali al parsing e all’analisi di form di
+questo tipo all’interno di questo mixin, allo scopo di facilitare il riuso
+all’interno delle funzioni e delle strutture dedicate al parsing dei diversi
+costrutti che utilizzano un \texttt{IMPLICIT-PROGN}.
 
 \begin{lstlisting}[caption=Esempio di costrutto che fa utilizzo di del
 costrutto PROGN in modo implicito]
@@ -334,23 +333,23 @@ traccia delle form innestate all’interno di quella rappresentata da questa
 istanza di CLAST-ELEMENT, ossia delle form che verranno implicitamente
 eseguite all’interno di una form di tipo \texttt{PROGN}. Un secondo scopo di
 questa classe, non meno importante del primo, è quello di mantenere la
-relazione tra una form e le sue sotto-form; ciò consentira infatti la
+relazione tra una form e le sue sotto-form. Ciò consentirà infatti la
 navigazione all'interno del codice, in quanto mantiene traccia delle form
-innestate all'intenro di dell'istanza corrente.
+innestate all'interno dell'istanza corrente.
 
 \item \texttt{BODY-ENV} è invece un attributo che riporta un oggetto di tipo
-ambiente, il quale rappresenta ambiente all’interno del quale verrà eseguita
-la valutazione delle form memorizzate dall’attributo \texttt {IPROGN-FORMS}
-appena riportato. È importante notare che, nel caso di molte special forms,
-questo attributo risulta di fondamentale importanza agli scopi di uno
-strumento di analisi, in quanto consente di osservare il reale ambiente
-all'interno del quale verrà eseguita una determinata form.
+ambiente, il quale rappresenta l'ambiente all’interno del quale verrà eseguita
+la valutazione delle form memorizzate dall’attributo \texttt {IPROGN-FORMS}. È
+importante notare che, nel caso di molte special forms, questo attributo risulta
+di fondamentale importanza agli scopi di uno strumento di analisi. Questo
+consente infatti di osservare il reale ambiente all'interno del quale verrà
+eseguita una determinata form.
 
 \end{itemize}
 
 La classe \texttt{EXPANSION-COMPONENT} è invece responsabile per la
 definizione delle strutture e dei metodi che consentono il parsing di form
-soggette al processo di valutazione tipico di una macro presentato nel corso
+soggette al processo di valutazione tipico di una macro, presentato nel corso
 dalla Sottosezione \ref{macroexpansion}.
 
 In particolare, questa classe espone un altro attributo, chiamato \texttt
@@ -366,15 +365,16 @@ solamente queste tre classi. La libreria dichiara infatti più di cento classi
 che vengono utilizzate per rappresentare istruzioni ad un livello di dettaglio
 di singolo operatore. Una discussione puntuale rispetto alla rappresentazione
 offerta permessa da ciascuna di queste risulterebbe troppo estesa per essere
-riportata all’interno di questa tesi e viene rimandata alla documentazione
-relativa alla libreria.\\
+riportata all’interno di questa tesi e viene pertanto rimandata alla
+documentazione della libreria.\\
 
 Non sarebbe possibile e nemmeno utile, avere un classe specifica per la
 rappresentazioni qualsiasi possibile operatore definito da un utente e
-linguaggio. In particolare, vengono considerati nel dettaglio gli operatori
-speciali indicati dallo standard ANSI Common Lisp, Sezione 3.1.2.1.2 Listato
-2, più tutti gli operatori ritenuti di particolare interesse dal punto di
-vista dell’analisi non presentati all’interno di quella lista.
+linguaggio. In particolare, vengono la libreria espone strutture per la
+rappresentazione nel dettaglio di tutti gli operatori speciali indicati dallo
+standard ANSI Common Lisp, Sezione 3.1.2.1.2 Listato 2, più tutti gli operatori
+ritenuti di particolare interesse dal punto di vista dell’analisi non presentati
+all’interno di quella lista.
 
 L'insieme di questi operatori aggiuntivi consiste principalmente degli
 operatori legati al CLOS, al meccanismo delle dichiarazioni e al costrutto
@@ -383,15 +383,15 @@ particolarmente utilizzati dagli utenti del linguaggio Common Lisp e quindi
 significativamente più rilevanti dal punto di vista dell’analisi.\\
 
 Qualsiasi compound form viene tuttavia rappresentata con il maggiore grado di
-precisione possibile, a seconda dello specifico caso in analisi. In presenza
-di operatori non trattati in modo specifico dalla libreria, come
-un'applicazione dell'operatore della compound form, distinguendo se si tratta
-dell’applicazione di una funzione o di una macro a partire dalla ricerca
-dell'operatore all'interno dell'environment in uso.\\
+precisione possibile, a seconda dello specifico caso in analisi. In presenza di
+operatori non trattati in modo specifico dalla libreria, come un'applicazione
+dell'operatore della compound form la libreria è in grado di rappresentare,
+distinguendo, se si tratti dell’applicazione di una funzione o di una macro a
+partire dalla ricerca dell'operatore all'interno dell'environment in uso.\\
 
-Questa Sezione ha presentato in dettaglio la struttura e le componenti
+Questa Sezione ha presentato nel dettaglio la struttura e le componenti
 fondamentali del modulo di rappresentazione presente nella libreria CLAST.
-Nella prossima Sezione verrà invece approfondito il funzionamento del modulo
+Nella prossima sezione verrà invece approfondito il funzionamento del modulo
 dedicato a parsing e analisi del codice sorgente di un programma, mostrando
 quindi come gli elementi del modulo di rappresentazione vengano realmente
 impiegati dalla libreria stessa.
