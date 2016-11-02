@@ -192,7 +192,7 @@ Il limite di un sistema all'interno del quale un modello di valutazione lazy
 viene implementato solamente a partire da queste due primitive è rappresentato
 dal fatto che la definizione di una qualsiasi funzione, che adotta il modello
 lazy, prevederà un utilizzo particolarmente intenso di questi due costrutti. Ad
-esempio, l'operatore discusso dalla precedente Sottosezione e presentato dal
+esempio, l'operatore discusso dalla precedente sottosezione e presentato dal
 Listato \ref{lst:si} potrebbe essere implementato in modo lazy come mostrato dal
 Listato \ref{lst:si-delay-force}, combinando il meccanismo delle macro Common
 Lisp alle due primitive.
@@ -451,12 +451,7 @@ Come presentato nel corso capitoli precedenti, la libreria CLAST è però in gra
 di compiere questa operazione di ricerca in modo particolarmente semplice ed
 efficiente. La libreria consente quindi la definizione del processo di
 riscrittura appena descritto attraverso la definizione di una macro, risolvendo
-il problema discusso nel corso di questa Sottosezione.\\
-
-Questo consente quindi ad un utente del linguaggio di programmazione Common Lisp
-la possibilità di adottare un modello di valutazione lazy, per un certa porzione
-di codice, in maniera particolarmente semplice e nativa rispetto al linguaggio
-di programmazione, come mostrato nel Listato \ref{lst:lazily}.
+il problema discusso nel corso di questa sottosezione.\\
 
 \begin{lstlisting}[
   caption=Modalità di utilizzo della lazy evalutation abilitata da CLAST,
@@ -475,6 +470,11 @@ di programmazione, come mostrato nel Listato \ref{lst:lazily}.
      (values mean (- mean h) (+ mean h)))))
 
 \end{lstlisting}
+
+Questo consente quindi ad un utente del linguaggio di programmazione Common Lisp
+la possibilità di adottare un modello di valutazione lazy, per un certa porzione
+di codice, in maniera particolarmente semplice e nativa rispetto al linguaggio
+di programmazione, come mostrato nel Listato \ref{lst:lazily}.
 
 In questa sezione si è quindi come la libreria CLAST possa essere utilizzata
 come strumento per definire un estensione nativa del linguaggio Common Lisp,
