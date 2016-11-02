@@ -290,7 +290,117 @@ come ad esempio il linguaggio Haskell ed il linguaggio LML.
 \endgroup
 
 \chapter{Conclusione}
-\section{Sviluppi Futuri}
+
+Lo scopo della tesi svolta è stato quello di progettare ed implementare una
+libreria per la generazione di abstract syntax tree nel contesto di un
+linguaggio di programmazione ad ambiente dinamico ed estensibile, il linguaggio
+Common Lisp, studiando quindi le possibili applicazioni di questa. Applicazioni
+sia come fondamento per la creazione di strumenti di source code analysis, sia
+come infrastruttura in grado di abilitare la definizione di estensioni del
+linguaggio Common Lisp stesso.\\
+
+L'obiettivo primario della tesi è quindi stato rappresentato dalla progettazione
+della libreria CLAST. Tra gli utilizzi anticipati della libreria, uno dei più
+significativi è sicuramente quello rappresentato dalla possibilità di costruire
+uno strumento di source code analysis a partire da questa. Per questa ragione,
+si è mostrato come questa si integri alla tradizionale architettura a tre
+componenti di uno strumento di source code analysis. Si è presentato come
+specifiche scelte progettuali abbiano cercato di rendere il più semplice
+possibile questo procedimento di integrazione e come questa consente ad un
+utente di potersi dedicare interamente allo sviluppo della componente di analisi
+relativa allo studio delle proprietà di proprio interesse.
+
+Si è quindi illustrata la struttura interna della libreria, le sue componenti e
+l'API offerta da questa. Durante questa presentazione sono state descritte le
+principali difficoltà del processo di definizione di un insieme di elementi che
+consentano la rappresentazione di un programma Common Lisp ad un livello che
+consente lo svolgimento di analisi anche molto complesse. Difficoltà dovute sia
+alla mancanza di riferimenti relativi allo specifico linguaggio sia alla novità
+dello studio svolto da questa tesi. Infine, si è presentato il funzionamento
+della libreria, le scelte progettuali ed implementative legate alla definizione
+di questo.\\
+
+Il secondo obiettivo fondamentale della tesi è stato quello di studiare le
+possibili applicazioni della libreria CLAST, sia alla creazione di strumenti per
+la source code analysis, sia all'utilizzo di questa come fondamento per la
+definizione di estensione del linguaggio Common Lisp stesso.
+
+In particolare, sono stati presentati tre casi di studio relativamente ai quali
+si è analizzato l'utilizzo della libreria come strumetno abilitante: la
+costruzione di sturmenti per la source code analysis, l'estensione del
+linguaggio allo scopo di introdurre un supporto al pattern matching ed infine
+l'estensione del linguaggio allo scopo di introdurre un supporto nativo alla
+lazy evaluation.\\
+
+Si è quindi presentato come la libreria consenta di definire strumenti di
+analisi statica come ad esempio strumenti di linting, strumenti in grado di
+identificare potenziali inconistenze all'interno di un programma e produrre
+segnalazioni relative a queste. Il caso di strumento di linting analizzato è
+stato quello di uno strumento per la free variable analysis, la ricerca di
+variabili libere all'interno di un dato frammento di codice, rappresentato da
+una form nel contesto del linguaggio Common Lisp. Si è quindi mostrato come
+questo possa essere realizzato in maniera estremamente semplice a partire dalle
+funzionalità di analisi del codice di un programma offerte dalla libreria.\\
+
+La successiva applicazione della libreria analizzata dalla tesi è stata quella
+in funzione della definizione di un'estensione del linguaggio Common Lisp allo
+scopo di introdurre un supporto nativo al pattern matching. Sono stati
+presentati i vantaggi che la disponibilità di questo meccanismo introduce a
+livello di linguaggio di programmazione e come questo possa essere introdotto a
+partire dall'applicazione di un algoritmo offerto dallo stato dell'arte.
+
+Si è quindi descritto come questo algoritmo possa essere implementato in maniera
+tale da produrre operazioni di riscrittura del codice sorgente a partire dal
+costrutto macro Common Lisp e come un'implementazione diretta di questo
+algoritmo porti alla produzione di codice con un grande numero di variabili
+libere, codice quindi meno efficiente rispetto a quello che si potrebbe ottenere
+utilizzando i costrutti nativi del linguaggio.
+
+La libreria CLAST è stata applicata in questo contesto come strumento che
+consente l'identificazione delle variabili libere introdotte dalla riscrittura
+operata a partire dall'algoritmo e permette quindi di operare una riscrittura
+del codice sorgente che elimini queste variabili. Questo ha consentito di
+definire un processo a partire dal quale è possibile introdurre un supporto al
+pattern matching garantendo un livello di performance di questo del tutto
+equivalente a quelle che si otterebbe utilizzando i costrutti nativi del
+linguaggio.\\
+
+L'ultimo caso di studio nel contesto del quale è stata studiata l'applicazione
+della libreria CLAST è stato quello dell'aggiunta di un supporto alla lazy
+evaluation al Common Lisp. Si sono quindi presentate le caratteristiche di
+questo modello e come questo si contrapponga al modello di valutazione strict
+adottato dal linguaggio, presentando vantaggi e svantaggi di ciascuno di questi.
+
+Anche in questo caso di è presentato come l'introduzione di questo modello di
+valutazione sia possibile combinando operazioni di riscrittura, definite a
+partire da elementi dello stato dell'arte, alle funzionalità di introspezione a
+livello di codice sorgente offerte dalla libreria CLAST. Sono inoltre stati
+discussi i diversi problemi che si incontrano nel corso della realizzazione di
+questa seconda estensione, soprattutto dal punto di vista dell'API offerte ad un
+utente del linguaggio per l'accesso a questa funzionalità.\\
+
+L'aspetto più caratteristico di queste estensioni è rappresentato dal fatto che
+introducono nuove funzionalità ad un linguaggio di programmazione agendo in
+maniera del tutto trasparente rispetto ad un utente del linguaggio, che non ha
+quindi la necessità di utilizzare strumenti esterni, come preprocessors o
+transpilers, senza dover apportare modifiche ad un compilatore e, anzi, in
+maniera del tutto portabile da un'implementazione all'altra, un aspetto
+particolarmente significativo nel contesto del linguaggio analizzato dalla tesi.
+
+Gli approcci mostrati durante la realizzazione delle estensioni del linguaggio
+descritte nel corso della tesi possono essere riutilizzati allo scopo di
+consentire l'introduzione, con le stesse caratteristiche di efficienza e
+portabilità, anche di altre funzionalità al linguaggio Common Lisp, non
+analizzate nel corso di questa tesi.
+
+Inoltre, l'approccio e l'idea di procedere all'estensione di un linguaggio di
+programmazione attraverso la definizione di operazioni di riscrittura e meta-
+programmazione a livello del codice sorgente di un programma sono anch'esse
+riutilizzabili nel contesto di qualsiasi altro linguaggio di programmazione,
+presente o futuro, che disponga di un costrutto per la riscrittura di codice
+sorgente, equivalente al costrutto macro Common Lisp, e all'introspezione a
+livello di codice sorgente, ossia una funzionalità equivalente all'Environments
+API.
 
 \appendix
 
