@@ -224,70 +224,52 @@ in grado di accedere ai servizi offerti da questa.
 \chapter{Applicazioni}
 \label{applications}
 
-AGGIUNGI ALL’INTRODUZIONE DELLE APPLICAZIONI IL FATTO CHE L’OBIETTIVO DELLA
-LIBRERIA È SIA QUELLO DI CONSENTIRE LA COSTRUZIONE DI STRUMENTI DI SOURCE CODE
-ANALYSIS MA ANCHE, DAL PUNTO DI VISTA PIÙ SPERIMENTALE, LA DEFINIZIONE DI
-ESTENSIONI DEL LINGUAGGIO DI PROGRAMMAZIONE COMMON LISP STESSO.
+Il precedente capitolo ha presentato la libreria CLAST, uno strumento per la
+generazione di AST per programmi scritti utilizzando il linguaggio di
+programmazione Common Lisp. Essendo questo CLAST uno strumento del tutto nuovo
+nel contesto di questo linguaggio di programmazione, questo capitolo
+approfondisce ciò che viene reso possibile dalla disponibilità di questo
+strumento.
 
-La riscrittura del form Lisp è tradizionalmente considerata un'operazione
-particolarmente semplice, soprattutto grazie al ricco costrutto macro offerto
-dal linguaggio di programmazione stesso.
+Vengono quindi presentate alcune delle potenziali applicazioni della libreria
+CLAST. In particolare, si descrive come questa possa essere utilizzata come
+fondamento per la costruzione di strumenti di source code analysis e per la
+definizione di estensioni, anche molto complesse, del linguaggio di
+programmazione Common Lisp.\\
 
-Tuttavia, proprio a causa della della presenza all'interno del linguaggio di
-dello stesso costrutto macro, una funzionalità di supporto alla
-meta-programmazione particolarmente potente e particolare, descritta nel corso
-della Sezione \ref{macro}, la manipolazione del codice sorgente vero e proprio
-di un programma risulta invece essere particolarmente complessa.
+La Sezione \ref{lint} presenta come la libreria consenta, in modo estremamente
+semplice, la definizione di operazioni di ricerca all’interno di particolari
+elementi all’interno di un frammento di codice Common Lisp. Questo viene fatto
+considerando come esempio una particolare tipologia di analisi, chiamata free
+variables analysis, un’analisi mirata all’identificazione della presenza di
+variabili libere. Si mostra quindi come la libreria offra un supporto a questo
+tipo di analisi e più in generale allo svolgimento di moltissime diverse
+tecniche di analisi statica basate sul codice sorgente, grazie alla facilità con
+cui è possibile, a partire da questa, identificare particolari elementi
+all’interno di un programma. Si presenta quindi come queste analisi possano
+andare a rappresentare la base per la costruzione di uno strumento di linting
+per il linguaggio Common Lisp, una particolare categoria di strumenti di
+supporto alla programmazione, attualmente non disponibili per il linguaggio.\\
 
-Il costrutto macro introduce infatti diversi livelli di astrazione anche a
-livello di codice sorgente, aspetto caratteristico del linguaggio Common Lisp, e
-che porta quindi a diverse difficoltà particolarmente significative nella
-definizione di modalità di analisi e gestione del codice sorgente.\\
+La Sezione \ref{pattern-matching} presenta un secondo caso di studio, relativo
+all’applicazione della libreria CLAST come strumento in grado di abilitare
+l’estensione del linguaggio Common Lisp in maniera tale da supportare l’utilizzo
+di costrutti di pattern matching in modo efficiente. Si discute dapprima come
+sia possibile introdurre un costrutto di pattern matching nel contesto del
+linguaggio combinando macro Common Lisp all’algoritmo per la compilazione del
+pattern matching presentato da L. Augustsson in … per poi mostrare poi come
+questa modalità di implementazione sia soggetta a problemi di efficienza.
+Problemi che si mostrerà possono essere risolti a partire dall'utilizzo di
+CLAST.\\
 
-% Avere a disposizione informazioni rispetto all'AST risulta particolarmente
-% abilitante nel contesto del CL.
-
-La libreria CLAST risolve questo problema fornendo uno strumento che consente la
-rappresentazione e l'analisi del codice sorgente di un programma Common Lisp, in
-forma di abstract syntax tree.
-
-In questo capitolo vengono quindi presentate alcune delle potenziali
-applicazioni di questo strumento, illustrando le possibilità che questo
-introduce a livello di strumenti per la source code analysis, che possono ora
-essere costruiti a partire da questo, e anche nel contesto del linguaggio di
-programmazione stesso.
-
-% Inoltre, come largamente anticipato nelle prime sezioni della tesi, l'avere a
-% disposizione uno strumento come CLAST, in grado di operare il parsing di un
-% frammento di codice e produrre una rappresentazione di questo risolve due
-% terzi del problema di costruire uno strumento di source code analysis.
-
-In particolare, la Sezione \ref{free-variables-analysis} presenta come la
-libreria possa essere immediatamente utilizzata per il supporto alla definizione
-di strumenti per la Free Variable Analysis, ossia uno strumento in grado di
-identificare e riportare l'utilizzo di variabili libere all'interno di un
-programma.
-
-Oltre a consentire l'identificazione in maniera semplice dell'utilizzo di
-variabili libere all'interno di un programma, la libreria CLAST consente
-l'identificazione dell'utilizzo di un qualsiasi costrutto. La sezione prosegue
-quindi discutendo come questa funzionalità possa essere utilizza allo scopo di
-costruire strumenti per il linting di codice Common Lisp, una particolare
-categoria di strumenti di supporto alla programmazione basato sull'analisi
-statica.\\
-
-Nel corso della Sezione \ref{pattern-matching} viene invece presentato il
-concetto di pattern matching, un particolare meccanismo, comune a diversi
-linguaggio di programmazione funzionali. A partire dalla definizione fornita
-viene quindi discusso come il linguaggio posso essere esteso sfruttando la
-soluzione proposta dalla libreria alla free variable analysis per ottenere
-un'implementazione del meccanismo particolarmente efficiente.\\
-
-Infine, la Sezione \ref{lazy-evaluation} discute un'altra estensione al
-linguaggio Common Lisp resa possibile dalla creazione della libreria. Questa
-estensione è rappresentata dall'introduzione in maniera nativa di un supporto al
-valutazione lazy di una programma, meccanismo comune a diversa altri linguaggio,
-come ad esempio il linguaggio Haskell ed il linguaggio LML.
+Infine, la Sezione \ref{lazy-evaluation} presenta il caso di studio
+rappresentato da una seconda estensione del linguaggio Common Lisp, questa volta
+mirata ad introdurre un supporto alla lazy evaluation all’interno di questo.
+Anche in questo caso di analizza come questo supporto possa essere realizzato a
+partire dall’impiego di operazioni di riscrittura del codice basate
+sull’utilizzo del costrutto macro ed elementi dallo stato dell’arte, per poi
+presentare come i problemi che emergono possano essere risolti utilizzando le
+funzionalità afrore dalla libreria CLAST.
 
 \include{src/free-variables-analysis}
 \include{src/pattern-matching}
