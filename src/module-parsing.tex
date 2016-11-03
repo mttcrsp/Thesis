@@ -9,7 +9,7 @@ modulo di parsing ed analisi è responsabile dello svolgimento delle reali
 operazioni di analisi sintattica e semantica del codice sorgente fornito in
 input alla libreria. Attività che produrranno come output la rappresentazione
 del programma Common Lisp soggetto in forma di abstract syntax tree da cui la
-libreria prende nome.\\
+libreria prende nome.
 
 \subsubsection{Attività parsing}
 
@@ -29,7 +29,7 @@ essere definito, dal punto di vista degli analizzatori sintattici, come un
 \textit{recursive predictive parser}: un parser a discesa ricorsiva in grado di
 svolgere la propria attività di analisi e scomposizione senza necessità di
 operare backtracking o, in altri termini, senza la necessità di svolgere e
-abbandonare computazioni parziali.\\
+abbandonare computazioni parziali.
 
 I principali vantaggi legati alla scelta di organizzare il processo di parsing
 come un parser di questo tipo sono principalmente due. Da un punto di vista
@@ -45,7 +45,7 @@ ciascuna produzione della grammatica del linguaggio in analisi, guida infatti
 l’implementazione nella definizione di un insieme di funzioni altamente coese
 nel rispetto dei principi di single responsibility e separation of concerns che
 consentono di ottenere codice particolarmente espressivo, manutenibile e
-facilmente testabile.\\
+facilmente testabile.
 
 È importante sottolineare che, affinché sia possibile definire un predictive
 parser per un dato linguaggio, è necessario che la grammatica di questo sia un
@@ -58,7 +58,7 @@ Lisp è una grammatica di tipo context-free.
 \subsubsection{Strategie per la costruzione di un parser}
 
 Un parser come quello appena descritto può essere costruito utilizzando un
-approccio di tipo automatico oppure utilizzando un approccio manuale.\\
+approccio di tipo automatico oppure utilizzando un approccio manuale.
 
 Approcci automatici alla creazione di un parser lavorano tipicamente a partire
 da uno strumento specializzato nella generazione di sistemi software di questo
@@ -67,7 +67,7 @@ input una descrizione formale della grammatica del linguaggio target e produce
 in output un programma in grado di operare il parsing di tale linguaggio.
 Alternativamente, alcuni generatori di parser producono in output una struttura,
 solitamente chiamata parse table, a partire dalla quale un programma driver
-generico è in grado di operare il parsing.\\
+generico è in grado di operare il parsing.
 
 Il vantaggio principale legato all'utilizzo di strumenti automatici è
 chiaramente rappresentato dall’immediatezza con la quale questi consentono di
@@ -81,7 +81,7 @@ informazioni aggiuntive, risulta molto spesso difficile se non impossibile.
 Inoltre, l’utilizzo di questi strumenti non è possibile nel caso in cui non sia
 disponibile una descrizione formale della grammatica del linguaggio target delle
 operazioni di parsing, una descrizione che possa essere fornita in input allo
-strumento.\\
+strumento.
 
 Il requisito e lo svantaggio appena citati rendono l’applicazione di un
 approccio automatico non applicabile al contesto del progetto soggetto di questa
@@ -92,7 +92,7 @@ molteplici tipologie, la possibilità di estendere il processo di parsing al fin
 di raccogliere il maggior numero di informazioni possibili rispetto al codice
 del programma in analisi risulta di fondamentale importanza. Informazioni che un
 parser generato in modo automatico da uno strumento generico non è tipicamente
-in grado di fornire.\\
+in grado di fornire.
 
 Per queste ragioni, la scelta intrapresa è stata quella di implementare un
 parser in modo manuale. Da un punto di vista prettamente legato all’analisi
@@ -123,7 +123,7 @@ source code analysis che non possono essere ricavate da un solo AST sono le
 informazioni relative all'utilizzo da parte del programma di variabili libere,
 particolarmente interessanti per la realizzazione di strumenti per il linting, o
 informazioni relative al tipo delle form che rappresentano i nodi dell'AST,
-particolarmente interessati per la realizzazione type checkers.\\
+particolarmente interessati per la realizzazione type checkers.
 
 Per questa ragione, parallelamente all'attività di parsing vera a propria, il
 modulo descritto da questa sezione opera un'attività di analisi e raccolta di
@@ -134,7 +134,7 @@ Questa attività di analisi viene svolta a partire dal gestione di oggetti di
 tipo ambiente, oggetti che consentono la memorizzazione di definizioni e
 dichiarazioni valide al momento della valutazione di un particolare frammento di
 codice, e che ricalca molto da vicino l’attività svolta dalla componente di
-valutazione di un sistema Common Lisp.\\
+valutazione di un sistema Common Lisp.
 
 La progettazione e realizzazione dell'attività appena descritta rappresentano
 uno degli aspetti di maggiore complessità all'interno della libreria; richiedono
@@ -225,7 +225,7 @@ linguaggio Common Lisp.
 Questo significa che la funzione si limita a verificare se la form fornita in
 input rappresenti un self-evaluating object, un simbolo o una compound form: i
 tre elementi fondamentali della grammatica e del processo di valutazione del
-Common Lisp presentato nel corso della Sezione \ref{representation}.\\
+Common Lisp presentato nel corso della Sezione \ref{representation}.
 
 Nel caso in cui la form rappresenti un self-evaluating symbol, il parsing e la
 valutazione risultano relativamente semplici. Viene infatti immediatamente
@@ -234,7 +234,7 @@ sottoclasse più appropriata alla rappresentazione del self-evaluating object in
 analisi e il parsing termina immediatamente, riportando, insieme all’istanza
 appena descritta, un ambiente lessicale vuoto. Questo in quanto la valutazione
 di self-evaluating objects non produce alcuna variazione rispetto al contenuto
-dell'ambiente.\\
+dell'ambiente.
 
 Nel caso in cui la form rappresenti un simbolo questo viene risolto all’interno
 dell’oggetto ambiente opzionale specificato in fase di invocazione. A questo
@@ -264,14 +264,14 @@ significativamente più complesso. Questo in quanto, come riportato nella
 Sottosezione \ref{CL-valutazione} relativamente al processo di valutazione
 caratteristico del linguaggio Common Lisp, questo è il caso in cui si ha la
 possibilità di incontrare diversi costrutti che utilizzano una sintassi speciale
-e regole di valutazione speciali.\\
+e regole di valutazione speciali.
 
 Tenendo fede alla struttura precedentemente citata, in cui si ha una definizione
 di una funzione per ciascuna produzione della grammatica del linguaggio target e
 il parsing viene organizzato costruendo un predictive parser, la funzione
 \texttt{PARSE} delega ad un’altra funzione il processo di ricerca, all’interno
 dell’insieme delle diverse regole della grammatica, della corretta produzione da
-applicare per proseguire nel processo di parsing.\\
+applicare per proseguire nel processo di parsing.
 
 La funzione \texttt{PARSE} si limita quindi ad operare una destrutturazione
 dalla compound form all'interno di un coppia formata dell’elemento \texttt{CAR}
@@ -279,7 +279,7 @@ e del \texttt{CDR}, la testa e la coda della lista che costituisce la compond
 form, come mostra il Listato \ref{lst:car-cdr}. A partire da questi due elementi
 la funzione opera quindi un'invocazione della funzione generica
 \texttt{PARSE-FORM}, responsabile per la prosecuzione del parsing e per l'avvio
-dello schema di discesa ricorsiva.\\
+dello schema di discesa ricorsiva.
 
 La funzione \texttt{PARSE-FORM} è, come anche la funzione \texttt{PARSE}, una
 funzione generica. Il meccanismo delle funzioni generiche è uno dei meccanismi
@@ -295,7 +295,7 @@ meccanismo delle funzioni generiche Common Lisp.
 
 Formalmente, una funzione generica Common Lisp può essere definita come una
 funzione il cui comportamento viene determinato a partire dalle classi e dalle
-identità dei parametri che le vengono forniti in input.\\
+identità dei parametri che le vengono forniti in input.
 
 Una funzione generica specifica un nome di funzione e una lista di parametri ma,
 a differenza di una funzione ordinaria, non specifica alcun corpo e quindi
@@ -368,7 +368,7 @@ Da un punto di vista teorico, il meccanismo delle funzioni generiche Common Lisp
 rappresenta un’implementazione del concetto di polimorfismo tipico della
 programmazione Object Oriented, realizzato solitamente nel contesto di altri
 linguaggi di programmazione con tecniche di message passing e funzioni come
-\texttt{SEND} in Smalltalk e \texttt{objc\_msgSend} in Objective-C.\\
+\texttt{SEND} in Smalltalk e \texttt{objc\_msgSend} in Objective-C.
 
 \begin{lstlisting}[caption=Signature della funzione \texttt{PARSE-FORM}]
 
@@ -458,7 +458,7 @@ operate dalla libreria attraverso la discussione di un esempio, rappresentato da
 una semplificazione di uno dei metodi \texttt{PARSE-FORM} descritti nel corso
 dei paragrafi precedenti. In particolare, viene analizzato il funzionamento e
 l'implementazione del metodo \texttt{PARSE-FORM} responsabile del parsing e
-dell'analisi di compound form che utilizzano l’operatore \texttt{LET*}.\\
+dell'analisi di compound form che utilizzano l’operatore \texttt{LET*}.
 
 In seguito viene riportato un frammento della specifica ANSI in cui viene
 definita la sintassi del costrutto \texttt{LET*} e vengono specificati i
@@ -661,7 +661,7 @@ particolare importanza e uno dei concetti più complessi alla base del
 funzionamento della libreria. Questa convenzione consente infatti di
 implementare il parsing di costrutti come \texttt{LET*}, in cui l’environment in
 cui avviene la valutazione di una form di questo tipo contiene informazioni
-aggiuntive rispetto quello in prodotto in output dalla valutazione stessa.\\
+aggiuntive rispetto quello in prodotto in output dalla valutazione stessa.
 
 Il metodo opera quindi \textit{3.} un’invocazione del metodo
 
@@ -672,7 +672,7 @@ grammatica in relazione alla sintassi dei binding, ossia la regola \textit{var
 quello fornito in input, contenente la definizione della variabile specificata
 dal binding in analisi. Ogni invocazione della funzione \texttt{PARSE-BINDING}
 ritorna quindi un nuovo oggetto environment che viene utilizzato per aggiornare
-l’environment interno al metodo.\\
+l’environment interno al metodo.
 
 Il metodo prosegue con \textit{4.} l’analisi delle dichiarazioni specificate
 dalla form relativamente alle variabili dichiarate dai binding. Chiaramente,
@@ -698,7 +698,7 @@ all’interno delle form. Questa funzione rappresenta l'effettiva operazione di
 discesa ricorsiva operata dal modulo. Dal punto di vista pratico, la funzione si
 limita infatti ad operare una chiamata ricorsiva alla funzione \texttt{PARSE}
 per ciascuna form innestata, aggiornando ad ogni passo l'environment di
-scrittura.\\
+scrittura.
 
 Infine, a partire da quanto prodotto dai passi precedenti, il metodo si limita
 a \texttt{7.} ritornare i due valori descritti in apertura di questa
@@ -707,7 +707,7 @@ sottosezione e comuni a qualsiasi metodo \texttt{PARSE-FORM}: un'istanza di
 form \texttt{LET*} fornita in input, che rappresenta il nodo radice del
 sottoalbero del quale il metodo ha effettuato il parsing, e un secondo valore
 rappresentato dall'oggetto environment contenente tutte le informazioni
-raccolte durante la discesa ricorsiva attraverso la form operata dal parser.\\
+raccolte durante la discesa ricorsiva attraverso la form operata dal parser.
 
 \image{img/parse-form-let*.png}
       {Diagramma di flusso del metodo PARSE-FORM}

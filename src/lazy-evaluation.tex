@@ -7,7 +7,7 @@ come la libreria possa essere utilizzata per definire una seconda estensione al
 linguaggio di programmazione Common Lisp. In particolare, un'estensione che
 consenta ad un utente del linguaggio di utilizzare un modello di valutazione
 lazy, al contrario del tradizionale modello adottato dal linguaggio, detto di
-tipo eager o strict.\\
+tipo eager o strict.
 
 A questo scopo viene dapprima presentato il modello di valutazione lazy,
 discutendo le principali applicazioni, attraverso un esempio, e riportando
@@ -51,7 +51,7 @@ solamente nel momento in cui la computazione necessita realmente del risultato
 della loro valutazione per poter proseguire. Questo significa anche che, se la
 computazione non dovesse mai avere necessità del valore prodotto dalla
 valutazione di una data un'espressione, questa espressione non verrà mai
-effettivamente valutata.\\
+effettivamente valutata.
 
 Linguaggi di programmazione funzionali puri che adottano questo secondo modello
 di valutazione molto spesso combinano a questo l'utilizzo di tecniche di
@@ -64,7 +64,7 @@ a restituire il valore precedentemente memorizzato piuttosto che operare la
 stessa computazione nuovamente. Si tratta di un'ottimizzazione che in molti casi
 può portare ad ottimi risultati, ma che può essere applicata in modo sicuro
 solamente all'interno di un linguaggio puro, in cui la valutazione di una data
-espressione produce sempre lo stesso risultato.\\
+espressione produce sempre lo stesso risultato.
 
 Per meglio illustrare la differenza tra i modelli di valutazione appena
 descritti, il Listato \ref{lst:si} mostra un frammento di codice il cui
@@ -96,7 +96,7 @@ valore \texttt{9}. Questo perché i parametri forniti in input alla funzione non
 vengono valutati fino al momento in cui il valore associato a questo risulta
 realmente necessario all'esecuzione ed, essendo che il terzo parametro non
 risulta mai effettivamente necessario a questa, non sia avrà mai una valutazione
-del parametro \texttt{(loop)} né quindi il generarsi di un loop infinito.\\
+del parametro \texttt{(loop)} né quindi il generarsi di un loop infinito.
 
 Il vantaggio fondamentale introdotto dalla disponibilità di un supporto alla lazy
 evaluation è principalmente legato a questa ottimizzazione. A sua volta, la
@@ -123,7 +123,7 @@ Per questa ragione, un linguaggio di programmazione ideale dovrebbe consentire
 ad un utente un supporto per l'utilizzo di entrambi questi modelli, senza
 introdurre overhead significativi dal punto di vista sintattico e della
 complessità di un sistema, consentendo quindi ad un utente di scegliere quale
-modello adottare in relazione alle necessità del sistema in sviluppo.\\
+modello adottare in relazione alle necessità del sistema in sviluppo.
 
 Linguaggi di programmazione tradizionali, come ad esempio il linguaggio C e il
 linguaggio Java, adottano un modello di valutazione strict, e non prevedono, a
@@ -157,7 +157,7 @@ contesto di un linguaggio di programmazione.
 Tra queste strategie, la più nota e più adatta al contesto del linguaggio Common
 Lisp è probabilmente quella illustrata da Abelson et al. in \cite{Abelson1996} e
 parallelamente da Okasaki in \cite{DBLP:conf/afp/Okasaki96}, basata sul concetto
-di stream e sulle primitive \texttt{delay} e \texttt{force}.\\
+di stream e sulle primitive \texttt{delay} e \texttt{force}.
 
 La primitiva \texttt{delay} genera a partire da una data espressione una
 funzione che può essere invocata ottenendo come risultato il valore prodotto
@@ -227,7 +227,7 @@ significa che l'operatore \texttt{SI}, come qualsiasi altro operatore definito
 in maniera analoga, non potrà essere utilizzato come una funzione e quindi
 utilizzato in combinazione a funzioni come \texttt{FUNCALL}, \texttt{MAP} e in
 generale qualsiasi funzione di ordine superiore; aspetto che limita in maniera
-significativa l'utilità di questa definizione.\\
+significativa l'utilità di questa definizione.
 
 Per risolvere questi due problemi è possibile introdurre un nuovo costrutto,
 discusso nel dettaglio nei prossimi paragrafi.
@@ -312,7 +312,7 @@ modello di valutazione.
 
 L'avere a disposizione di entrambe le versioni di una stessa funzione permette
 ad un utente di poter scegliere il modello di esecuzione più adatto a seconda
-dallo specifico contesto in analisi.\\
+dallo specifico contesto in analisi.
 
 La libreria affronta quindi il problema delle definizione di una funzione lazy a
 partire dalla soluzione appena presentata. Dal punto di vista dell'invocazione
@@ -417,7 +417,7 @@ Come presentato nel corso capitoli precedenti, la libreria CLAST è però in gra
 di compiere questa operazione di ricerca in modo particolarmente semplice ed
 efficiente. La libreria consente quindi la definizione del processo di
 riscrittura appena descritto attraverso la definizione di una macro, risolvendo
-il problema discusso nel corso di questa sottosezione.\\
+il problema discusso nel corso di questa sottosezione.
 
 \begin{lstlisting}[
   caption=Confronto tra frammenti di codice scritti utilizzando i modelli di valutazione strict e lazy,

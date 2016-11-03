@@ -55,7 +55,7 @@ locale.
 
 Per contrasto, viene definita variabile occupata una variabile che è
 precedemente stata libera ma è attualmente è associata ad uno specifico valore o
-insieme di valori.\\
+insieme di valori.
 
 Dal punto di vista logico, il valore utilizzato come nome di una particolare
 variabile non risulta di particolare importanza. Tuttavia, il riutilizzo dello
@@ -71,7 +71,7 @@ l'utilizzo di variabili libere all'interno di un dato frammento di codice viene
 definita \textit{free variables analysis}.
 
 I prossimi paragrafi presentano come la libreria CLAST sia in grado di agire
-come fondamento per lo svolgimento di free variables analysis.\\
+come fondamento per lo svolgimento di free variables analysis.
 
 \subsubsection{Free Variables Analysis e CLAST}
 
@@ -87,7 +87,7 @@ variable analysis.
 La libreria modella l'utilizzo di una variabile libera all'interno di una data
 form utilizzando la classe \texttt{FREE-VARIABLE-REF}. Il diagramma in Figura
 \ref{fig:free-variable-ref} mostra la porzione del modulo di rappresentazione
-interessata dalla definizione di questa classe.\\
+interessata dalla definizione di questa classe.
 
 \image{img/free-variable-ref.png}
       {Diagramma della classi per la rappresentazione di variabili libere}
@@ -117,7 +117,7 @@ esportata dal modulo di traversal e presentata nel corso della Sezione
 \ref{traversal}. Questa funzione consente l'esecuzione del traversal di un AST
 prodotto dalla libreria secondo lo schema map-reduce, dando quindi la
 possibilità ad un utente di definire operazioni di ricerca e raccolta di
-informazioni all'interno dell'AST.\\
+informazioni all'interno dell'AST.
 
 Il Listato \ref{lst:free-variables} mostra quindi come la funzione \texttt{WALK}
 possa essere estesa, in maniera particolarmente semplice, allo scopo di svolgere
@@ -154,7 +154,7 @@ cui il nodo in input sia di tipo \texttt{FREE-VARIABLE}, e il valore
 reducing della funzione \texttt{WALK}, la funzione \texttt{FREE-VARIABLES}
 sfrutta del comportamento di default di questa, ossia quello di ritornare la
 lista degli elementi prodotti in output da ciascuna applicazione della funzione
-di mapping.\\
+di mapping.
 
 La Free variable analysis è quindi una delle tipologie di analisi che viene
 significativamente semplificato dalla possibilità di avere a disposizione una
@@ -205,7 +205,7 @@ altro.
 La verifica compiuta da un linter è quindi tipicamente più stringente rispetto a
 quella operata da un compilatore e consente di evidenziare l'utilizzo di bad
 practice nello sviluppo, di costrutti che portano ad uno spreco di risorse, o in
-generale di operazioni che sono tipicamente problematiche.\\
+generale di operazioni che sono tipicamente problematiche.
 
 È importante sottolineare il fatto che molti degli errori che risulta impossibile
 identificare a livello di compilazione risultano impossibili da identificare

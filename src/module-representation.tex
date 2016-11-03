@@ -7,7 +7,7 @@ vengono presentate e discusse le scelte compiute e il procedimento utilizzato
 per la definizione delle diverse classi utilizzate per la rappresentazione di un
 programma Common Lisp. Classi che verranno poi utilizzate dal modulo di parsing
 ed analisi in fase di generazione dell'AST associato al programma target
-dell'azione della libreria.\\
+dell'azione della libreria.
 
 La struttura del modulo di rappresentazione ricalca molto da vicino il processo
 di valutazione del codice sorgente di un programma Common Lisp. Questo allo
@@ -28,7 +28,7 @@ fornire al lettore una migliore comprensione degli elementi che verranno
 presentati nel dettaglio in seguito, in questa sottosezione viene presentato
 un breve sunto del processo di valutazione e delle strutture fondamentali di
 un programma scritto utilizzando il linguaggio di programmazione Common
-Lisp.\\
+Lisp.
 
 La struttura fondamentale alla base del processo di valutazione di un programma
 Lisp è la form. Una \textit{form} viene infatti definita formalmente dallo
@@ -85,7 +85,7 @@ illustrato nella Sottosezione \ref{macroexpansion}.
 Nel caso in cui non sia presente una definizione di macro all’interno
 dell’ambiente, il sistema Lisp assume che il simbolo rappresenti una variabile.
 Il valore della variabile associata al simbolo viene quindi ricercato e prodotto
-come output del processo di valutazione.\\
+come output del processo di valutazione.
 
 \begin{lstlisting}[caption=Esempio di form di tipo symbol]
 
@@ -109,7 +109,7 @@ lavoro del modulo di parsing e analisi sarà una rappresentazione che presenter�
 sufficienti informazioni da consentire l’individuazione e la segnalazione del un
 comportamento potenzialmente scorretto; esattamente ciò che risulta più
 interessante per gli strumenti di source code analysis per i quali CLAST si pone
-come infrastruttura abilitante.\\
+come infrastruttura abilitante.
 
 \subsubsection{Form composte: function, macro, lambda e special forms}
 
@@ -183,7 +183,7 @@ significa che form di tipo special form avranno un impatto particolarmente
 significativo sul funzionamento del modulo di parsing e analisi, in quanto, ad
 esempio, avendo la possibilità di utilizzare una sintassi speciale, e
 rappresenterà quindi potenzialmente una nuova regola della grammatica target del
-parser.\\
+parser.
 
 Questo conclude la breve panoramica del processo di valutazione di un programma
 Common Lisp e delle strutture fondamentali che caratterizzano questo processo
@@ -207,7 +207,7 @@ molto da vicino le informazioni prodotte e raccolte da un sistema Lisp durante
 il processo di valutazione. Questo perché che la rappresentazione che la
 libreria vuole offrire è la più ricca possibile e quello della valutazione è
 il momento in cui viene prodotto e raccolto il maggior numero di informazioni
-rispetto alla semantica del programma in analisi.\\
+rispetto alla semantica del programma in analisi.
 
 Dal punto di vista pratico, la rappresentazione fornita dalla libreria è
 strutturata all’interno di un grande insieme di classi. Classi organizzate
@@ -226,13 +226,13 @@ CLAST, è la classe \texttt{CLAST-ELEMENT}. Questa classe ha il semplice scopo
 di raccogliere le diverse strutture offerte dalla libreria all'interno di un
 unico tipo, in maniera tale da facilitare l’ispezione e l’analisi di oggetti
 prodotti dalla libreria. Per questa ragione la classe non dichiara alcun
-attributo e nessun metodo viene specializzato rispetto a questa.\\
+attributo e nessun metodo viene specializzato rispetto a questa.
 
 La prima classe concreta all’interno della gerarchia è la classe \texttt{FORM}.
 Lo scopo di questa classe è quello di rappresentare i dettagli fondamentali di
 qualsiasi elemento presente all’interno di un programma Common Lisp e, in
 particolare ,fungere da nodo, ossia unità fondamentale, della rappresentazione
-mediante AST fornita dalla libreria.\\
+mediante AST fornita dalla libreria.
 
 Per fare questo, la classe \texttt{FORM} espone quindi tre slot, attributi,
 fondamentali.
@@ -267,7 +267,7 @@ Common Lisp.
 Come precedentemente affermato, il modulo fa utilizzo del supporto
 all'ereditarietà multiplo offerto dal linguaggio. In particolare, questo il
 meccanismo viene sfruttato allo scopo di definire un insieme di classi in grado
-di agire da mixin.\\
+di agire da mixin.
 
 Un \textit{mixin} o \textit{trait} viene definito come una classe che definisce
 un insieme i metodi e/o attributi allo scopo di facilitare il riuso di questi da
@@ -277,14 +277,14 @@ soluzioni di questo tipo, implementate da diversi linguaggi di programmazione
 con modalità e nomi differenti, è quindi fondamentalmente quello di facilitare
 il riuso di codice, evitando allo stesso tempo i problemi legati alle ambiguità
 che possono essere causate dall’impiego dell’ereditarietà multipla, legate ad
-esempio al Diamond Problem\cite{martin1997}.\\
+esempio al Diamond Problem\cite{martin1997}.
 
 A differenza di quanto avviene nel contesto di altri linguaggi di
 programmazione, come ad esempio il linguaggio Scala, un linguaggio che
 specifica un costrutto dedicato esclusivamente alla definizione di mixin, in
 Common Lisp un mixin viene definito attraverso una semplice definizione di
 classe, in maniera del tutto analoga a quanto avverrebbe per la definizione di
-una classe tradizionale.\\
+una classe tradizionale.
 
 Alla base della libreria vengono quindi definite altre due classi, oltre alla
 classe \texttt{FORM} che, come anticipato, hanno lo scopo di agire da mixin.
@@ -354,7 +354,7 @@ dalla Sottosezione \ref{macroexpansion}.
 
 In particolare, questa classe espone un altro attributo, chiamato \texttt
 {FORM-EXPANSION}, fondamentale ad uno strumento per l’analisi di un programma
-Lisp, ossia la risultato dell’espansione della macro rappresentata dal nodo.\\
+Lisp, ossia la risultato dell’espansione della macro rappresentata dal nodo.
 
 \subsubsection{Strutture di dettaglio}
 
@@ -366,7 +366,7 @@ che vengono utilizzate per rappresentare istruzioni ad un livello di dettaglio
 di singolo operatore. Una discussione puntuale rispetto alla rappresentazione
 offerta permessa da ciascuna di queste risulterebbe troppo estesa per essere
 riportata all’interno di questa tesi e viene pertanto rimandata alla
-documentazione della libreria.\\
+documentazione della libreria.
 
 Non sarebbe possibile e nemmeno utile, avere un classe specifica per la
 rappresentazioni qualsiasi possibile operatore definito da un utente e
@@ -380,14 +380,14 @@ L'insieme di questi operatori aggiuntivi consiste principalmente degli
 operatori legati al CLOS, al meccanismo delle dichiarazioni e al costrutto
 loop, considerati di maggiore interesse rispetto ad altri in quanto
 particolarmente utilizzati dagli utenti del linguaggio Common Lisp e quindi
-significativamente più rilevanti dal punto di vista dell’analisi.\\
+significativamente più rilevanti dal punto di vista dell’analisi.
 
 Qualsiasi compound form viene tuttavia rappresentata con il maggiore grado di
 precisione possibile, a seconda dello specifico caso in analisi. In presenza di
 operatori non trattati in modo specifico dalla libreria, come un'applicazione
 dell'operatore della compound form la libreria è in grado di rappresentare,
 distinguendo, se si tratti dell’applicazione di una funzione o di una macro a
-partire dalla ricerca dell'operatore all'interno dell'environment in uso.\\
+partire dalla ricerca dell'operatore all'interno dell'environment in uso.
 
 Questa sezione ha presentato nel dettaglio la struttura e le componenti
 fondamentali del modulo di rappresentazione presente nella libreria CLAST.

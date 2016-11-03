@@ -14,12 +14,12 @@ presenza di diversi livelli di astrazione anche dal punto di vista del codice
 sorgente, un aspetto che risulta particolarmente condizionante per la
 progettazione e la realizzazione di una libreria come CLAST, la quale si pone
 come fondamento per la definizione di strumenti di source code analysis per
-sistemi scritti utilizzando il linguaggio di programmazione Common Lisp.\\
+sistemi scritti utilizzando il linguaggio di programmazione Common Lisp.
 
 Il costrutto macro Common Lisp può essere definito come un funzionalità del
 linguaggio che consente ad un utente di questo la definizione di funzioni in
 grado di convertire form Lisp in differenti form Lisp prima che queste vengano
-valutate e compilate.\\
+valutate e compilate.
 
 A differenza differenza dell'omonimo costrutto offerto da diversi altri
 linguaggi di programmazione, la conversione operata dal costrutto macro Common
@@ -28,7 +28,7 @@ caratteri. Questo significa che il costrutto non consente semplicemente la
 possibilità di definire una sostituzione testuale che permetta ad un utente del
 linguaggio l’utilizzo di una sintassi tipicamente più breve, una macro Lisp
 consente l'estensione in maniera nativa il linguaggio di programmazione
-stesso.\\
+stesso.
 
 Nel contesto del linguaggio di programmazione Common Lisp, il costrutto macro
 risulta di fondamentale importanza per la scrittura di codice di qualità: la
@@ -39,18 +39,18 @@ semplice rispetto alla correttezza e alle caratteristiche di questo, andando poi
 però ad eseguire una trasformazione ad versione interna di questo codice più
 efficiente ma tipicamente più complessa. Tutto questo avviene tipicamente a
 livello di compilazione, senza che l'implementazione incorra in penalità a
-runtime.\\
+runtime.
 
 La caratteristica fondamentale che distingue una form macro da form Lisp
 ordinarie è rappresentata dal fatto che, come accennato in apertura di questa
 sezione, una macro non produce in output un valore. Ogni macro produce come
 output una nuova form, costruita a partire da quella in input, rappresentata dal
-parametro body specificato in fase di invocazione della macro.\\
+parametro body specificato in fase di invocazione della macro.
 
 Proprio perché una macro consiste in un processo di generazione di una nuova
 form, ossia codice Lisp, a partire da altre form, molto spesso risulta
 particolarmente intuitivo pensare ad una macro come ad un programma in grado di
-generare un altro programma.\\
+generare un altro programma.
 
 Nel caso più semplice, una macro sostituisce una form a partire da un template
 che stabilisce una chiara corrispondenza, anche a livello visivo, tra il codice
@@ -96,7 +96,7 @@ rappresentata dal fatto che i parametri che vengono forniti ad una macro non
 vengono valutati, a differenza di quanto avviene nel caso dell’invocazione di
 una funzione. Ad esempio, fornendo in input la form \texttt{(+ 1 2)} ad una
 macro, il parametro body della macro verrà definito come la lista \texttt{(+ 1
-2)} e non come il valore $3$.\\
+2)} e non come il valore $3$.
 
 Il metodo più semplice per generare una form nel corpo di una macro è
 utilizzando la cosiddetta \textit{backquote reader macro} \texttt{`}. Questa
@@ -136,7 +136,7 @@ CL-USER > '(1 plus 2 is (+ 1 2))
 
 Risulta abbastanza naturale immaginare come \texttt{BACKQUOTE} e \texttt{COMMA}
 possano quindi fornire uno strumento per la definizione di template che
-consentano la sostituzione di elementi.\\
+consentano la sostituzione di elementi.
 
 Quanto appena riportato raccoglie le informazioni fondamentali alla definizione
 di una macro. In seguito viene invece analizzato il momento successivo alla
@@ -155,7 +155,7 @@ ricerca non ottiene risultati, il sistema verifica invece la presenza di
 definizioni a livello globale per il simbolo. Se una qualsiasi di queste due
 ricerche ha successo, e quindi il simbolo utilizza un l’identificativo
 precedentemente associato ad una definizione di macro, la form viene
-identificata come una chiamata a macro.\\
+identificata come una chiamata a macro.
 
 Dopo aver identificato una chiamata a macro, il sistema utilizza una funzione
 definita a livello di linguaggio, detta \textit{funzione di espansione}. Questa
@@ -168,7 +168,7 @@ chiamata a macro.
 Una volta che la funzione di espansione ha prodotto in output l'espansione della
 form originale, questa viene valutata al posto della form originale e il
 risultato di questa valutazione viene ritornato come risultato complessivo della
-chiamata a macro.\\
+chiamata a macro.
 
 Il processo appena illustrato rappresenta una semplificazione del reale processo
 di espansione di una macro ma rimane comunque corretto dal punto di vista
@@ -226,7 +226,7 @@ prima battuta, una macro non può essere specificata come parametro di una
 funzione di ordine superiore, come ad esempio \texttt{APPLY}, \texttt{FUNCALL} o
 \texttt{MAP}. In queste situazioni, la lista che rappresenta la chiama a macro
 originale infatti non esisterà, e non può esistere, questo perché, in una certa
-misura, è come se i parametri di questa fossero già stati valutati.\\
+misura, è come se i parametri di questa fossero già stati valutati.
 
 Si è scelto di sottolineare la particolarità del costrutto macro dal punto di
 vista della valutazione, e in particolare dal punto di vista dei diversi momenti

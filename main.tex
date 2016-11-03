@@ -119,7 +119,7 @@ il linguaggio Common Lisp, e lo studio delle applicazioni di questa.
 Applicazioni come fondamento per la creazione di strumenti di source code
 analysis ma soprattutto come infrastruttura in grado di abilitare la definizione
 di estensioni del linguaggio stesso che introducano un supporto a funzionalità
-anche molto significative.\\
+anche molto significative.
 
 Le principale motivazione alla base della scelta di questo progetto sono legate
 alla mancanza di uno strumento analogo nel contesto del linguaggio Common Lisp.
@@ -128,7 +128,7 @@ contesto di molti altri linguaggi di programmazione. Una seconda motivazione,
 non meno significativa, è stata rappresentato dalla volontà di definire un
 procedimento che consenta di estendere un linguaggio di programmazione grazie
 all’impiego di tecniche di meta programmazione applicate a livello di codice
-sorgente.\\
+sorgente.
 
 Il principale ambito di ricerca nel quale si colloca questa tesi è quello della
 Source Code Analysis and Manipulation, spesso abbreviato con la sigla SCAM nella
@@ -139,7 +139,7 @@ affronta infatti tematiche come la rappresentazione di codice sorgente scritto
 utilizzando un particolare linguaggio di programmazione e la definizione di
 tecniche di riscrittura del codice sorgente a partire dall’analisi sintattica di
 questo. Altri ambiti di ricerca toccati dalla tesi sono quelli della teoria dei
-linguaggi di programmazione e dei compilatori.\\
+linguaggi di programmazione e dei compilatori.
 
 Questo documento si articola in tre macro capitoli: un primo capitolo relativo
 ai concetti fondamentali a partire dai quali il lavoro di tesi si articola, una
@@ -147,7 +147,7 @@ secondo capitolo che presenta invece la libreria CLAST, soggetto del lavoro di
 tesi, ed un terzo capitolo, il cui obiettivo è quello di presentare alcune
 applicazioni della libreria CLAST, mostrando ciò che questa consente, sia dal
 punto di vista della creazione di strumenti pratici, sia dal punto di vista del
-linguaggio di programmazione Common Lisp.\\
+linguaggio di programmazione Common Lisp.
 
 La libreria CLAST si pone l’obiettivo si consentire e semplificare la
 costruzione di strumenti di source code analysis. Il Capitolo 2 si apre quindi
@@ -177,7 +177,7 @@ che consente alla libreria CLAST di operare gran parte delle attività di analis
 statica operate da questa, e illustrando come, a differenza di quanto avviene
 nella grande maggioranza dei linguaggi di programmazione, questo sia modellato
 direttamente da un oggetto specifico, reso accessibile agli utenti del
-linguaggio attraverso una specifica interfaccia.\\
+linguaggio attraverso una specifica interfaccia.
 
 Il Capitolo 3 entra invece nel dettaglio rispetto alle attività svolte rispetto
 alle attività svolte e alle scelte compiute durante la realizzazione della
@@ -188,7 +188,7 @@ per il linguaggio target dell’analisi svolta dalla libreria.
 In seguito, il capitolo presenta le attività di parsing e analisi operate dalla
 libreria, attività che compongono il processo a partire dal quale viene prodotta
 la rappresentazione in forma di abstract syntax tree di un programma e che
-rappresentano il cuore del funzionamento di CLAST.\\
+rappresentano il cuore del funzionamento di CLAST.
 
 Infine, il Capitolo 4 discute le potenziali applicazioni di CLAST attraverso
 l’analisi di tre diversi casi di studio. Il primo caso di studio approfondisce
@@ -217,7 +217,7 @@ rispetto ad un utente del linguaggio.
 Lo scopo di questo capitolo è quello di introdurre il lettore all’ambito di
 ricerca all’interno del quale questa tesi si colloca, e quindi in particolare
 all’ambito della source code analysis, e ai concetti fondamentali a partire dai
-quali si articola il progetto soggetto del lavoro di tesi.\\
+quali si articola il progetto soggetto del lavoro di tesi.
 
 La \textit{Source Code Analysis} studia il processo di estrazione di un
 informazioni riguardo un programma a partire dal codice sorgente di questo,
@@ -233,7 +233,7 @@ All'interno della Sezione \ref{source-code-analysis}, vengono quindi presentate
 l'architettura tipica di uno strumento di source code analysis e le principali
 strategie per la creazione di strumenti di questo tipo, indicando e discutendo
 come la libreria CLAST si inserisca all'interno di questa architettura e come
-possa semplificare la progettazione e costruzione di nuovi strumenti.\\
+possa semplificare la progettazione e costruzione di nuovi strumenti.
 
 Le sezioni successive, come precedentemente indicato, affrontano invece i
 concetti fondamentali a partire dai quali la libreria CLAST opera e che
@@ -243,7 +243,7 @@ Capitolo \ref{library}.
 
 Tra questi concetti vengono quindi presenti quello di
 \textit{abstract syntax tree} e quelli di \textit{macro} e \textit{ambiente}
-Common Lisp.\\
+Common Lisp.
 
 La Sezione \ref{abstract-syntax-tree} illustra quindi il concetto di abstract
 syntax tree, in quanto rappresenta la struttura dati fondamentale a partire
@@ -289,7 +289,7 @@ della libreria sia le funzionalità offerte da questa ad un utente.
 Internamente la libreria è organizzata in moduli, in particolare, all'interno di
 tre diversi moduli chiamati rispettivamente: \textit{modulo di
 rappresentazione}, \textit{modulo di parsing e analisi} e \textit{modulo di
-traversal}.\\
+traversal}.
 
 Il modulo di rappresentazione è responsabile per la definizione delle strutture
 necessarie alla modellazione di un programma Common Lisp. Si tratta quindi del
@@ -297,7 +297,7 @@ modulo fondamentale a partire dal quale la libreria è in grado di realizzare un
 rappresentazione in forma di AST del programma in input, a partire anche
 dall'azione del modulo di parsing e analisi. La progettazione e la struttura
 interna di questo modulo vengono illustrate e discusse all'interno della Sezione
-\ref{representation}.\\
+\ref{representation}.
 
 All'interno della Sezione \ref{parsing} viene invece presentato il modulo di
 parsing ed analisi. Questo modulo rappresenta il cuore del funzionamento della
@@ -313,7 +313,7 @@ un'attività di analisi del funzionamento di questo, mirata ad arricchire con
 maggiori informazioni i nodi che compongono la struttura ad albero producendo
 quindi la rappresentazione più ricca possibile del programma in input. Nel corso
 della sezione vengono quindi presentate le principali componenti del modulo e
-l'interazione tra queste attraverso un esempio.\\
+l'interazione tra queste attraverso un esempio.
 
 L'ultima sezione di questo capitolo presenta invece il modulo di traversal
 offerto dalla libreria, il quale raccoglie le diverse funzionalità costruite a
@@ -355,7 +355,7 @@ Vengono quindi presentate alcune delle potenziali applicazioni della libreria
 CLAST. In particolare, si descrive come questa possa essere utilizzata come
 fondamento per la costruzione di strumenti di source code analysis e per la
 definizione di estensioni, anche molto complesse, del linguaggio di
-programmazione Common Lisp.\\
+programmazione Common Lisp.
 
 La Sezione \ref{lint} presenta come la libreria consenta, in modo estremamente
 semplice, la definizione di operazioni di ricerca all’interno di particolari
@@ -369,7 +369,7 @@ cui è possibile, a partire da questa, identificare particolari elementi
 all’interno di un programma. Si presenta quindi come queste analisi possano
 andare a rappresentare la base per la costruzione di uno strumento di linting
 per il linguaggio Common Lisp, una particolare categoria di strumenti di
-supporto alla programmazione, attualmente non disponibili per il linguaggio.\\
+supporto alla programmazione, attualmente non disponibili per il linguaggio.
 
 La Sezione \ref{pattern-matching} presenta un secondo caso di studio, relativo
 all’applicazione della libreria CLAST come strumento in grado di abilitare
@@ -380,7 +380,7 @@ linguaggio combinando macro Common Lisp all’algoritmo per la compilazione del
 pattern matching presentato da L. Augustsson in … per poi mostrare poi come
 questa modalità di implementazione sia soggetta a problemi di efficienza.
 Problemi che si mostrerà possono essere risolti a partire dall'utilizzo di
-CLAST.\\
+CLAST.
 
 Infine, la Sezione \ref{lazy-evaluation} presenta il caso di studio
 rappresentato da una seconda estensione del linguaggio Common Lisp, questa volta
@@ -405,7 +405,7 @@ linguaggio di programmazione ad ambiente dinamico ed estensibile, il linguaggio
 Common Lisp, studiando quindi le possibili applicazioni di questa. Applicazioni
 sia come fondamento per la creazione di strumenti di source code analysis, sia
 come infrastruttura in grado di abilitare la definizione di estensioni del
-linguaggio Common Lisp stesso.\\
+linguaggio Common Lisp stesso.
 
 L'obiettivo primario della tesi è quindi stato rappresentato dalla progettazione
 della libreria CLAST. Tra gli utilizzi anticipati della libreria, uno dei più
@@ -426,7 +426,7 @@ consente lo svolgimento di analisi anche molto complesse. Difficoltà dovute sia
 alla mancanza di riferimenti relativi allo specifico linguaggio sia alla novità
 dello studio svolto da questa tesi. Infine, si è presentato il funzionamento
 della libreria, le scelte progettuali ed implementative legate alla definizione
-di questo.\\
+di questo.
 
 Il secondo obiettivo fondamentale della tesi è stato quello di studiare le
 possibili applicazioni della libreria CLAST, sia alla creazione di strumenti per
@@ -438,7 +438,7 @@ si è analizzato l'utilizzo della libreria come strumento abilitante: la
 costruzione di strumenti per la source code analysis, l'estensione del
 linguaggio allo scopo di introdurre un supporto al pattern matching ed infine
 l'estensione del linguaggio allo scopo di introdurre un supporto nativo alla
-lazy evaluation.\\
+lazy evaluation.
 
 Si è quindi presentato come la libreria consenta di definire strumenti di
 analisi statica come ad esempio strumenti di linting, strumenti in grado di
@@ -448,7 +448,7 @@ stato quello di uno strumento per la free variable analysis, la ricerca di
 variabili libere all'interno di un dato frammento di codice, rappresentato da
 una form nel contesto del linguaggio Common Lisp. Si è quindi mostrato come
 questo possa essere realizzato in maniera estremamente semplice a partire dalle
-funzionalità di analisi del codice di un programma offerte dalla libreria.\\
+funzionalità di analisi del codice di un programma offerte dalla libreria.
 
 La successiva applicazione della libreria analizzata dalla tesi è stata quella
 in funzione della definizione di un'estensione del linguaggio Common Lisp allo
@@ -471,7 +471,7 @@ del codice sorgente che elimini queste variabili. Questo ha consentito di
 definire un processo a partire dal quale è possibile introdurre un supporto al
 pattern matching garantendo un livello di performance di questo del tutto
 equivalente a quelle che si otterrebbe utilizzando i costrutti nativi del
-linguaggio.\\
+linguaggio.
 
 L'ultimo caso di studio nel contesto del quale è stata studiata l'applicazione
 della libreria CLAST è stato quello dell'aggiunta di un supporto alla lazy
@@ -485,7 +485,7 @@ partire da elementi dello stato dell'arte, alle funzionalità di introspezione a
 livello di codice sorgente offerte dalla libreria CLAST. Sono inoltre stati
 discussi i diversi problemi che si incontrano nel corso della realizzazione di
 questa seconda estensione, soprattutto dal punto di vista dell'API offerte ad un
-utente del linguaggio per l'accesso a questa funzionalità.\\
+utente del linguaggio per l'accesso a questa funzionalità.
 
 L'aspetto più caratteristico di queste estensioni è rappresentato dal fatto che
 introducono nuove funzionalità ad un linguaggio di programmazione agendo in
@@ -516,7 +516,7 @@ In questa sezione vengono presentati alcuni potenziali sviluppi futuri del
 lavoro presentato da questa tesi, alcuni dei quali presi in considerazione
 durante il progetto di tesi stesso ma non affrontati per mancanza di risorse,
 altri invece semplicemente auspicati ma dei quali si è tenuto conto sia in fase
-di progettazione che di implementazione della libreria.\\
+di progettazione che di implementazione della libreria.
 
 In questa tesi, e in particolare nel corso del Capitolo \ref{applications}, sono
 state presentate alcune applicazioni della libreria allo scopo di costruire
@@ -533,7 +533,7 @@ mostrate nel contesto del Capitolo \ref{applications} relativamente alla free
 variables analysis e al pattern matching, la creazione di un moto di inferenza
 relativamente ai tipi di un programma che permetta di definire un processo
 alternativo a quello di annotazione e compilazione source-to-source attualmente
-adottato dalla grande maggioranza delle soluzioni in questo ambito.\\
+adottato dalla grande maggioranza delle soluzioni in questo ambito.
 
 Un secondo aspetto che potrebbe essere approfondito ulteriormente rispetto a
 quanto mostrato nel contesto di questa tesi riguarda il procedimento descritto
@@ -545,7 +545,7 @@ un costrutto di base al quale può essere ricondotto qualsiasi altro costrutto d
 pattern matching. Potrebbe però essere interessante studiare come il pattern
 matching possa essere adattato allo specifico contesto del linguaggio Common
 Lisp, attraverso la definizione di una struttura ed una sintassi che possa
-risultare maggiormente naturali rispetto al linguaggio.\\
+risultare maggiormente naturali rispetto al linguaggio.
 
 Infine, un ultima ma non meno interessante tematica che potrebbe essere
 approfondita relativamente alle quanto presentato in questa tesi è rappresentata

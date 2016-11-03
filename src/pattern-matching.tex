@@ -13,7 +13,7 @@ linguaggio Haskell.
 
 Viene poi mostrato un esempio di implementazione di questo costrutto nel
 contesto di un linguaggio di programmazione, rappresentato in particolare dal
-costrutto \texttt{CASE} del linguaggio LML.\\
+costrutto \texttt{CASE} del linguaggio LML.
 
 Il linguaggio Common Lisp non offre un supporto nativo al pattern matching,
 anche se i concetti alla base del funzionamento di questo meccanismo possono
@@ -23,7 +23,7 @@ Viene quindi mostrato come sia possibile operare un'estensione del linguaggio
 allo scopo di introdurre un supporto al pattern matching a partire dal lavoro di
 L. Augustsson, co-autore del linguaggio LML ed esponente di spicco della
 comunità Haskell, non che autore di uno dei primi e più noti per lo stesso
-linguaggio di programmazione.\\
+linguaggio di programmazione.
 
 Viene quindi presentato il problema dell'inefficienza introdotta da
 un'implementazione diretta dei principi descritti da Augustsson in
@@ -39,7 +39,7 @@ consente di identificare e scomporre le componenti di un certo pattern a partire
 dal confronto con i valori presenti all’interno di una data struttura dati. Nel
 caso in cui siano presenti variabili all’interno del pattern specificato, il
 meccanismo prevede che queste vengano inizializzate al valore corrispondente
-specificato all’interno della struttura dati.\\
+specificato all’interno della struttura dati.
 
 Il pattern matching è considerato essere uno strumento di fondamentale
 importanza nel contesto dei linguaggi di programmazione funzionali. Proprio per
@@ -54,7 +54,7 @@ ricercatori presso l'università di Edimburgo. Il primo utilizzo nel contesto di
 un linguaggio di programmazione più diffuso risale però all’utilizzo nel
 contesto del linguaggio di programmazione ML nel 1973, prima all’interno del
 dialetto Standard-ML (SML) \cite{milner1997definition} e poi con il dialetto
-Lazy-ML (LML) \cite{DBLP:conf/lfp/Augustsson84}.\\
+Lazy-ML (LML) \cite{DBLP:conf/lfp/Augustsson84}.
 
 Nel corso degli anni, il pattern matching è divenuto un elemento comune
 all'interno di molti linguaggi di programmazione. Nel linguaggio Haskell
@@ -66,7 +66,7 @@ tipi di dato algebrici che lo contraddistinguono. Per concludere questo
 riferimento storico, è importante sottolineare che anche linguaggi molto
 recenti, come ad Rust \cite{rust2016}, Elixir \cite{laurent2014introducing} ed
 Elm \cite{elm2016}, hanno scelto di introdurre un supporto al pattern
-matching.\\
+matching.
 
 Per meglio illustrare la definizione fornita nel paragrafo precedente, viene
 presentato un esempio di costrutto che implementa un supporto al meccanismo di
@@ -75,7 +75,7 @@ particolare, l'esempio di implementazione proposto in seguito fa riferimento al
 linguaggio LML e al costrutto \texttt{CASE} definito da questo. Si è scelto di
 presentare questo particolare esempio di implementazione dei principi del
 pattern matching in quanto particolarmente rappresentativo dei principi generali
-alla base del meccanismo.\\
+alla base del meccanismo.
 
 Il costrutto \texttt{CASE} consente ad un utente del linguaggio ML di esaminare
 il valore di un elemento ed eseguire codice in modo condizionale a partire da
@@ -112,7 +112,7 @@ detto \textit{semplice}.
 
 Gli elementi che compongono un'espressione, come anche i pattern che vanno ad
 essere verificati a partire da questa, possono essere organizzati all’interno di
-una lista o di un albero, costruito a partire da liste innestate.\\
+una lista o di un albero, costruito a partire da liste innestate.
 
 Nel caso invece di valori costanti, il matching operato tra valore specificato
 dal pattern e corrispondente valore presente all'interno della struttura dati è
@@ -133,7 +133,7 @@ della variabile.
 Il valore prodotto quindi dalla valutazione di un'istanza del costrutto
 \texttt{CASE} è quello prodotto dalla valutazione dell’espressione $e_i$
 associata al primo pattern $p_i$ identificato come match rispetto
-all’espressione discriminante $e$.\\
+all’espressione discriminante $e$.
 
 Durante la valutazione di un'istanza del costrutto \texttt{CASE}, valgono le
 seguenti proprietà:
@@ -245,7 +245,7 @@ comuni, come ad esempio il linguaggio Java, il dispatching delle chiamate viene
 effettuato andando a verificare l’effettivo valore dei parametri specificati
 dall’invocazione, e non solamente il tipo di questi. Questo in maniera molto
 siimile a quanto presentato dalla Sezione \ref{generic-functions} relativamente
-al meccanismo delle funzioni generiche Common Lisp.\\
+al meccanismo delle funzioni generiche Common Lisp.
 
 Il fatto che il pattern matching possa essere utilizzato come strumento che
 consente di introdurre aspetti come l’esecuzione condizionata e dynamic dispatch
@@ -258,7 +258,7 @@ matching, i principi alla base di questo ed alcuni esempi di utilizzo di questo
 meccanismo, in seguito vengono analizzati i principali vantaggi che un
 linguaggio di programmazione può ottenere introducendo un supporto al pattern
 matching e come il linguaggio Common Lisp si relazioni con il pattern
-matching.\\
+matching.
 
 \subsubsection{Vantaggi legati al Pattern Matching}
 
@@ -278,7 +278,7 @@ Struttura che infatti molto spesso viene aggiunta a linguaggi di questo tipo ma
 che, molto spesso, non è in grado di fornire le garanzie che è in grado di
 fornire un approccio dichiarativo, in cui la validità delle precondizioni, o
 asserzioni, rispetto ai parametri può essere garantita già in fase di
-compilazione, prevenendo il potenziale generarsi di errori a runtime.\\
+compilazione, prevenendo il potenziale generarsi di errori a runtime.
 
 Il vantaggio più significativo che la disponibilità di un supporto al pattern
 matching porta all’interno di un linguaggio di programmazione è però
@@ -292,7 +292,7 @@ intensivo del compilatore porta ad ottenere è relativo alle prestazioni di un
 programma: avendo a disposizione maggiori informazioni rispetto al funzionamento
 e ad i meccanismi di rappresentazione interni del linguaggio di programmazione,
 un compilatore è tipicamente in grado di produrre codice più efficiente rispetto
-a quello che potrebbe essere prodotto da un utente del linguaggio.\\
+a quello che potrebbe essere prodotto da un utente del linguaggio.
 
 \subsection{Common Lisp e Pattern Matching}
 
@@ -341,7 +341,7 @@ presentato nella Sezione \ref{generic-functions}, in cui il corretto metodo, o
 insieme di metodi, che dovrà essere eseguito in risposta ad una particolare
 invocazione di una funzione generica viene identificato dal sistema Common Lisp
 utilizzando un meccanismo di matching molto simile a quello del pattern
-matching.\\
+matching.
 
 Nonostante l'assenza di un supporto nativo al pattern matching, la forte
 estensibilità che contraddistingue il Common Lisp, dovuta soprattutto alla
@@ -555,7 +555,7 @@ questo è molto maggiore rispetto alla quantità di codice originale. Questo
 tuttavia risulta poco significativo, in quanto si trattarebbe di codice generato
 in maniera automatica in fase di compilazione attraverso l'utilizzo del
 costrutto macro, e che quindi risulterebbe sostanzialmente invisibile ad un
-utente del linguaggio.\\
+utente del linguaggio.
 
 Una seconda osservazione è invece relativa all'efficienza dell'algoritmo. Si può
 infatti osservare che l'algoritmo porta alla generazione di un grande numero di
@@ -563,7 +563,7 @@ variabili, un aspetto che incide sia dal punto di vista dei tempi di
 compilazione sia dal punto di vista dell'efficienza a runtime di un programma
 che utilizza questo meccanismo. Si evidenzia inoltre che molte di queste
 variabili non vengono poi utilizzate effettivamente dal programma ma risultano
-essere variabili libere per tanto potenzialmente eliminabili dal programma.\\
+essere variabili libere per tanto potenzialmente eliminabili dal programma.
 
 Teoricamente, la fase di ottimizzazione di svolta da un compilatore dovrebbe
 essere in grado di compiere un'operazione di rimozione di queste variabili. Cosa
@@ -572,14 +572,14 @@ efficienza che caratterizza gli altri costrutti offerti dal linguaggio.
 
 Sfortunatamente i compilatori per il linguaggio Common Lisp, come anche la gran
 parte dei compilatori per linguaggi analoghi, non sono solitamente in grado di
-compiere questo tipo di ottimizzazione.\\
+compiere questo tipo di ottimizzazione.
 
 Tuttavia, grazie alla presenza del costrutto macro non è richiesto che sia il
 compilatore stesso a compiere questo passo di ottimizzazione. Un programma
 Common Lisp stesso è infatti in grado, a partire dal meccanismo rappresentato
 dalle macro, di operare una riscrittura del proprio codice sorgente e quindi,
 potenzialmente, anche di operare una riscrittura in cui si compie
-un'eliminazione delle variabili precedentemente descritte.\\
+un'eliminazione delle variabili precedentemente descritte.
 
 Questo, fino a prima della costruzione della libreria CLAST risultava
 impossibile, non era infatti disponibile alcun componente che consentisse
@@ -601,7 +601,7 @@ per compiere una trasformazione \textit{source-to-source} attraverso la quale
 queste variabili vengono eliminate, consentendo quindi la generazione di codice
 maggiormente efficiente e rendendo possibile l'introduzione di un meccanismo
 nativo di pattern matching nel contesto del linguaggio per estensione di
-questo.\\
+questo.
 
 \image{img/pattern-matching-rewrite.png}
       {Pattern Matching - Diagramma di flusso del processo di riscrittura}
