@@ -81,6 +81,8 @@ Il costrutto \texttt{CASE} consente ad un utente del linguaggio ML di esaminare
 il valore di un elemento ed eseguire codice in modo condizionale a partire da
 questa valutazione.
 
+\newpage
+
 \begin{lstlisting}[
   caption=Esempio di utilizzo del costrutto \texttt{CASE} LML,
   label={lst:case}
@@ -399,8 +401,10 @@ quindi essere riscritto come un semplice if statement.
 Il Listato \ref{lst:compiling-pattern-matching} mostra l'azione dell'algoritmo a
 partire da un esempio.
 
+\newpage
+
 \begin{lstlisting}[
-  caption=Esempio di funzionamento dell'algoritmo per la compilazione del pattern matching di L. Augustsson,
+  caption=Esempio di funzionamento dell'algoritmo per la compilazione del pattern matching di L. Augustsson (continua),
   label={lst:compiling-pattern-matching}
 ]
 (* Original pattern matching expression *)
@@ -435,6 +439,14 @@ case e in
 ||  z : false
 end
 
+\end{lstlisting}
+
+\newpage
+
+\begin{lstlisting}[
+  caption=Esempio di funzionamento dell'algoritmo per la compilazione del pattern matching di L. Augustsson,
+  label={lst:compiling-pattern-matching-continues}
+]
 (* Final rewrite *)
 case e in
     cons(x, v2) :
@@ -468,6 +480,8 @@ utilizzando i costrutti nativi \texttt{CASE}, molto simile al costrutto
 \texttt{LET}, costrutto utilizzato per la definizione di variabili locali. Il
 Listato \ref{lst:cl-pm-compiled} mostra come il risultato del processo di
 riscrittura appena descritto.
+
+\newpage
 
 % (case e
 %   ((eql 'cons (type-of e))
@@ -532,6 +546,8 @@ riscrittura appena descritto.
   (otherwise nil))
 
 \end{lstlisting}
+
+\newpage
 
 Si possono quindi compiere diverse osservazioni rispetto al funzionamento
 dell'algoritmo. Una prima osservazione è che la quantità di codice generata da

@@ -161,10 +161,13 @@ Dopo aver presentato le principali componenti per la creazione di uno strumento
 di source code analysis, la Sottosezione \ref{sca-approches} approfondisce i
 principali approcci alla creazione di uno strumento di questo tipo.
 
-\image{img/sca-tool-architecture}
-      {Architettura di uno strumento di Source Code Analysis}
-      {fig:sca-tool-architecture}
-      {0.5}
+\begin{figure}
+\makebox[\textwidth][c]{
+  \includegraphics[scale=0.5]{img/sca-tool-architecture}
+}
+\caption{Architettura di uno strumento di Source Code Analysis}
+\label{fig:sca-tool-architecture}
+\end{figure}
 
 Nel contesto dell'architettura appena illustrata, mostrata grafica in Figura
 \ref{fig:sca-tool-architecture} la libreria CLAST, soggetto di questa tesi, va a
@@ -279,11 +282,14 @@ possibile.
 
 \end{itemize}
 
-\image{img/sca-compiler-strategies}
-      {Strategie per la strutturazione dell'interazione tra uno strumento di
-      source code analysis e un compilatore}
-      {fig:sca-compiler-strategies}
-      {0.5}
+\begin{figure}
+\makebox[\textwidth][c]{
+  \includegraphics[scale=0.5]{img/sca-compiler-strategies}
+}
+\caption{Strategie per la strutturazione dell'interazione tra uno strumento di
+source code analysis e un compilatore}
+\label{fig:sca-compiler-strategies}
+\end{figure}
 
 Uno degli svantaggi principali del primo approccio citato è rappresentato dal
 fatto che, in molti casi, l'architettura del compilatore non viene definita in

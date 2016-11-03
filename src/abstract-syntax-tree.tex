@@ -61,15 +61,21 @@ informazioni ridondanti o ritenute non interessanti per queste elaborazioni. Gli
 AST sono infatti molto spesso degli strumenti per il supporto alla realizzazione
 di funzionalità complesse e non un prodotto ultimo dell’elaborazione.
 
-\image{img/concrete-syntax-tree.png}
-      {Esempio di Concrete Syntax Tree per l'espressione \texttt{3 + 4 * 5}}
-      {fig:concrete-syntax-tree}
-      {0.5}
+\begin{figure}
+\makebox[\textwidth][c]{
+  \includegraphics[scale=0.5]{img/concrete-syntax-tree.png}
+}
+\caption{Esempio di Concrete Syntax Tree per l'espressione \texttt{3 + 4 * 5}}
+\label{fig:concrete-syntax-tree}
+\end{figure}
 
-\image{img/abstract-syntax-tree.png}
-      {Esempio di Abstract Syntax Tree per l'espressione \texttt{3 + 4 * 5}}
-      {fig:abstract-syntax-tree}
-      {0.5}
+\begin{figure}
+\makebox[\textwidth][c]{
+  \includegraphics[scale=0.5]{img/abstract-syntax-tree.png}
+}
+\caption{Esempio di Abstract Syntax Tree per l'espressione \texttt{3 + 4 * 5}}
+\label{fig:abstract-syntax-tree}
+\end{figure}
 
 Purtroppo, non esiste una tecnica per la generazione di AST indipendente dal
 linguaggio e dal contesto di utilizzo. La causa fondamentale che porta a questa
@@ -212,11 +218,14 @@ spesso l’output della fase di elaborazione compiuta dalla componente parser, o
 più generalmente l’output della fase di parsing, e l’input per le successive
 fasi di analisi semantica e generazione di codice macchina.
 
-\image{img/compiler-architecture}
-      {Architettura di un compilatore per un linguaggio di programmazione
-      tradizionale}
-      {fig:compiler-architecture}
-      {0.5}
+\begin{figure}
+\makebox[\textwidth][c]{
+  \includegraphics[scale=0.5]{img/compiler-architecture}
+}
+\caption{Architettura di un compilatore per un linguaggio di programmazione
+tradizionale}
+\label{fig:compiler-architecture}
+\end{figure}
 
 Tipicamente, un compilatore fa riferimento a diverse altre strutture dati
 durante la sua azione. Tuttavia l’AST esegue ricopre un ruolo unico in quanto
