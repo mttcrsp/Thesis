@@ -484,6 +484,55 @@ sorgente, equivalente al costrutto macro Common Lisp, e all'introspezione a
 livello di codice sorgente, ossia una funzionalità equivalente all'Environments
 API.
 
+\subsection{Sviluppi Futuri}
+
+In questa sezione vengono presentati alcuni potenziali sviluppi futuri del
+lavoro presentato da questa tesi, alcuni dei quali presi in considerazione
+durante il progetto di tesi stesso ma non affrontati per mancanza di risorse,
+altri invece semplicemente auspicati ma dei quali si è tenuto conto sia in fase
+di progettazione che di implementazione della libreria.\\
+
+In questa tesi, e in particolare nel corso del Capitolo \ref{applications}, sono
+state presentate alcune applicazioni della libreria allo scopo di costruire
+sturmenti di analisi. Un primo aspetto potrebbe risultare interessante
+approfondire è rappresentato dallo studio dell'applicazione della libreria CLAST
+allo scopo di realizzare uno strumento di type checking, uno strumento che
+consenta di ottenere i vantaggi e le garanzie caratteristiche della tipicazzione
+statica all'interno di un linguaggio dinamico come il Common Lisp.
+
+Il problema dell'aggiunta di una tipizzazione statica ad un linguaggio dinamico
+rappresenta un problema di grande attualità nel contesto dei linguaggi di
+programmazione. La libreria CLAST può consentire, a partire dalle stesse analisi
+mostrate nel contesto del Capitolo \ref{applications} relativamente alla free
+variables analysis e al pattern matching, la creazione di un moto di inferenza
+relativamente ai tipi di un programma che permetta di definire un processo
+alternativo a quello di annotazione e compilazione source-to-source attualmente
+adottato dalla grande maggioranza delle soluzioni in questo ambito.\\
+
+Un secondo aspetto che potrebbe essere approfondito ulteriormente rispetto a
+quanto mostrato nel contesto di questa tesi riguarda il procedimento descritto
+per l'estensione del linguaggio Common Lisp relativamente al pattern matching.
+Questa tesi ha descritto un procedimento grazie al quale questo meccanismo
+potrebbe essere aggiunto al linguaggio operando una traduzione diretta rispetto
+al costrutto \texttt{CASE} LML. Il costrutto \texttt{CASE} rappresenta infatti
+un costrutto di base al quale può essere ricondotto qualsiasi altro costrutto di
+pattern matching. Potrebbe però essere interessante studiare come il pattern
+matching possa essere adattato allo specifico contesto del linguaggio Common
+Lisp, attraverso la definizione di una struttura ed una sintassi che possa
+risultare maggiormente naturali rispetto al linguaggio.\\
+
+Infine, un ultima ma non meno interessante tematica che potrebbe essere
+approfondita relativamente alle quanto presentato in questa tesi è rappresentata
+dalla reinterpretazione delle tecniche descritte nel contesto di linguaggi di
+programmazione tradizionali. In particolare, potrebbe essere interessante
+studiare l'implementazione e l'applicazione delle tecniche di meta
+programmazione a livello di codice sorgente di linguaggi di programmazione
+largamente diffusi e fortemente fortemente dinamici, come ad esempio il
+linguaggio JavaScript e il linguaggio Python. Il forte dinamismo che li
+contraddistingue e la disponbilità di strumenti che consentano la generazione di
+AST rende infatti entrambi questi linguaggi candidati ideali allo studio
+dell'applicazione delle tecniche descritte da questa tesi.
+
 \defbibfilter{papers}{
   type=article or
   type=inproceedings
