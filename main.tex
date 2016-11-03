@@ -87,6 +87,31 @@
 
 \chapter{Introduzione}
 
+% La source code analysis rappresenta il passo preliminare necessario per lo
+% svolgimento di attività che si concentrano sulla stima, sul monitoraggio e sul
+% miglioramento della qualità di un sistema software. Attività come reverse
+% engineering, re-engineering, testing o costruzione di modelli empirici per la
+% valutazione della qualità del software prevedono tutte una fase preliminare in
+% cui vengono estratte informazioni dal codice sorgente, o per la costruzione di
+% un AST che consenta una più semplice interazione con il codice di un programma
+% o per la costruzione di una rappresentazione analoga che funga da meccanismo
+% per la raccolta e l’accesso alle informazioni espresse dal codice sorgente del
+% sistema in analisi.
+
+% Nell’ultimo decennio sono stati sviluppati diversi tipi di linguaggi e toolkits
+% per la source code analysis. Alcuni di questi sono particolarmente adatti alla
+% comprensione e trasformazione di un sistema <citazione> <citazione> <citazione>
+% ; gli strumenti di questo tipo hanno delle potenti capacità dal punto di vista
+% dell’analisi, consentono ad esempio di fornire linguaggi per il pattern
+% matching o un modo per compiere ricerche all’interno di un AST o operare
+% trasformazioni di questo. Altri strumenti, come ad esempio <citazione>
+% <citazione> <citazione>, sono invece più orientati verso l’analisi statica e
+% verso il calcolo di metriche di valutazione della qualità piuttosto che verso
+% la capacità di operare trasformazioni. Ciascuno di questi strumenti per la
+% stima, il monitoraggio e l’estrazione di metriche rispetto alla qualità del
+% codice sorgente di un programma richiede però, come accennato in precedenza,
+% che sia disponibile una qualche tecnologia che consenta il parsing.
+
 Questa tesi presenta le attività svolte durante la progettazione ed
 implementazione di una libreria per la generazione di abstract syntax tree nel
 contesto di un linguaggio di programmazione ad ambiente dinamico ed estensibile,
@@ -183,8 +208,6 @@ rispetto ai costrutti tradizionali del linguaggio di programmazione, senza dover
 agire a livello compilatore e quindi garantendo portabilità tra le diverse
 implementazioni del linguaggio e agendo in maniera del tutto trasparente
 rispetto ad un utente del linguaggio.
-
-\include{src/motivations}
 
 \begingroup
 \let\clearpage\relax
