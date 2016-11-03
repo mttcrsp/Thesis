@@ -86,7 +86,102 @@
 
 \chapter{Introduzione}
 
+Questa tesi presenta le attività svolte durante la progettazione ed
+implementazione di una libreria per la generazione di abstract syntax tree nel
+contesto di un linguaggio di programmazione ad ambiente dinamico ed estensibile,
+il linguaggio Common Lisp, e lo studio delle applicazioni di questa.
+Applicazioni come fondamento per la creazione di strumenti di source code
+analysis ma soprattutto come infrastruttura in grado di abilitare la definizione
+di estensioni del linguaggio stesso che introducano un supporto a funzionalità
+anche molto significative.\\
 
+Le principale motivazione alla base della scelta di questo progetto sono legate
+alla mancanza di uno strumento analogo nel contesto del linguaggio Common Lisp.
+Questo nonostante le applicazioni degli AST siano diverse e documentate nel
+contesto di molti altri linguaggi di programmazione. Una seconda motivazione,
+non meno significativa, è stata rappresentato dalla volontà di definire un
+procedimento che consenta di estendere un linguaggio di programmazione grazie
+all’impiego di tecniche di meta programmazione applicate a livello di codice
+sorgente.\\
+
+Il principale ambito di ricerca nel quale si colloca questa tesi è quello della
+Source Code Analysis and Manipulation, spesso abbreviato con la sigla SCAM nella
+letteratura, branca del più ampio settore dell’Ingegneria del Software dedicata
+allo studio del processo di estrazione di informazioni relative ad un programma
+e della manipolazione di questo a partire dal suo codice sorgente. La tesi
+affronta infatti tematiche come la rappresentazione di codice sorgente scritto
+utilizzando un particolare linguaggio di programmazione e la definizione di
+tecniche di riscrittura del codice sorgente a partire dall’analisi sintattica di
+questo. Altri ambiti di ricerca toccati dalla tesi sono quelli della teoria dei
+linguaggi di programmazione e dei compilatori.\\
+
+Questo documento si articola in tre macro capitoli: un primo capitolo relativo
+ai concetti fondamentali a partire dai quali il lavoro di tesi si articola, una
+secondo capitolo che presenta invece la libreria CLAST, soggetto del lavoro di
+tesi, ed un terzo capitolo, il cui obiettivo è quello di presentare alcune
+applicazioni della libreria CLAST, mostrando ciò che questa consente, sia dal
+punto di vista della creazione di strumenti pratici, sia dal punto di vista del
+linguaggio di programmazione Common Lisp.\\
+
+La libreria CLAST si pone l’obiettivo si consentire e semplificare la
+costruzione di strumenti di source code analysis. Il Capitolo 2 si apre quindi
+presentando l’architettura tradizionale di uno strumento di questo tipo e
+mostrando come la libreria si integri in questo contesto.
+
+Il capitolo prosegue quindi presentando il concetto di abstract syntax tree, la
+struttura dati fondamentale a partire dalla quale la libreria compie il proprio
+lavoro di rappresentazione di un programma, e riportando come questo venga
+impiegato sia nell’ambito della ricerca, sia nell’ambito dell’industria, aspetti
+che consentono di mostrare come uno strumento di generazione di abstract syntax
+tree possa risultare abilitante in diversi contesti.
+
+In seguito, viene illustrato il concetto di macro Common Lisp, costrutto che
+risulta fondamentale sia dal punto di vista del funzionamento della libreria,
+sia dal punto di vista delle applicazioni di questa. Fondamentale rispetto al
+funzionamento, in quanto aspetto del linguaggio di programmazione che produce
+significative differenze nel modus operandi di uno strumento di source code
+analysis come CLAST, specifico per il linguaggio Common Lisp, ed uno strumento
+che invece si riferisce a linguaggi di programmazione tradizionali. Fondamentale
+rispetto alle applicazioni in quanto costrutto che consente la definizione delle
+operazioni di riscrittura del codice che queste sfruttano in maniera molto
+importante.
+
+Il capitolo si chiude presentando il concetto di ambiente Common Lisp, strumento
+che consente alla libreria CLAST di operare gran parte delle attività di analisi
+statica operate da questa, e illustrando come, a differenza di quanto avviene
+nella grande maggioranza dei linguaggi di programmazione, questo sia modellato
+direttamente da un oggetto specifico, reso accessibile agli utenti del
+linguaggio attraverso una specifica interfaccia.\\
+
+Il Capitolo 3 entra invece nel dettaglio rispetto alle attività svolte rispetto
+alle attività svolte e alle scelte compiute durante la realizzazione della
+libreria CLAST. In particolare, si presenta come questa consenta di
+rappresentare un programma attraverso un insieme di strutture definite ad hoc
+per il linguaggio target dell’analisi svolta dalla libreria.
+
+In seguito, il capitolo presenta le attività di parsing e analisi operate dalla
+libreria, attività che compongono il processo a partire dal quale viene prodotta
+la rappresentazione in forma di abstract syntax tree di un programma e che
+rappresentano il cuore del funzionamento di CLAST.\\
+
+Infine, il Capitolo 4 discute le potenziali applicazioni di CLAST attraverso
+l’analisi di tre diversi casi di studio. Il primo caso di studio approfondisce
+come la libreria possa essere utilizzata nel contesto della creazione di uno
+strumento di source code analysis, applicazione più facilmente auspicabile,
+facendo riferimento all’esempio rappresentato da uno strumento di free variables
+analysis.
+
+I successivi casi di studi approfondiscono invece l’applicazione della libreria
+CLAST come fondamento per la definizione di estensioni del linguaggio Common
+Lisp stesso. In questo contesto viene presentato come, combinando processi di
+riscrittura del codice alla capacità di analisi a livello di codice sorgente
+consentita dalla libreria, sia possibile introdurre un supporto all’utilizzo di
+costrutti di pattern matching e di un modello di valutazione lazy all’interno
+del linguaggio. Questo mantenendo caratteristiche di performance analoghe
+rispetto ai costrutti tradizionali del linguaggio di programmazione, senza dover
+agire a livello compilatore e quindi garantendo portabilità tra le diverse
+implementazioni del linguaggio e agendo in maniera del tutto trasparente
+rispetto ad un utente del linguaggio.
 
 \include{src/motivations}
 
@@ -321,7 +416,7 @@ lazy evaluation.\\
 
 Si è quindi presentato come la libreria consenta di definire strumenti di
 analisi statica come ad esempio strumenti di linting, strumenti in grado di
-identificare potenziali inconistenze all'interno di un programma e produrre
+identificare potenziali inconstenze all'interno di un programma e produrre
 segnalazioni relative a queste. Il caso di strumento di linting analizzato è
 stato quello di uno strumento per la free variable analysis, la ricerca di
 variabili libere all'interno di un dato frammento di codice, rappresentato da
