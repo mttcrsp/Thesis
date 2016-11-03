@@ -453,7 +453,7 @@ stessa.
 Per illustrare in maniera più approfondita il funzionamento della libreria, in
 questa sezione vengono discusse nel dettaglio le attività di parsing e analisi
 operate dalla libreria attraverso la discussione di un esempio, rappresentato da
-una semplificazione di uno dei metodi \texttt {PARSE-FORM} descritti nel corso
+una semplificazione di uno dei metodi \texttt{PARSE-FORM} descritti nel corso
 dei paragrafi precedenti. In particolare, viene analizzato il funzionamento e
 l'implementazione del metodo \texttt{PARSE-FORM} responsabile del parsing e
 dell'analisi di compound form che utilizzano l’operatore \texttt{LET*}.\\
@@ -659,15 +659,16 @@ implementare il parsing di costrutti come \texttt{LET*}, in cui l’environment 
 cui avviene la valutazione di una form di questo tipo contiene informazioni
 aggiuntive rispetto quello in prodotto in output dalla valutazione stessa.\\
 
-Il metodo opera quindi \textit{3.} un’invocazione del metodo \texttt {PARSE-
-BINDING} a partire da ciascun binding. La funzione \texttt {PARSE-BINDING} è
-responsabile del parsing delle regole specificate dalla grammatica in relazione
-alla sintassi dei binding, ossia la regola \textit {var | (var [init-form])}, e
-della creazione un nuovo environment, a partire da quello fornito in input,
-contenente la definizione della variabile specificata dal binding in analisi.
-Ogni invocazione della funzione \texttt{PARSE-BINDING} ritorna quindi un nuovo
-oggetto environment che viene utilizzato per aggiornare l’environment interno al
-metodo.\\
+Il metodo opera quindi \textit{3.} un’invocazione del metodo
+
+\texttt{PARSE-BINDING} a partire da ciascun binding. La funzione
+\texttt{PARSE-BINDING} è responsabile del parsing delle regole specificate dalla
+grammatica in relazione alla sintassi dei binding, ossia la regola \textit{var
+| (var [init- form])}, e della creazione un nuovo environment, a partire da
+quello fornito in input, contenente la definizione della variabile specificata
+dal binding in analisi. Ogni invocazione della funzione \texttt{PARSE-BINDING}
+ritorna quindi un nuovo oggetto environment che viene utilizzato per aggiornare
+l’environment interno al metodo.\\
 
 Il metodo prosegue con \textit{4.} l’analisi delle dichiarazioni specificate
 dalla form relativamente alle variabili dichiarate dai binding. Chiaramente,
