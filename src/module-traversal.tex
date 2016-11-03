@@ -9,12 +9,12 @@ dalla Sezione \ref{parsing}. Si tratta quindi del modulo più critico dal punto
 di vista dell'API, in quanto rappresenta la principale interfaccia tra CLAST ed
 un analizzatore costruito a partire da questa.
 
-\subsection{Funzionalità traversal}
+In seguito viene fornita al lettore una presentazione ad alto livello del
+funzionamento interno del modulo, per poi proseguire presentando le diverse
+funzionalità che vengono offerte dal modulo di traversal agli utenti della
+libreria.\\
 
-In questa sottosezione viene fornita al lettore una presentazione ad alto
-livello del funzionamento interno del modulo, per poi proseguire presentando le
-diverse funzionalità che vengono offerte dal modulo di traversal agli utenti
-della libreria.\\
+\subsection{Struttura del modulo}
 
 La struttura interna del modulo ricalca molto da vicino il design pattern
 Visitor, presentato da Gamma et al. in \cite{gamma1995design}. In seguito, viene
@@ -166,8 +166,10 @@ Visitor, precedentemente illustrato, la funzione \texttt{WALK} può essere vista
 con una certa approssimazione, come la classe astratta \texttt{Visitor}, la
 quale può essere estesa per implementare un particolare processo di visita.\\
 
+\subsection{Funzionalità offerte}
+
 La funzione \texttt{WALK} è una funzione di ordine superiore, ossia una funzione
-che prende in input o restituisce altre funzioni. Proprio questa aspetto
+che prende in input o restituisce altre funzioni. Proprio questo aspetto
 rappresenta il meccanismo di estensione attraverso il quale un utente della
 libreria può adattare il processo di visita alle proprie necessità e specificare
 le operazioni che desidera svolgere in risposta alla visita di un nodo o
